@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- enables mobile view -->
+
+<title>New Volunteer Introductory Videos</title> <!-- Title shown in browser tab -->
+
+<!-- Import Inter font from Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- YouTube IFrame API so the page can detect when the video finishes -->
+<script src="https://www.youtube.com/iframe_api"></script>
+
+    <style>
+*   {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Page background and default text color */
+    body {
+        background: #f4f6f9;
+        color: #1f2937;
+    }
+
+    /* Navbar */
+    .navbar {
+        background: #0f172a;
+        padding: 18px 40px;
+        display: flex;
+        justify-content: center; /* Center links */
+        gap: 25px; /* Space between links */
+        flex-wrap: wrap; /* navbar links wrap on small screens - supports mobile view */
+    }
+    /* Navbar link styling */
+    .navbar a {
+        text-decoration: none;
+        color: white;
+        font-weight: 600;
+        padding: 10px 18px;
+        border-radius: 8px;
+        transition: 0.3s ease; /*  hover animation */
+    }
+    /* Navbar hover effect */
+    .navbar a:hover {
+        background: #2563eb; /* Blue highlight on hover */
+    }
+
+    /* Main page layout (left side has readable info + right side has video) */
+    .container {
+        display: flex; /* Places sections side by side */
+        padding: 60px;
+        gap: 60px; /* Space between left and right sections */
+    }
+
+    /* Left side text box */
+    .info-section {
+        width: 35%; /* Takes 35% of horizontal space */
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08); /*  card shadow */
+    }
+    /* Heading inside info section */
+    .info-section h2 {
+        margin-bottom: 20px;
+    }
+
+    /* Paragraph spacing inside info section */
+    .info-section p {
+        margin-bottom: 15px;
+        line-height: 1.6;
+    }
+    /* Right side video area */
+    .video-section {
+        width: 65%; /* Takes remaining width */
+        text-align: center;
+    }
+
+
+    /* Styling for YouTube player container - unsure if we will make an introductory video and post it on youtube and link it here */
+    #player {
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2); /* Stronger shadow for emphasis */
+    }
+
+    /* Next button - hidden until video finishes */
+    .next-btn {
+        margin-top: 30px;
+        padding: 16px 40px;
+        font-size: 18px;
+        font-weight: 600;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        background: linear-gradient(135deg, #28a745, #218838); /* Green gradient */
+        color: white;
+        box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        display: none; 
+    }
+
+    /* Help button */
+    .help-btn {
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        background: #e5e7eb;
+        border: none;
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    /* Help button hover effect */
+    .help-btn:hover {
+        background: #d1d5db;
+    }
+
+    /* mobile view */
+    @media (max-width: 768px) {
+
+        .container {
+            flex-direction: column; /* Stack sections vertically */
+            padding: 30px; /* Reduce padding for smaller screens */
+        }
+
+        .info-section,
+        .video-section {
+            width: 100%; /* Full width */
+        }
+
+        #player {
+            width: 100% !important; /* Make video responsive */
+            height: 250px !important; /* Adjust height for mobile */
+        }
+
+        .navbar {
+            padding: 12px 10px; /* Reduce navbar padding */
+            gap: 10px; /* Reduce spacing between links */
+        }
+    }
+    </style>
+    </head>
+
+    <body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="index.html">HOME</a>
+        <a href="#">MEET THE TEAM</a>
+        <a href="contribute.html">CONTRIBUTE</a>
+        <a href="volunteer-intro.html">VOLUNTEER</a>
+        <a href="#">STUDENTS</a>
+    </nav>
+
+    <!-- Main two-column layout -->
+    <div class="container">
+
+    <!-- Left - Volunteer expectations information -->
+    <div class="info-section">
+        <h2>Volunteer Expectations</h2>
+        <p>Three Pillars of Chunch:</p>
+        <p>Accept the students where they are in life</p>
+        <p>Show and feel love unconditionally</p>
+        <p>Serve them well (with a home cooked meal, of course!)</p>
+    </div>
+
+    <!-- Right side -  YouTube video and Next button -->
+    <div class="video-section">
+        <div id="player"></div> <!-- YouTube video loads here -->
+        <button class="next-btn" id="nextButton">Next</button> <!-- Appears after video finishes -->
+    </div>
+
+</div>
+
+<!-- help button -->
+<button class="help-btn" onclick="showHelp()">?</button>
+
+<script>
+let player; // Variable to hold YouTube player instance
+
+// Called automatically when YouTube API is ready
+function onYouTubeIframeAPIReady() {
+    player = new YT.Player('player', {
+        height: '400', // Video height (desktop)
+        width: '700',  // Video width (desktop)
+        videoId: '7LSDGPnRDHY', // YouTube video ID
+        playerVars: {
+            'controls': 1, // Show playback controls
+            'rel': 0       // Do not show related videos at end
+        },
+        events: {
+            'onStateChange': onPlayerStateChange // Listen for video state changes
+        }
+    });
+}
+
+// Detects when video finishes playing
+function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.ENDED) {
+        document.getElementById("nextButton").style.display = "inline-block";
+    }
+}
+
+// Displays help contact information in popup
+function showHelp() {
+    alert("Having issues? Contact Bryan Scott at: (123)456-7890.");
+}
+</script>
+
+</body>
+</html>
+
+
+
+
+
