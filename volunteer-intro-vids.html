@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Volunteer Introduction</title>
-
-<!-- Google Fonts -->
+<title>Volunteer Intro</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -16,7 +14,6 @@
     font-family: 'Inter', sans-serif;
 }
 
-/* Body styling */
 body {
     background: #f4f6f9;
     color: #1f2937;
@@ -43,14 +40,12 @@ body {
     background: #2563eb;
 }
 
-/* Container layout */
+/* Layout */
 .container {
     display: flex;
     padding: 60px;
     gap: 60px;
 }
-
-/* Info box on left */
 .info-section {
     width: 35%;
     background: white;
@@ -66,22 +61,21 @@ body {
     line-height: 1.6;
 }
 
-/* Video section on right */
 .video-section {
     width: 65%;
     text-align: center;
 }
 
-/* video styling */
+/* Video styling */
 #introVideo {
     width: 100%;
     max-width: 700px;
-    height: 400px;
+    height: auto;
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.2);
 }
 
-/* Next button (hidden until video ends) */
+/* Next button */
 .next-btn {
     margin-top: 30px;
     padding: 16px 40px;
@@ -114,7 +108,7 @@ body {
     background: #d1d5db;
 }
 
-/* Mobile responsiveness */
+/* Mobile view */
 @media (max-width: 768px) {
     .container {
         flex-direction: column;
@@ -123,13 +117,6 @@ body {
     .info-section,
     .video-section {
         width: 100%;
-    }
-    #introVideo {
-        height: 250px;
-    }
-    .navbar {
-        padding: 12px 10px;
-        gap: 10px;
     }
 }
 </style>
@@ -147,6 +134,7 @@ body {
 
 <!-- Main layout -->
 <div class="container">
+
     <!-- Left info -->
     <div class="info-section">
         <h2>Volunteer Expectations</h2>
@@ -159,24 +147,24 @@ body {
     <!-- Right video -->
     <div class="video-section">
         <video id="introVideo" controls>
-            <source src="intro.mp4" type="video/mp4">
-            Your browser does not support the video tag. <!-- lets us know the video does not work-->
+            <source src="videos/intro.mp4" type="video/mp4">
+            Your browser does not support the video tag.
         </video>
-        <button class="next-btn" id="nextButton">Next</button>
+        <button class="next-btn" id="nextButton" onclick="location.href='apply.html'">Next</button>
     </div>
+
 </div>
 
 <!-- Help button -->
 <button class="help-btn" onclick="showHelp()">?</button>
 
 <script>
-// Grab video and next button
-const video = document.getElementById('introVideo');
-const nextBtn = document.getElementById('nextButton');
+// Show Next button after video ends
+const video = document.getElementById("introVideo");
+const nextButton = document.getElementById("nextButton");
 
-// Show Next button when video ends
-video.addEventListener('ended', () => {
-    nextBtn.style.display = 'inline-block';
+video.addEventListener("ended", () => {
+    nextButton.style.display = "inline-block";
 });
 
 // Help button
