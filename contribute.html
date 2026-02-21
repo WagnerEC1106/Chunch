@@ -42,6 +42,7 @@
         position: fixed; /* navbar does not move */
         top: 0; /* Positions it at top */
         width: 100%; /* navbar spans full width */
+        flex-wrap: wrap; /* allows wrapping on smaller screens - needed for mobile view */
     }   
 
     .navbar a {
@@ -90,6 +91,24 @@
             margin-bottom: 20px; /* Space below heading */
             font-weight: 600; /* bold heading */
         }
+            
+        /* supports mobile view */
+        @media (max-width: 768px) {
+        .navbar {
+            gap: 10px; /* reduce spacing between links */
+            padding: 12px 10px; /* reduce padding so it fits better */
+        }
+        body {
+            margin-top: 160px; /* extra space so wrapped navbar does not cover content */
+        }
+
+
+        .food-section {
+            width: 90%; /* makes card fit nicely on mobile */
+            padding: 25px; /* smaller padding */
+        }
+    }
+
     </style>
 </head>
 <body>
