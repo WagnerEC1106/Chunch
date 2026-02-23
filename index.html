@@ -254,7 +254,7 @@ function handleCredentialResponse(response) {
         localStorage.setItem("chunchName", name);
         window.location.href = "admin.html";
     } else {
-        alert("Signed in, but not authorized.");
+        alert("You are not an authorized user.");
         closeModal();
     }
 }
