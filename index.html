@@ -237,7 +237,7 @@ document.addEventListener("keydown", function(event) {
 function handleCredentialResponse(response) {
     const data = parseJwt(response.credential);
     const email = data.email
-    const name = data.name
+    const name = data.name || data.given_name || email; // Just a fallback chain just in case name is undefined
     
     console.log("Signed in as: ", email);
 
