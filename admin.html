@@ -7,6 +7,22 @@ if (!user) {
   window.location.href = "index.html";
 }
 </script>
-  
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const name = localStorage.getItem("chunchName");
+  if (name) {
+    document.getElementById("welcome").innerText = 
+      "Welcome, " + name;
+  }
+}};
+
+<body>
+                          <h2 id="welcome"></h2>
+                          
+</body>
+                          
+</script>
 </html>
 
