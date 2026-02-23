@@ -8,7 +8,8 @@
 
 <!-- Google Identity Services -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<meta name="google-signin-client_id" content="483439290581-t6qm63e9rcuvm62l6j3cghvj71eo5h1k.apps.googleusercontent.com">
 <style>
 * {
     margin: 0;
@@ -234,29 +235,36 @@ document.addEventListener("keydown", function(event) {
 });
 
 function handleCredentialResponse(response) {
-    const id_token = response.credential;
+    const data = parseJwt(response.credential);
+    const email = data.email
+    const name = data.name || data.given_name || email; // Just a fallback chain just in case name is undefined
+    
+    console.log("Signed in as: ", email);
 
-    fetch("http://localhost:5000/google-login", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ token: id_token })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.status === "success") {
-            window.location.href = "/admin.html";
-        } else {
-            alert("Access denied.");
-            closeModal();
-        }
-    })
-    .catch(() => {
-        alert("Login failed.");
+    // People allowed into admin page
+    const allowedUsers = [
+        "garza22@southwestern.edu",
+        "harringte@southwestern.edu",
+        "wagnere@southwestern.edu",
+        "williamsr@southwestern.edu"
+    ];
+
+    if (allowedUsers.includes(email)) {
+        localStorage.setItem("chunchUser", email);
+        localStorage.setItem("chunchName", name);
+        window.location.href = "admin.html";
+    } else {
+        alert("You are not an authorized user.");
         closeModal();
-    });
+    }
 }
+
+function parseJwt(token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(base64));
+}
+
 </script>
 
 </body>
