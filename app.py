@@ -4,6 +4,7 @@ from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import Column, Integer, String
 from sqlalchemy import Column, Integer, String, Enum, Date, Time
 from sqlalchemy.orm import DeclarativeBase, relationship
+from sqlalchemy import ForeignKey
 
 
 app = Flask(__name__, static_folder='.', static_url_path='')
