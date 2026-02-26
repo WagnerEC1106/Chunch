@@ -234,27 +234,23 @@ document.addEventListener("keydown", function(event) {
     }
 });
 
-function handleCredentialResponse(response) {
-    const data = parseJwt(response.credential);
-    const email = data.email
-    const name = data.name || data.given_name || email; // Just a fallback chain just in case name is undefined
-    
-    console.log("Signed in as: ", email);
+async function handleCredentialResponse(response) {
+   const res = await fetch("/api/google-login", {
+       method: "POST", 
+       headers: {
+           "Content-Type": "application/json"
+       },
+       body: JSON.stringify({
+           credential: response.credential
+       })
+   });
 
-    // People allowed into admin page
-    const allowedUsers = [
-        "garza22@southwestern.edu",
-        "harringte@southwestern.edu",
-        "wagnere@southwestern.edu",
-        "williamsr@southwestern.edu"
-    ];
+    const data = await res.json();
 
-    if (allowedUsers.includes(email)) {
-        localStorage.setItem("chunchUser", email);
-        localStorage.setItem("chunchName", name);
-        window.location.href = "admin.html";
+    if (data.success) {
+        window.location.href = "/admin";
     } else {
-        alert("You are not an authorized user.");
+        alert("You are not authorized.");
         closeModal();
     }
 }
