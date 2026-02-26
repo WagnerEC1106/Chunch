@@ -88,9 +88,9 @@ class Assignment(db.Model):
     __tablename__ = "assignments"
     assignment_id = Column(Integer, primary_key=True)
     
-    volunteer_id = Column(Integer, ForeignKey("volunteers.id"), primary_key=True)
-    station_id = Column(Integer, ForeignKey("schedule.schedule_id"))
-    schedule_id = Column(Integer, "schedule.schedule_id")
+    volunteer_id = Column(Integer, ForeignKey("volunteers.id"))
+    station_id = Column(Integer, ForeignKey("station.station_id"))
+    schedule_id = Column(Integer, ForeignKey("schedule.schedule_id"))
     
     created_by = Column(Integer, ForeignKey("user_account.user_id"))
 
