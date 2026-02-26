@@ -9,7 +9,14 @@ import os
 from flask import request, jsonify, session, redirect, url_for
 from google.oauth2 import id_token
 from google.auth.transport import requests as grequests
+from werkzeug.middleware.proxy_fix import ProxyFix
 
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax"
+)
 app = Flask(__name__, static_folder='.', static_url_path='')
 app.secret_key = os.environ["SECRET_KEY"]
 class Base(DeclarativeBase):
@@ -171,4 +178,27 @@ def admin_page():
         return redirect("/")
 
     return send_from_directory(".", "admin.html")
+
+@app.route("/seed-admin")
+def seed_admin():
+    from models import db, UserAccount
+
+    email = "garza22@southwestern.edu"   # must match Google email
+    name = "Aaron Garza"
+
+    existing = UserAccount.query.filter_by(email=email).first()
+
+    if existing:
+        return "User already exists."
+
+    admin = UserAccount(
+        name=name,
+        email=email,
+        role="admin"   # or however you mark admins
+    )
+
+    db.session.add(admin)
+    db.session.commit()
+
+    return "Admin user created."
 
