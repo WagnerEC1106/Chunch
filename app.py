@@ -97,7 +97,11 @@ class Assignment(db.Model):
     volunteer = relationship("Volunteer", backref = "assignments")
     station = relationship("Station", backref = "assignments")
     schedule = relationship("Schedule", backref = "assignments")
-        
+
+
+if os.environ.get("RUN_DB_INIT") == "1":
+    with app.app_context():
+        db.create_all()
 # Serve your existing HTML pages
 @app.route("/")
 def home():
