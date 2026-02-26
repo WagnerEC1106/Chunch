@@ -97,11 +97,7 @@ class Assignment(db.Model):
     volunteer = relationship("Volunteer", backref = "assignments")
     station = relationship("Station", backref = "assignments")
     schedule = relationship("Schedule", backref = "assignments")
-    
-with app.app_context():
-    db.create_all()
-    db.session.commit()
-    
+        
 # Serve your existing HTML pages
 @app.route("/")
 def home():
