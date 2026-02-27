@@ -178,7 +178,8 @@ def admin_page():
 def seed_admin():
     
     email = "garza22@southwestern.edu"   # must match Google email
-    name = "Aaron Garza"
+    first_name = "Aaron"
+    last_name = "Garza"
     
     volunteer = Volunteer.query.filter_by(email=email).first()
     if not volunteer:
@@ -190,7 +191,8 @@ def seed_admin():
         db.session.add(volunteer)
         db.session.commit()
 
-    existing = UserAccount.query.filter_by(email=email).first()
+    #checking if account already exists
+    existing = UserAccount.query.filter_by(volunteer_id=volunteer.id).first()
 
     if existing:
         return "User already exists."
