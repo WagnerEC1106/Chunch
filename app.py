@@ -213,3 +213,40 @@ def seed_admin():
 
     return "Admin user created."
 
+#attempting to write a flask cli command to add admins
+import click
+from flask.cli import with_appcontext
+
+@app.cli.command("create-admin")
+@click.argument("email")
+@click.argument("first_name")
+@click.argument("last_name")
+@with_appcontext
+
+def create_admin(email, first_name, last_name):
+    volunteer = Volunteer.query.filter_by(email=email).first()
+
+    if not volunteer:
+        volunteer = Volunteer(
+            first_name=first_name,
+            last_name=last_name,
+            email=email
+        )
+        db.session.add(volunteer)
+        db.session.flush() #adds without actually committing so we can get ID
+
+    existing = UserAccount.query.filter_by(volunteer_id=volunteer.id).first()
+
+    if existing: 
+        click.echo("User already has an account")
+        return
+    admin = UserAccount(
+        volunteer_id=volunteer.id,
+        password="stilltesting",
+        role="admin"
+    )
+    db.session.add(admin)
+    db.session.commit()
+
+    click.echo(f"admin privileges given to {email}")
+
