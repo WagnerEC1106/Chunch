@@ -25,6 +25,8 @@ sheet = client.open_by_key(SPREADSHEET_ID).sheet1
 # 6️⃣ Read all rows
 rows = sheet.get_all_records()
 
+os.makedirs("data", exist_ok=True)
+
 # Save directly in repo
 with open("data/sheet_data.json", "w", encoding="utf-8") as f:
     json.dump(rows, f, indent=4, ensure_ascii=False)
