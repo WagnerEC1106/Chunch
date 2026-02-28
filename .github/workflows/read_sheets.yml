@@ -1,32 +1,33 @@
 name: Read Google Sheet
 
-# When to run the workflow
 on:
   push:
     branches:
       - main
-  workflow_dispatch:  # allows manual triggering from GitHub UI
+  workflow_dispatch:
 
 jobs:
   read_sheet:
-    runs-on: ubuntu-latest  # GitHub runner
+    runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repo
       - uses: actions/checkout@v3
 
-      # Step 2: Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
 
-      # Step 3: Install dependencies
       - name: Install dependencies
         run: pip install gspread google-auth
 
-      # Step 4: Run the script with secret
-      - name: Run read_sheets.py
+      - name: Run script
         env:
           GSHEET_KEY: ${{ secrets.GSHEET_KEY }}
         run: python read_sheets.py
+
+      - name: Upload sheet_data.json
+        uses: actions/upload-artifact@v3
+        with:
+          name: sheet-data
+          path: sheet_data.json
