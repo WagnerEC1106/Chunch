@@ -10,6 +10,7 @@ from flask import request, jsonify, session, redirect, url_for
 from google.oauth2 import id_token
 from google.auth.transport import requests as grequests
 from werkzeug.middleware.proxy_fix import ProxyFix
+from flask import render_template
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
@@ -177,7 +178,8 @@ def admin_page():
     if "user_id" not in session:
         return redirect("/")
 
-    return send_from_directory(".", "admin.html")
+    return render_template("admin.html", volunteers=volunteers)
+    
 def volunteer_list():
     volunteers = Volunteer.query.order_by(Volunteer.last_name).all()
     return render_template("admin.html", volunteers=volunteers)
