@@ -213,6 +213,24 @@ def seed_admin():
 
     return "Admin user created."
 
+
+
+import json
+import gspread
+from google.oauth2.service_account import Credentials
+
+def get_sheet():
+    creds_dict = json.loads(os.environ["GOOGLE_SERVICE_JSON"])
+
+    scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+    credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+
+    client = gspread.authorize(credentials)
+    sheet = client.open("").sheet1
+    return sheet
+
+    
+
 #attempting to write a flask cli command to add admins
 import click
 from flask.cli import with_appcontext
