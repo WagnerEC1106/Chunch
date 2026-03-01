@@ -178,6 +178,9 @@ def admin_page():
         return redirect("/")
 
     return send_from_directory(".", "admin.html")
+def volunteer_list():
+    volunteers = Volunteer.query.order_by(Volunteer.last_name).all()
+    return render_template("admin.html", volunteers=volunteers)
 
 @app.route("/seed-admin")
 def seed_admin():
@@ -230,7 +233,33 @@ def get_sheet():
     return sheet
 
     
+@app.route("/api/sync-volunteers")
+def sync_volunteers():
+    sheet = get_sheet()
+    rows = sheet.get_all_records()
 
+    added = 0
+
+    for row in rows:
+        email = row["Email"].strip()
+
+        volunteer = Volunteer.query.filter_by(email=email).first()
+
+        if not volunteer:
+            volunteer = Volunteer(
+                first_name = row["First Name"],
+                last_name = row["Last Name"],
+                email = email
+            )
+            db.session.add(volunteer)
+            added += 1
+    db.session.commit()
+
+    return {
+        "status": "success", 
+        "added": added
+    }
+    
 #attempting to write a flask cli command to add admins
 import click
 from flask.cli import with_appcontext
