@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Volunteer Confirmation</title>
+<title>Volunteer Training Videos</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -15,75 +15,122 @@
 }
 
 body {
-    background: linear-gradient(135deg, #0f172a, #1e293b);
+    background: #f4f6f9;
+    color: #1f2937;
+}
+
+/* Navbar */
+.navbar {
+    background: #0f172a;
+    padding: 18px 40px;
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.navbar a {
+    text-decoration: none;
     color: white;
-    text-align: center;
-}
-
-.card {
-    background: white;
-    color: #1f2937;
-    padding: 50px;
-    border-radius: 20px;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-    max-width: 500px;
-    width: 90%;
-}
-
-.card h1 {
-    margin-bottom: 20px;
-}
-
-.card p {
-    margin-bottom: 25px;
-    line-height: 1.6;
-}
-
-.next-step-btn {
-    padding: 14px 35px;
-    font-size: 16px;
     font-weight: 600;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
     transition: 0.3s ease;
 }
 
-.next-step-btn:hover {
-    transform: scale(1.05);
+.navbar a:hover {
+    background: #2563eb;
+}
+
+/* Page header */
+.header {
+    text-align: center;
+    padding: 60px 20px 30px;
+}
+
+.header h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+/* Video grid */
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 40px;
+    padding: 40px 60px 80px;
+}
+
+.video-card {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    transition: 0.3s ease;
+}
+
+.video-card:hover {
+    transform: translateY(-5px);
+}
+
+.video-card h3 {
+    margin-bottom: 15px;
+}
+
+video {
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .video-grid {
+        padding: 20px;
+    }
 }
 </style>
 </head>
 <body>
 
-<script>
-// 🔐 Secret key check
-const params = new URLSearchParams(window.location.search);
-const key = params.get("key");
+<nav class="navbar">
+    <a href="index.html">HOME</a>
+    <a href="#">MEET THE TEAM</a>
+    <a href="contribute.html">CONTRIBUTE</a>
+    <a href="volunteer-intro-vids.html">VOLUNTEER</a>
+    <a href="student-spotlight.html">STUDENTS</a>
+</nav>
 
-if (key !== "chunch-volunteer-2026") {
-    window.location.href = "volunteer-intro-vids.html";
-}
-</script>
+<div class="header">
+    <h1>Volunteer Training Library</h1>
+    <p>Please watch all required training videos below.</p>
+</div>
 
-<div class="card">
-    <h1>🎉 Application Submitted!</h1>
-    <p>
-        Thank you for applying to volunteer.
-        Our team will review your submission and contact you soon.
-    </p>
-    <p>
-        In the meantime, you can explore more about our mission below.
-    </p>
-    <button class="next-step-btn" onclick="window.location.href='index.html'">
-        Return to Home
-    </button>
+<div class="video-grid">
+
+    <!-- Video 1 -->
+    <div class="video-card">
+        <h3>Welcome & Mission Overview</h3>
+        <video controls>
+            <source src="videos/intro.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <!-- Video 2 -->
+    <div class="video-card">
+        <h3>Working with Students</h3>
+        <video controls>
+            <source src="videos/intro.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <!-- Video 3 -->
+    <div class="video-card">
+        <h3>Safety & Expectations</h3>
+        <video controls>
+            <source src="videos/intro.mp4" type="video/mp4">
+        </video>
+    </div>
+
 </div>
 
 </body>
