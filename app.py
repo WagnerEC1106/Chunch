@@ -178,7 +178,7 @@ def admin_page():
     if "user_id" not in session:
         return redirect("/")
 
-    return render_template("admin.html", volunteers=volunteers)
+    return render_template("admin.html")
     
 def volunteer_list():
     volunteers = Volunteer.query.order_by(Volunteer.last_name).all()
