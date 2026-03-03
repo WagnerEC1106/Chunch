@@ -233,12 +233,13 @@ def get_sheet():
     return sheet
 
     
-@app.route("/api/sync-volunteers")
+@app.route("/admin/sync-volunteers")
 def sync_volunteers():
+    if "user_id" not in session:
+        return redirect("/")
+    
     sheet = get_sheet()
     rows = sheet.get_all_records()
-
-    added = 0
 
     for row in rows:
         email = row["Email"].strip()
@@ -252,13 +253,9 @@ def sync_volunteers():
                 email = email
             )
             db.session.add(volunteer)
-            added += 1
     db.session.commit()
 
-    return {
-        "status": "success", 
-        "added": added
-    }
+    return redirect("/admin")
     
 #attempting to write a flask cli command to add admins
 import click
