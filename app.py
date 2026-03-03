@@ -233,7 +233,7 @@ def get_sheet():
     return sheet
 
     
-@app.route("/admin/sync-volunteers")
+@app.route("/admin/sync-volunteers", methods=["POST"])
 def sync_volunteers():
     if "user_id" not in session:
         return redirect("/")
