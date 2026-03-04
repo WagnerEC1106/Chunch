@@ -179,12 +179,38 @@ def admin_page():
         return redirect("/")
     return render_template("admin.html")
 
-@app.route("/master-list")
+@app.route("/admin/master-list")
 def master_list():
     volunteers = Volunteer.query.order_by(Volunteer.last_name).all()
     return render_template("master-list.html", volunteers=volunteers)
     
+@app.route("/admin/master-list/add-volunteer", methods=["POST"])
+def add_volunteer():
+    if "user_id" not in session:
+        return redirect("/")
+    
+    first_name = request.form.get("first_name").strip()
+    last_name = request.form.get("last_name").strip()
+    email = request.form.get("email").strip().lower()
 
+    existing = Volunteer.query.filter_by(email=email).first()
+    if existing:
+        flash("Volunteer with that email already exists.")
+        return redirect("/admin")
+
+    new_volunteer = Volunteer(
+        first_name=first_name,
+        last_name=last_name,
+        email=email
+    )
+
+    db.session.add(new_volunteer)
+    db.session.commit()
+
+    flash("Volunteer added successfully!")
+    return redirect("/admin/master-list")
+
+    
 @app.route("/seed-admin")
 def seed_admin():
     
