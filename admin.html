@@ -1,0 +1,162 @@
+<!--
+  Home page of administrator
+-->
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Home</title>
+
+    <!-- <link rel="stylesheet" href="style.css"> -->
+     
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        text-align: center;
+        /* font-family: 'Atkinson Hyperlegible', sans-serif; */
+      }
+      .schedule {
+        display: grid;
+        grid-template-columns: auto auto auto;
+      }
+      .schedule div {
+        border: 1px solid black;
+        padding: 15px;
+        margin: 10px;
+        text-align: center;
+      }
+
+      .schedule div table {
+        margin-top: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Admin View</h1>
+
+    <!-- Maybe change all of these to buttons instead -->
+    <nav class="adminNav"> <!-- vertical navigation menus -->
+      <a href="admin.html">Home</a>
+      <a href="schedule.html">Show Schedule</a>
+      <a href="inbox.html">Inbox</a>
+    </nav>
+
+    <button type="button" class="inbox" onclick="window.location.href='inbox.html'">Inbox</button>
+    <!-- Contains all of center view -->
+    <div id="homeView">
+      <!-- Contains station schedule -->
+      <div class="schedule">
+        <div>
+          <h3>Servers</h3>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Time</th>
+              <th>Contact</th>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </table>
+        </div>
+        <div>
+          <h3>Drinks</h3>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Time</th>
+              <th>Contact</th>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </table>
+        </div>
+        <div>
+          <h3>Desserts</h3>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Time</th>
+              <th>Contact</th>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </table>
+        </div>
+        <div>
+          <h3>Kitchen</h3>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Time</th>
+              <th>Contact</th>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </table>
+        </div>
+        <div>
+          <h3>Dishes</h3>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Time</th>
+              <th>Contact</th>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </table>
+        </div>
+        <div>
+          <h3>Bussboys</h3>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Time</th>
+              <th>Contact</th>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <script>
+    const user = localStorage.getItem("chunchUser");
+
+    if (!user) {
+      window.location.href = "index.html";
+    }
+    </script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const name = localStorage.getItem("chunchName");
+      if (name) {
+        document.getElementById("welcome").innerText = 
+          "Welcome, " + name;
+      }
+    });                       
+    </script>
+  </body>
+</html>
