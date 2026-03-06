@@ -46,6 +46,18 @@ class Volunteer(db.Model):
     last_name = Column(String(50))
 
     email = Column(String(100), unique=True)
+
+# for people signing up to volunteer that will be placed in inbox
+class Applicant(db.Model):
+    __tablename__ = "applicants"
+
+    id = Column(Integer, primary_key=True)
+    first_name = Column(String(50))
+    last_name = Column(String(50))
+    email = Column(String(50))
+    phone = Column(String(50))
+    # availability = ()
+    
 # creating user account class
 # only admins and captains should have be on this table
 class UserAccount(db.Model):
