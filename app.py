@@ -235,8 +235,8 @@ def add_volunteer():
 # Adding route to new volunteer hours page
 @app.route("/admin/volunteer-hours")
 def volunteer_hours():
-    if "user_id" not in session:
-        return redirect("/")
+    #if "user_id" not in session:
+     #   return redirect("/")
     
     # Get all volunteers sorted by last name
     volunteers = Volunteer.query.order_by(Volunteer.last_name).all()
