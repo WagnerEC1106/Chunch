@@ -8,13 +8,9 @@ from sqlalchemy import ForeignKey
 import os
 from flask import request, jsonify, session, redirect, url_for
 from google.oauth2 import id_token
-import json
-from google.oauth2.service_account import Credentials
-from googleapiclient.discovery import build
 from google.auth.transport import requests as grequests
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask import render_template
-from flask import request, jsonify, session, redirect, url_for, flash
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
@@ -129,33 +125,6 @@ class Assignment(db.Model):
     station = relationship("Station", backref = "assignments")
     schedule = relationship("Schedule", backref = "assignments")
 
-##def sync_drive_access(email):
-
-    ##if not os.path.exists("chunchdriveaccess-489601-02c473410f26.json"):
-   ##     raise Exception("Service account JSON file not found")
-
-   ## with open("chunchdriveaccess-489601-02c473410f26.json") as f:
-       ## creds_dict = json.load(f)
-
-   ## scopes = ["https://www.googleapis.com/auth/drive"]
-
-   ## credentials = Credentials.from_service_account_info(
-      ##  creds_dict,
-       ## scopes=scopes
-    ##)
-
-    ##service = build("drive", "v3", credentials=credentials)
-
-    ##folder_id = "1IwmKyFWKEvAB86WKg9I7C9N1BBvrSzD-"
-
-    ##service.permissions().create(
-        ##fileId=folder_id,
-       ## body={
-      ##      "type": "user",
-        ##    "role": "reader",
-      ##      "emailAddress": email
-    ##    }
-   ## ).execute()
 
 if os.environ.get("RUN_DB_INIT") == "1":
     with app.app_context():
@@ -249,14 +218,6 @@ def add_volunteer():
 
     db.session.add(new_volunteer)
     db.session.commit()
-  ##  error_message = None
-   ## try:
-      ##  sync_drive_access(email)
-   ## except Exception as e:
-       ## error_message = str(e)
-
-   ## if error_message:
-      ##  return f"Drive error: {error_message}"
     return redirect("/admin/master-list")
 
     
@@ -372,4 +333,3 @@ def create_admin(email, first_name, last_name):
     db.session.commit()
 
     click.echo(f"admin privileges given to {email}")
-
