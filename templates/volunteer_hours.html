@@ -1,0 +1,22 @@
+<table border="1" cellpadding="6">
+<tr>
+<th>Name</th>
+<th>8</th>
+<th>9</th>
+<th>10</th>
+<th>11</th>
+</tr>
+
+{% for v in volunteers %}
+<tr>
+
+<td>{{ v.first_name }} {{ v.last_name }}</td>
+
+<td>{% for a in v.availability %}{% if a.hour == 8 %}✓{% endif %}{% endfor %}</td>
+<td>{% for a in v.availability %}{% if a.hour == 9 %}✓{% endif %}{% endfor %}</td>
+<td>{% for a in v.availability %}{% if a.hour == 10 %}✓{% endif %}{% endfor %}</td>
+<td>{% for a in v.availability %}{% if a.hour == 11 %}✓{% endif %}{% endfor %}</td>
+
+</tr>
+{% endfor %}
+</table>

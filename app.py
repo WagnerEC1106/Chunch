@@ -307,6 +307,43 @@ def sync_volunteers():
             db.session.add(volunteer)
     db.session.commit()
 
+
+    # Trying to get the hours added to the data table
+    for row in rows:
+        email = row["Email"].strip()
+        volunteer = Volunteer.query.filter_by(email=email).first()
+        if not volunteer:
+            continue  # just in case
+
+        # Remove old availability so we don’t duplicate
+        Availability.query.filter_by(volunteer_id=volunteer.id).delete()
+
+        availability_text = str(row.get("Availability", ""))
+        entries = availability_text.split(",")
+
+        for entry in entries:
+            time_str = entry.strip().upper()
+            if not time_str:
+                continue
+
+            # convert AM/PM text to numeric hour
+            if "AM" in time_str:
+                hour = int(time_str.replace("AM", ""))
+            elif "PM" in time_str:
+                hour = int(time_str.replace("PM", ""))
+                if hour != 12:
+                    hour += 12
+            else:
+                continue
+
+            new_availability = Availability(
+                volunteer_id=volunteer.id,
+                hour=hour
+            )
+            db.session.add(new_availability)
+
+    db.session.commit()  # commit the new availability rows
+
     return redirect("/admin")
     
 #attempting to write a flask cli command to add admins
