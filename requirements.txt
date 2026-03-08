@@ -4,3 +4,6 @@ gunicorn==25.1.0
 google-api-python-client
 google-auth
 google-auth-httplib2
+psycopg2-binary
+gspread
+google-auth

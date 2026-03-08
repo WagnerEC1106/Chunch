@@ -10,6 +10,7 @@ from flask import request, jsonify, session, redirect, url_for
 from google.oauth2 import id_token
 from google.auth.transport import requests as grequests
 from werkzeug.middleware.proxy_fix import ProxyFix
+from flask import render_template
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
@@ -23,8 +24,13 @@ class Base(DeclarativeBase):
     pass
 
 db = SQLAlchemy(model_class=Base)
+db_url = os.environ.get("DATABASE_URL")
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/users.db'
+#render sometimes gives postgres://, sqlalchemy needs postgresql://
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
@@ -40,6 +46,18 @@ class Volunteer(db.Model):
     last_name = Column(String(50))
 
     email = Column(String(100), unique=True)
+
+# for people signing up to volunteer that will be placed in inbox
+class Applicant(db.Model):
+    __tablename__ = "applicants"
+
+    id = Column(Integer, primary_key=True)
+    first_name = Column(String(50))
+    last_name = Column(String(50))
+    email = Column(String(50))
+    phone = Column(String(50))
+    # availability = ()
+    
 # creating user account class
 # only admins and captains should have be on this table
 class UserAccount(db.Model):
@@ -171,15 +189,44 @@ def me():
 def admin_page():
     if "user_id" not in session:
         return redirect("/")
+    return render_template("admin.html")
 
-    return send_from_directory(".", "admin.html")
+@app.route("/admin/master-list")
+def master_list():
+    volunteers = Volunteer.query.order_by(Volunteer.last_name).all()
+    return render_template("master-list.html", volunteers=volunteers)
+    
+@app.route("/admin/master-list/add-volunteer", methods=["POST"])
+def add_volunteer():
+    if "user_id" not in session:
+        return redirect("/")
+    
+    first_name = request.form.get("first_name").strip()
+    last_name = request.form.get("last_name").strip()
+    email = request.form.get("email").strip().lower()
 
+    existing = Volunteer.query.filter_by(email=email).first()
+    if existing:
+        flash("Volunteer with that email already exists.")
+        return redirect("/admin/master-list")
+
+    new_volunteer = Volunteer(
+        first_name=first_name,
+        last_name=last_name,
+        email=email
+    )
+
+    db.session.add(new_volunteer)
+    db.session.commit()
+    return redirect("/admin/master-list")
+
+    
 @app.route("/seed-admin")
 def seed_admin():
     
-    email = "garza22@southwestern.edu"   # must match Google email
-    first_name = "Aaron"
-    last_name = "Garza"
+    email = "anthonyb@southwestern.edu"   # must match Google email
+    first_name = "Barbara"
+    last_name = "Anthony"
     
     volunteer = Volunteer.query.filter_by(email=email).first()
     if not volunteer:
@@ -208,3 +255,81 @@ def seed_admin():
 
     return "Admin user created."
 
+
+
+import json
+import gspread
+from google.oauth2.service_account import Credentials
+
+def get_sheet():
+    creds_dict = json.loads(os.environ["GOOGLE_SERVICE_JSON"])
+
+    scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly", 
+             "https://www.googleapis.com/auth/drive"]
+    credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+
+    client = gspread.authorize(credentials)
+    sheet = client.open("Chunch Volunteer Info").sheet1
+    return sheet
+
+    
+@app.route("/admin/sync-volunteers", methods=["POST"])
+def sync_volunteers():
+    if "user_id" not in session:
+        return redirect("/")
+    
+    sheet = get_sheet()
+    rows = sheet.get_all_records()
+
+    for row in rows:
+        email = row["Email"].strip()
+
+        volunteer = Volunteer.query.filter_by(email=email).first()
+
+        if not volunteer:
+            volunteer = Volunteer(
+                first_name = row["First Name"],
+                last_name = row["Last Name"],
+                email = email
+            )
+            db.session.add(volunteer)
+    db.session.commit()
+
+    return redirect("/admin")
+    
+#attempting to write a flask cli command to add admins
+import click
+from flask.cli import with_appcontext
+
+@app.cli.command("create-admin")
+@click.argument("email")
+@click.argument("first_name")
+@click.argument("last_name")
+@with_appcontext
+
+def create_admin(email, first_name, last_name):
+    volunteer = Volunteer.query.filter_by(email=email).first()
+
+    if not volunteer:
+        volunteer = Volunteer(
+            first_name=first_name,
+            last_name=last_name,
+            email=email
+        )
+        db.session.add(volunteer)
+        db.session.flush() #adds without actually committing so we can get ID
+
+    existing = UserAccount.query.filter_by(volunteer_id=volunteer.id).first()
+
+    if existing: 
+        click.echo("User already has an account")
+        return
+    admin = UserAccount(
+        volunteer_id=volunteer.id,
+        password="stilltesting",
+        role="admin"
+    )
+    db.session.add(admin)
+    db.session.commit()
+
+    click.echo(f"admin privileges given to {email}")
