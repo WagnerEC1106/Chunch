@@ -232,6 +232,17 @@ def add_volunteer():
     db.session.commit()
     return redirect("/admin/master-list")
 
+# Adding route to new volunteer hours page
+@app.route("/admin/volunteer-hours")
+def volunteer_hours():
+    if "user_id" not in session:
+        return redirect("/")
+    
+    # Get all volunteers sorted by last name
+    volunteers = Volunteer.query.order_by(Volunteer.last_name).all()
+    
+    return render_template("volunteer_hours.html", volunteers=volunteers)
+
     
 @app.route("/seed-admin")
 def seed_admin():
