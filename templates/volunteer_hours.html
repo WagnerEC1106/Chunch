@@ -1,28 +1,7 @@
-<!DOCTYPE HTML>
-<HTML>
+<!DOCTYPE html>
+<html>
   <body>
-    <h1>Volunteer Hours</h1>
-
-    <table border="1" cellpadding="6">
-        <tr>
-            <th>Name</th>
-            <th>Available Hours</th>
-        </tr>
-
-        {% for v in volunteers %}
-        <tr>
-            <td>{{ v.first_name }} {{ v.last_name }}</td>
-            <td>
-                {% if v.availability %}
-                    {% for a in v.availability %}
-                        {{ a.hour }}{% if not loop.last %}, {% endif %}
-                    {% endfor %}
-                {% else %}
-                    No hours listed
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    <h1>Volunteer Hours Page is Working!</h1>
+    <p>If you see this, your Flask route is correct.</p>
   </body>
-</HTML>
+</html>
