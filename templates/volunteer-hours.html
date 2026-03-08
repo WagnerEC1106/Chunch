@@ -1,28 +1,33 @@
-<!-- templates/volunteer_hours.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Volunteer Hours</title>
+  <title>Volunteer Hourly View</title>
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
     table {
+      width: 100%;
       border-collapse: collapse;
-      width: 80%;
-      margin: 20px auto;
     }
     th, td {
-      border: 1px solid #444;
-      padding: 8px 12px;
+      border: 1px solid #333;
+      padding: 8px;
       text-align: left;
     }
     th {
-      background-color: #2563eb;
-      color: white;
+      background-color: #f2f2f2;
     }
   </style>
 </head>
 <body>
-  <h1 style="text-align:center;">Volunteer Hours</h1>
+  <h1>Volunteer Hourly View</h1>
 
   <table>
     <tr>
@@ -34,15 +39,17 @@
     <tr>
       <td>{{ v.first_name }} {{ v.last_name }}</td>
       <td>
-        {% set hours = [] %}
-        {% for a in v.availability %}
-          {% set _ = hours.append(a.hour|string) %}
-        {% endfor %}
-        {{ hours|join(', ') if hours else "No hours" }}
+        {% if v.availability %}
+          {% for slot in v.availability %}
+            {{ slot.hour }}:00<br>
+          {% endfor %}
+        {% else %}
+          No hours recorded
+        {% endif %}
       </td>
     </tr>
     {% endfor %}
-
   </table>
+
 </body>
 </html>

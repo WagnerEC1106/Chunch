@@ -20,6 +20,7 @@ app.config.update(
     SESSION_COOKIE_SAMESITE="Lax"
 )
 app.secret_key = os.environ["SECRET_KEY"]
+
 class Base(DeclarativeBase):
     pass
 
@@ -56,7 +57,7 @@ class Applicant(db.Model):
     last_name = Column(String(50))
     email = Column(String(50))
     phone = Column(String(50))
-    # availability = ()
+    availability = Column(String(50))
     
 # creating user account class
 # only admins and captains should have be on this table
