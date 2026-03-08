@@ -5,6 +5,7 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy import Column, Integer, String, Enum, Date, Time
 from sqlalchemy.orm import DeclarativeBase, relationship
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship, backref
 import os
 from flask import request, jsonify, session, redirect, url_for
 from google.oauth2 import id_token
@@ -136,7 +137,7 @@ class Availability(db.Model):
 
     hour = Column(String(50))       # Example: 8, 9, 10, 11
 
-    volunteer = relationship("Volunteer", backref="availability")
+    volunteer = relationship("Volunteer", backref=backref("availability", cascade = "all, delete-orphan"))
 
 if os.environ.get("RUN_DB_INIT") == "1":
     with app.app_context():
@@ -312,7 +313,7 @@ def sync_volunteers():
     rows = sheet.get_all_records()
 
     for row in rows:
-        email = row["Email"].strip()
+        email = row["Email (enter N/A) if you do not have one"].strip()
 
         volunteer = Volunteer.query.filter_by(email=email).first()
 
@@ -328,7 +329,7 @@ def sync_volunteers():
 
     # Trying to get the hours added to the data table
     for row in rows:
-        email = row["Email"].strip()
+        email = row["Email (enter N/A) if you do not have one"].strip()
         volunteer = Volunteer.query.filter_by(email=email).first()
         if not volunteer:
             continue  # just in case
@@ -336,7 +337,7 @@ def sync_volunteers():
         # Remove old availability so we don’t duplicate
         Availability.query.filter_by(volunteer_id=volunteer.id).delete()
 
-        availability_text = str(row.get("Availability", ""))
+        availability_text = str(row.get("What is your typical shift? Select all hours that you work from when you come in until you leave. (Ex. if you work 11-2, you would select 11AM, 12PM, 1PM, 2PM)", ""))
         entries = availability_text.split(",")
 
         for entry in entries:
