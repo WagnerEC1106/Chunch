@@ -249,13 +249,14 @@ def add_volunteer():
 
     db.session.add(new_volunteer)
     db.session.commit()
-    flash("DEBUG: route reached")
+    error_message = None
     try:
         sync_drive_access(email)
-        flash("Drive access granted.")
     except Exception as e:
-        flash(f"Drive access failed: {e}")
-    return redirect("/admin/master-list")
+        error_message = str(e)
+
+    if error_message:
+        return f"Drive error: {error_message}"
 
     
 @app.route("/seed-admin")
