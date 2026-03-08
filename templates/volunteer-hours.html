@@ -1,55 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Volunteer Hourly View</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th, td {
-      border: 1px solid #333;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-  </style>
-</head>
-<body>
-  <h1>Volunteer Hourly View</h1>
-
-  <table>
-    <tr>
-      <th>Name</th>
-      <th>Hours</th>
-    </tr>
-
-    {% for v in volunteers %}
-    <tr>
-      <td>{{ v.first_name }} {{ v.last_name }}</td>
-      <td>
-        {% if v.availability %}
-          {% for slot in v.availability %}
-            {{ slot.hour }}:00<br>
-          {% endfor %}
-        {% else %}
-          No hours recorded
-        {% endif %}
-      </td>
-    </tr>
-    {% endfor %}
-  </table>
-
-</body>
+<html>
+  <head>
+    <title>Volunteer Hours</title>
+  </head>
+  <body>
+    <h1>Volunteer Hours Page is Working!</h1>
+    <p>If you see this, your Flask route is correct.</p>
+  </body>
 </html>
