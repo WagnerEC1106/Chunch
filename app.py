@@ -249,7 +249,11 @@ def add_volunteer():
 
     db.session.add(new_volunteer)
     db.session.commit()
-    sync_drive_access(email)
+    try:
+        sync_drive_access(email)
+        flash("Drive access granted.")
+    except Exception as e:
+        flash(f"Drive access failed: {e}")
     return redirect("/admin/master-list")
 
     
