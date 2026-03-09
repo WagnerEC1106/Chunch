@@ -13,7 +13,7 @@ from google.auth.transport import requests as grequests
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask import render_template
 from googleapiclient.discovery import build
-from flask_softdelete import SoftDeleteMixIn
+from flask_softdelete import SoftDeleteMixin
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
