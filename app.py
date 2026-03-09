@@ -29,17 +29,17 @@ class Base(DeclarativeBase):
     pass
 
 db = SQLAlchemy(model_class=Base)
-migrate = Migrate(app, db)
 db_url = os.environ.get("DATABASE_URL")
 if not db_url:
     db_url = "sqlite:///local.db"   # local dev
 #render sometimes gives postgres://, sqlalchemy needs postgresql://
-if db_url.startswith("postgres://"):
+elif db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
+migrate = Migrate(app, db)
 
 # creating a volunteer class
 #class Volunteer(db.Model, SoftDeleteMixin):
@@ -458,6 +458,3 @@ def create_admin(email, first_name, last_name):
 
     click.echo(f"admin privileges given to {email}")
 
-
-with app.app_context():
-    db.create_all()
