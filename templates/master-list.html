@@ -3,7 +3,10 @@
   <body>
     <h1>This is the master list</h1>
     <button onclick = "toggleForm()">Add Volunteer</button>
-
+    <form method="POST" action = "/admin/sync-volunteers">
+            <button type="submit">Update Volunteer List</button>
+        </form>
+    <button onclick="window.location.href='admin.html'">Go back</button>
     <div id="addForm" style ="display:none; margin-top:15px;">
       <form method="POST" action ="/admin/master-list/add-volunteer">
         <input type="text" name="first_name" placeholder="First Name" required>
