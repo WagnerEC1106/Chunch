@@ -31,7 +31,8 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 migrate = Migrate(app, db)
 db_url = os.environ.get("DATABASE_URL")
-
+if not db_url:
+    db_url = "sqlite:///local.db"   # local dev
 #render sometimes gives postgres://, sqlalchemy needs postgresql://
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
