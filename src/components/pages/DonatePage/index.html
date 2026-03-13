@@ -5,13 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Helps to support mobile use, tells the page to render page size to the device size and not just a default  -->
         <title>Contribute</title>
 
-        <!-- TODO: Import .css file -->
-        <!-- TODO: Delete temporary font import -->
-
-        <!-- Temporary font import -->
-        <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+        <!-- Importing font -->
         <!-- <link rel="preload" href="/src/assets/fonts/Atkinson-Hyperlegible-Regular.woff2" as="font" type="font/woff2" crossorigin>
         <link rel="preload" href="/src/assets/fonts/Atkinson-Hyperlegible-Regular.woff" as="font" type="font/woff" crossorigin> -->
+        <!-- Temporary font import -->
+        <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 
         <style>
         * {
@@ -19,7 +17,6 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Atkinson Hyperlegible', sans-serif;
-            
         }
         body {
             background: #f4f6f9; /* matches index, can change later*/
@@ -79,7 +76,7 @@
             margin: 60px;
         }
         .donate p {
-            margin-top: 20px;
+            margin-top: 50px;
         }
         .donate button {
             background-color: #28A745;
@@ -138,11 +135,11 @@
 
         <!-- Navbar at top of page -->
         <nav class="navbar">
-            <a href="index.html">HOME</a> 
-            <a href="team.html">MEET THE TEAM</a> 
-            <a href="contribute.html">CONTRIBUTE</a>
-            <a href="volunteer-intro-vids.html">VOLUNTEER</a> 
-            <a href="student-spotlight.html">STUDENTS</a> 
+            <a href="../HomePage/index.html">HOME</a> 
+            <a href="../MeetTheTeamPage/index.html">MEET THE TEAM</a> 
+            <a href="../DonatePage/index.html">CONTRIBUTE</a>
+            <a href="../ApplyPage/index.html">VOLUNTEER</a> 
+            <a href="../Students/index.html">STUDENTS</a> 
         </nav>
 
         <!-- non monetary donation option -->
@@ -167,7 +164,7 @@
         <section class="volunteer">
             <h2>Volunteer</h2>
             <p>Want to contribute in a more direct way? Become a part of the team!<p>
-            <button onclick="window.location.href='https://volunteer-volunteer-intro-vids.html'">Apply Here</button>
+            <button onclick="window.location.href='../ApplyPage/index.html'">Apply Here</button>
         </section>
     </body>
 </html>
