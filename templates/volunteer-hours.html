@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Volunteer Hours</title>
+</head>
+<body>
+    <h1>Volunteer Hours</h1>
+
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Typical Shift</th>
+        </tr>
+        {% for volunteer in volunteer_data %}
+        <tr>
+            <td>{{ volunteer.name }}</td>
+            <td>{{ volunteer.email }}</td>
+            <td>{{ volunteer.availability }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
