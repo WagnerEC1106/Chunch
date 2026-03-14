@@ -48,24 +48,58 @@
       .container {
         display: flex;
         flex-wrap: wrap;
+        height: 100%;
       }
       .side {
         height: 100%;
         width: 10vw;
-        position: fixed;
-        z-index: 1;
-        background-color: #e5e3e3ff;
+        position: absolute;
+        background-color: #E3E3E3;
+      }
+      .side p {
+        margin: 12px 0 0 0;
+        border: 1px solid #A0A0A0;
+        padding: 12px 24px;
+        text-align: right;
       }
       .main {
         margin-left: 10vw;
+        position: absolute;
+        height: 100%;
+        width: 87vw; 
         background-color: white;
-        padding: 20px;
+        /* padding: 24px 0 24px 24px; */
         border: 1px dashed #AAA;
       }
+      .right {
+        margin-left: 97vw;
+        position: fixed;
+        height: 100%;
+        width: 4vw;
+        border: 2px dotted Tomato;
+      }
+      /* maintain spacing between blocks */
+      .main section {
+        margin: 24px 0 24px 24px;
+        border: 2px dashed #595959;
+      }
+
+      #status {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-evenly;
+      }
+      #status div {
+        padding: 2px 8px;
+        border-radius: 16px;
+        box-shadow: 0 0 3px 3px red;
+      }
+
       .schedule {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
-        padding: 15px;
+        padding: 16px;
+        border: 1px solid black;
       }
       .schedule div {
         display: grid;
@@ -74,7 +108,6 @@
         margin: 10px;
         text-align: center;
       }
-
       .schedule div table {
         margin-top: 15px;
         font-size: 12px;
@@ -103,109 +136,119 @@
 
     <!-- not needed rn -->
     <!-- <button type="button" class="inbox" onclick="window.location.href='inbox.html'">Inbox</button> -->
-    
-    
-    <!-- Contains all of center view -->
     <div class="container">
       <div class="side">
         <p>Thing 1</p>
         <p>Thing 2</p>
       </div>
+      
       <!-- Contains all of center view -->
       <div class="main">
+        <section id="status">
+          <div style="background-color:#FF6347;"> <h4>Servers</h4> </div>
+          <div style="background-color:#FFBE47;"> <h4>Drinks</h4> </div>
+          <div style="background-color:#FFF947;""> <h4>Desserts</h4> </div>
+          <div style="background-color:#81FF47;"> <h4>Kitchen</h4> </div>
+          <div style="background-color:#47FFC1;"> <h4>Dishes</h4> </div>
+          <div style="background-color:#B347FF;"> <h4>Bussboys</h4> </div>
+        </section>
         <!-- Contains station schedule -->
-      <div class="schedule">
-        <div>
-          <h3>Servers</h3>
-          <!-- Tables with columns for names, shift times, and contact information -->
-          <table>
-            <tr>
-              <th>Name</th>
-              <th>Time</th>
-              <th>Contact</th>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-          </table>
-        </div>
-        <div>
-          <h3>Drinks</h3>
-          <table>
-            <tr>
-              <th>Name</th>
-              <th>Time</th>
-              <th>Contact</th>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-          </table>
-        </div>
-        <div>
-          <h3>Desserts</h3>
-          <table>
-            <tr>
-              <th>Name</th>
-              <th>Time</th>
-              <th>Contact</th>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-          </table>
-        </div>
-        <div>
-          <h3>Kitchen</h3>
-          <table>
-            <tr>
-              <th>Name</th>
-              <th>Time</th>
-              <th>Contact</th>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-          </table>
-        </div>
-        <div>
-          <h3>Dishes</h3>
-          <table>
-            <tr>
-              <th>Name</th>
-              <th>Time</th>
-              <th>Contact</th>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-          </table>
-        </div>
-        <div>
-          <h3>Bussboys</h3>
-          <table>
-            <tr>
-              <th>Name</th>
-              <th>Time</th>
-              <th>Contact</th>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-          </table>
-        </div>
+        <section class="schedule">
+          <div>
+            <h3>Servers</h3>
+            <!-- Tables with columns for names, shift times, and contact information -->
+            <table>
+              <tr>
+                <th>Name</th>
+                <th>Time</th>
+                <th>Contact</th>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+          <div>
+            <h3>Drinks</h3>
+            <table>
+              <tr>
+                <th>Name</th>
+                <th>Time</th>
+                <th>Contact</th>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+          <div>
+            <h3>Desserts</h3>
+            <table>
+              <tr>
+                <th>Name</th>
+                <th>Time</th>
+                <th>Contact</th>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+          <div>
+            <h3>Kitchen</h3>
+            <table>
+              <tr>
+                <th>Name</th>
+                <th>Time</th>
+                <th>Contact</th>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+          <div>
+            <h3>Dishes</h3>
+            <table>
+              <tr>
+                <th>Name</th>
+                <th>Time</th>
+                <th>Contact</th>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+          <div>
+            <h3>Bussboys</h3>
+            <table>
+              <tr>
+                <th>Name</th>
+                <th>Time</th>
+                <th>Contact</th>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+        </section>
+      </div>
+      <div class="right">
+        <p></p>
       </div>
     </div>
     <script>
