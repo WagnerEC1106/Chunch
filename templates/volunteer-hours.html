@@ -7,43 +7,84 @@
 <body>
     <h1>TEST Hours</h1>
 
-    <canvas id="hoursChart"></canvas>
+    <label for="stationSelect">Select Station:</label>
+<select id="stationSelect">
+    {% for station in station_data.keys() %}
+    <option value="{{ station }}">{{ station }}</option>
+    {% endfor %}
+</select>
+<button id="goBtn">Go</button>
+
+<canvas id="hoursChart"></canvas>
 
 <script>
-    const data = {{ volunteer_data | tojson | safe }};
+const stationData = {{ station_data | tojson | safe }};
+let currentChart = null;
+
+function renderChart(stationName) {
+    const data = stationData[stationName] || [];
+
     const labels = data.map(v => v.name);
-    const hoursWorked = data.map(v => {
-        if (v.hours.length === 0) return 5;
-        return Math.max(...v.hours);
+
+    // Each volunteer can have multiple shifts
+    const datasets = [];
+    data.forEach((v, i) => {
+        v.shifts.forEach((shift, j) => {
+            datasets.push({
+                label: v.name + (j > 0 ? ` (Shift ${j+1})` : ''),
+                data: [{x: shift.start, y: shift.end}],
+                backgroundColor: '#4e79a7',
+                barPercentage: 1.0,
+                categoryPercentage: 1.0,
+                parsing: false // important for start/end ranges
+            });
+        });
     });
 
     const ctx = document.getElementById('hoursChart').getContext('2d');
+    if (currentChart) currentChart.destroy();
 
-    new Chart(ctx, {
+    currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
-            datasets: [{
-                label: 'Hours Worked',
-                data: hoursWorked
-            }]
+            datasets: datasets
         },
         options: {
+            indexAxis: 'y',
             scales: {
-                y: {
+                x: {
                     min: 5,
                     max: 16,
+                    title: { display: true, text: 'Hour' },
                     ticks: {
+                        stepSize: 1,
                         callback: function(value) {
-                            if (value === 12) return "12PM";
-                            if (value < 12) return value + "AM";
-                            return (value - 12) + "PM";
+                            if (value === 0) return '12AM';
+                            if (value < 12) return value + 'AM';
+                            if (value === 12) return '12PM';
+                            return (value-12) + 'PM';
                         }
                     }
+                },
+                y: {
+                    title: { display: true, text: 'Volunteers' }
                 }
-            }
-        }  
+            },
+            plugins: { legend: { display: false } }
+        }
     });
+}
+
+// Initial render
+const firstStation = Object.keys(stationData)[0];
+renderChart(firstStation);
+
+// Go button
+document.getElementById('goBtn').addEventListener('click', () => {
+    const station = document.getElementById('stationSelect').value;
+    renderChart(station);
+});
 </script>
 </body>
 </html>
