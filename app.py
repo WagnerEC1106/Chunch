@@ -89,7 +89,7 @@ class UserAccount(db.Model, SoftDeleteMixin):
 class Station(db.Model, SoftDeleteMixin):
     __tablename__ = "station"
     station_id = Column(Integer, primary_key=True)
-
+    is_absent = Column(Boolean, default = False, nullable = False)
     station_name = Column(
         Enum(
             "Setup Team",
@@ -129,7 +129,7 @@ class Assignment(db.Model, SoftDeleteMixin):
     
     created_by = Column(Integer, ForeignKey("user_account.user_id"))
 
-    original_station_id = Column(Integer, ForeignKey("station.station_id"))
+   # original_station_id = Column(Integer, ForeignKey("station.station_id"))
 
     volunteer = relationship("Volunteer", backref = "assignments")
     station = relationship("Station", backref = "assignments")
