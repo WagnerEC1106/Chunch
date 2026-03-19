@@ -68,7 +68,7 @@ class Applicant(db.Model, SoftDeleteMixin):
     
 # creating user account class
 # only admins and captains should have be on this table
-class UserAccount(db.Model):
+class UserAccount(db.Model, SoftDeleteMixin):
     __tablename__ = "user_account"
 
     user_id = Column(Integer, primary_key=True)
@@ -86,7 +86,7 @@ class UserAccount(db.Model):
     volunteer = relationship("Volunteer", backref="account")
 
 # creating a stations table
-class Station(db.Model, SoftDeleteMixin):
+class Station(db.Model):
     __tablename__ = "station"
     station_id = Column(Integer, primary_key=True)
     station_name = Column(
