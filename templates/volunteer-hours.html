@@ -1,24 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>TEST HOURS</title>
+    <title>Volunteer Hours</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <h1>Volunteer Hours</h1>
 
-    <table border="1" cellpadding="5">
-        <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Typical Shift</th>
-        </tr>
-        {% for volunteer in volunteer_data %}
-        <tr>
-            <td>{{ volunteer.name }}</td>
-            <td>{{ volunteer.email }}</td>
-            <td>{{ volunteer.range }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <canvas id="hoursChart"></canvas>
+
+<script>
+    const data = {{ volunteer_data | tojson }};
+
+    const labels = data.map(v => v.name);
+    const hoursWorked = data.map(v => v.hours.length);
+
+    const ctx = document.getElementById('hoursChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Hours Worked',
+                data: hoursWorked
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
 </body>
 </html>
