@@ -305,7 +305,7 @@ def volunteer_hours():
                 "hours": hours,
                 "range": hour_range
             })
-    return render_template("volunteer-hours.html", station_data=station_data) 
+    return render_template("volunteer-hours.html", volunteer_data=station_data)
 
 @app.route("/seed-admin")
 def seed_admin():
