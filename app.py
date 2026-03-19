@@ -269,6 +269,15 @@ def delete_volunteer(volunteer_id):
 
     return redirect("/admin/master-list")
 
+@app.route("/debug/assignment-columns")
+def debug_assignment_columns():
+    return {
+        "assignment_columns": [c.name for c in Assignment.__table__.columns],
+        "station_columns": [c.name for c in Station.__table__.columns],
+        "assignment_class": str(Assignment),
+        "station_class": str(Station)
+    }
+
 # Adding route to new volunteer hours page
 @app.route("/admin/volunteer-hours")
 def volunteer_hours():
