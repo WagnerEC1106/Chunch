@@ -278,6 +278,35 @@ def volunteer_hours():
             .order_by(Volunteer.last_name, Volunteer.first_name)\
             .all()
 
+        station_names = [
+            "Setup Team",
+            "Teardown Team",
+            "Line Servers",
+            "Kitchen",
+            "Drink Station",
+            "Desserts",
+            "Busboys/sanitation",
+            "Dishwashers",
+            "Reserve",
+            "General Manager",
+            "Greeters",
+            "Baked Potato Bar",
+            "Salad Bar",
+            "Absent",
+            "Other"
+        ]
+
+        existing_station_names = {
+            str(s.station_name) for s in Station.query.all()
+        }
+
+        for name in station_names:
+            if name not in existing_station_names:
+                db.session.add(Station(station_name=name))
+
+        db.session.commit()
+        # --- END AUTO SEED ---
+
         stations = Station.query\
             .order_by(Station.station_name)\
             .all()
