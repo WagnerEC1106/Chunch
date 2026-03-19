@@ -143,7 +143,7 @@ class Availability(db.Model, SoftDeleteMixin):
 
     volunteer_id = Column(Integer, ForeignKey("volunteers.id"))
 
-    hour = Column(String(50))       # Example: 8, 9, 10, 11
+    hour = Column(Integer)       # Example: 8, 9, 10, 11
 
     volunteer = relationship("Volunteer", backref=backref("availability", cascade = "all, delete-orphan"))
 
