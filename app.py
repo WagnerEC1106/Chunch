@@ -359,7 +359,7 @@ def volunteer_hours():
             else:
                 return f"{h-12}PM"
 
-        volunteer_hours_map = {}
+        volunteer_rows = []
         for v in volunteers:
             hours = parse_hours(v.availability)
             ranges = build_ranges(hours)
@@ -372,40 +372,19 @@ def volunteer_hours():
             else:
                 range_label = "N/A"
 
-            volunteer_hours_map[v.id] = {
+            volunteer_rows.append({
                 "name": f"{v.first_name} {v.last_name}",
                 "email": v.email,
                 "hours": hours,
                 "ranges": ranges,
                 "range_label": range_label
-            }
+            })
 
-        assignments = Assignment.query.all()
-
-        station_to_volunteer_ids = {}
-        for station in stations:
-            station_to_volunteer_ids[station.station_id] = set()
-
-        for assignment in assignments:
-            if assignment.station_id is None or assignment.volunteer_id is None:
-                continue
-
-            if assignment.station_id not in station_to_volunteer_ids:
-                station_to_volunteer_ids[assignment.station_id] = set()
-
-            station_to_volunteer_ids[assignment.station_id].add(assignment.volunteer_id)
+        volunteer_rows.sort(key=lambda x: x["name"])
 
         for station in stations:
             station_name = str(station.station_name)
-            station_data[station_name] = []
-
-            assigned_volunteer_ids = station_to_volunteer_ids.get(station.station_id, set())
-
-            for volunteer_id in assigned_volunteer_ids:
-                if volunteer_id in volunteer_hours_map:
-                    station_data[station_name].append(volunteer_hours_map[volunteer_id])
-
-            station_data[station_name].sort(key=lambda x: x["name"])
+            station_data[station_name] = list(volunteer_rows)
 
         return render_template(
             "volunteer-hours.html",
