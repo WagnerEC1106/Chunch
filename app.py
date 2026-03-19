@@ -18,6 +18,8 @@ from flask_migrate import Migrate
 from flask import render_template
 
 app = Flask(__name__, static_folder='.', static_url_path='')
+app.config['DEBUG'] = True
+app.config['TESTING'] = True
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 app.config.update(
     SESSION_COOKIE_SECURE=True,
