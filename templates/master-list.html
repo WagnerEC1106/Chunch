@@ -26,12 +26,14 @@
         <tr>
             <th>Name</th>
             <th>Email</th>
+            <th>Phone Number</th>
         </tr>
 
         {% for v in volunteers %}
         <tr>
             <td>{{ v.first_name }} {{ v.last_name }}</td>
             <td>{{ v.email }}</td>
+            <td>{{ v.phone }}</td>
             <td>
               <form method = "POST" action = "/admin/master-list/delete-volunteer/{{ v.id }}">
                 <button type ="submit"
