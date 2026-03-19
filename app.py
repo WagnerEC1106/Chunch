@@ -305,6 +305,7 @@ def volunteer_hours():
                 db.session.add(Station(station_name=name))
 
         db.session.commit()
+        # --- END AUTO SEED ---
 
         stations = Station.query\
             .order_by(Station.station_name)\
