@@ -273,38 +273,83 @@ def delete_volunteer(volunteer_id):
 # Adding route to new volunteer hours page
 @app.route("/admin/volunteer-hours")
 def volunteer_hours():
-    # Get all volunteers
-    volunteers = Volunteer.query.order_by(Volunteer.last_name).all()
-    
-    volunteer_data = []
+    volunteers = Volunteer.query\
+        .filter(Volunteer.deleted_at.is_(None))\
+        .order_by(Volunteer.last_name, Volunteer.first_name)\
+        .all()
 
-    for v in volunteers:
-        hours = sorted([int(a.hour) for a in v.availability])
-        def format_hour(h):
-            if h == 0:
-                return "12AM"
-            elif h < 12:
-                return f"{h}AM"
-            elif h == 12:
-                return "12PM"
+    stations = Station.query\
+        .filter(Station.deleted_at.is_(None))\
+        .order_by(Station.station_name)\
+        .all()
+
+    station_data = {}
+
+    for station in stations:
+        station_name = station.station_name
+        station_data[station_name] = []
+
+        assigned_volunteer_ids = {
+            a.volunteer_id for a in station.assignments
+            if a.deleted_at is None and a.volunteer_id is not None
+        }
+
+        for v in volunteers:
+            if v.id not in assigned_volunteer_ids:
+                continue
+
+            hours = sorted(
+                int(a.hour) for a in v.availability
+                if a.deleted_at is None
+            )
+
+            def format_hour(h):
+                if h == 0:
+                    return "12AM"
+                elif h < 12:
+                    return f"{h}AM"
+                elif h == 12:
+                    return "12PM"
+                else:
+                    return f"{h-12}PM"
+
+            if hours:
+                ranges = []
+                start = hours[0]
+                prev = hours[0]
+
+                for h in hours[1:]:
+                    if h == prev + 1:
+                        prev = h
+                    else:
+                        ranges.append([start, prev])
+                        start = h
+                        prev = h
+
+                ranges.append([start, prev])
+
+                display_ranges = [
+                    f"{format_hour(start)}-{format_hour(end)}"
+                    for start, end in ranges
+                ]
+                hour_range = ", ".join(display_ranges)
             else:
-                return f"{h-12}PM"
-        if hours:
-            start = format_hour(hours[0])
-            end = format_hour(hours[-1])
-            hour_range = f"{start}-{end}"
-        else:
-            hour_range = "N/A"
+                ranges = []
+                hour_range = "N/A"
 
-        volunteer_data.append({
-            "name": f"{v.first_name} {v.last_name}",
-            "email": v.email,
-            "hours": hours,
-            "range": hour_range
-        })
+            station_data[station_name].append({
+                "name": f"{v.first_name} {v.last_name}",
+                "email": v.email,
+                "hours": hours,
+                "ranges": ranges,
+                "range_label": hour_range
+            })
+
+    return render_template(
+        "volunteer-hours.html",
+        station_data=station_data
+    )
     
-    return render_template("volunteer-hours.html", volunteer_data=volunteer_data)   
-@app.route("/seed-admin")
 def seed_admin():
     
     email = "anthonyb@southwestern.edu"   # must match Google email
