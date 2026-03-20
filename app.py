@@ -858,6 +858,69 @@ def volunteer_hours():
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
+@app.route("/admin/debug-hourly-matches")
+def debug_hourly_matches():
+    volunteers = Volunteer.query\
+        .filter(Volunteer.deleted_at.is_(None))\
+        .order_by(Volunteer.last_name, Volunteer.first_name)\
+        .all()
+
+    sheet = get_sheet()
+    rows = sheet.get_all_records()
+
+    volunteer_id_by_email = {
+        v.email.strip().lower(): {
+            "id": v.id,
+            "name": f"{v.first_name} {v.last_name}"
+        }
+        for v in volunteers
+        if v.email
+    }
+
+    def parse_hours(availability_rows):
+        cleaned_hours = []
+
+        for row in availability_rows:
+            if row.deleted_at is not None:
+                continue
+            try:
+                hour = int(str(row.hour).strip())
+            except (ValueError, TypeError):
+                continue
+            if 5 <= hour <= 16:
+                cleaned_hours.append(hour)
+
+        return sorted(set(cleaned_hours))
+
+    output = []
+
+    for row in rows:
+        email = str(row.get("Email", "")).strip().lower()
+        first_name = str(row.get("First Name", "")).strip()
+        last_name = str(row.get("Last Name", "")).strip()
+        typical_station = str(row.get("Typical Station", "")).strip()
+        typical_shift = str(row.get("Typical Shift", "")).strip()
+
+        matched = volunteer_id_by_email.get(email)
+
+        if matched:
+            volunteer = Volunteer.query.get(matched["id"])
+            parsed_hours = parse_hours(volunteer.availability)
+        else:
+            parsed_hours = []
+
+        output.append({
+            "sheet_name": f"{first_name} {last_name}",
+            "email": email,
+            "typical_station": typical_station,
+            "typical_shift": typical_shift,
+            "matched_db_volunteer": matched["name"] if matched else None,
+            "matched_db_id": matched["id"] if matched else None,
+            "parsed_hours": parsed_hours
+        })
+
+    return {"rows": output}
+
 def seed_admin():
     
     email = "anthonyb@southwestern.edu"   # must match Google email
