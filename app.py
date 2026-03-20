@@ -1007,7 +1007,7 @@ def grant_drive_access(email):
         print(f"Drive permission error for {email}: {e}")
 
     
-@app.route("/admin/sync-volunteers", methods=["POST"])
+@app.route("/admin/sync-volunteers", methods=["GET", "POST"])
 def sync_volunteers():
     if "user_id" not in session:
         return redirect("/")
