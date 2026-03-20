@@ -506,7 +506,7 @@ def delete_volunteer(volunteer_id):
 
     return redirect("/admin/master-list")
 
-@app.route("/admin/debug-assignments")
+@app.route("/admin/debug-assignments2")
 def debug_assignments():
     assignments = Assignment.query.all()
     stations = Station.query.order_by(Station.station_id).all()
