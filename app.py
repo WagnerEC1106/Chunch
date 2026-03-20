@@ -305,7 +305,6 @@ def volunteer_hours():
                 db.session.add(Station(station_name=name))
 
         db.session.commit()
-        # --- END AUTO SEED ---
 
         stations = Station.query\
             .order_by(Station.station_name)\
@@ -359,7 +358,7 @@ def volunteer_hours():
             else:
                 return f"{h-12}PM"
 
-        volunteer_rows = []
+        volunteer_rows_by_id = {}
         for v in volunteers:
             hours = parse_hours(v.availability)
             ranges = build_ranges(hours)
@@ -372,24 +371,45 @@ def volunteer_hours():
             else:
                 range_label = "N/A"
 
-            volunteer_rows.append({
+            volunteer_rows_by_id[v.id] = {
                 "name": f"{v.first_name} {v.last_name}",
                 "email": v.email,
                 "hours": hours,
                 "ranges": ranges,
                 "range_label": range_label
-            })
+            }
 
-        volunteer_rows.sort(key=lambda x: x["name"])
+        assignments = Assignment.query.all()
+
+        station_to_volunteer_ids = {}
+        for station in stations:
+            station_to_volunteer_ids[station.station_id] = set()
+
+        for assignment in assignments:
+            if assignment.station_id is None or assignment.volunteer_id is None:
+                continue
+
+            station_to_volunteer_ids.setdefault(
+                assignment.station_id, set()
+            ).add(assignment.volunteer_id)
 
         for station in stations:
             station_name = str(station.station_name)
-            station_data[station_name] = list(volunteer_rows)
+            assigned_ids = station_to_volunteer_ids.get(station.station_id, set())
+
+            station_data[station_name] = [
+                volunteer_rows_by_id[vid]
+                for vid in assigned_ids
+                if vid in volunteer_rows_by_id
+            ]
+
+            station_data[station_name].sort(key=lambda x: x["name"])
 
         return render_template(
             "volunteer-hours.html",
             station_data=station_data
         )
+
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
