@@ -506,8 +506,8 @@ def debug_assignments():
         "volunteers": [
             {
                 "volunteer_id": v.id,
-                "name": f"{v.first_name} {v.last_name}"
-                "station_id": v.station_id
+                "name": f"{v.first_name} {v.last_name}",
+                "station_id": v.assignments[0].station_id
             }
             for v in volunteers[:50]
         ]
