@@ -55,8 +55,8 @@ class Volunteer(db.Model, SoftDeleteMixin):
 
     email = Column(String(100), unique=True)
 
-    station_id = Column(Integer, ForeignKey("station.station_id"))
-    station = relationship("Station")
+    #station_id = Column(Integer, ForeignKey("station.station_id"))
+    #station = relationship("Station")
 
 #for people signing up to volunteer that will be placed in inbox
 class Applicant(db.Model, SoftDeleteMixin):
@@ -237,7 +237,18 @@ def admin_page():
 
 @app.route("/debug/add-test-assignment")
 def add_test_assignment():
-    s = Station.query.filter_by(station_name="Teardown Team").first()
+    #s = Station.query.filter_by(station_name="Teardown Team").first()
+    
+    # Check if the volunteer already has an assignment
+    existing_assignment = Assignment.query.filter_by(volunteer_id=v.id).first()
+
+    if existing_assignment:
+        # Use their current station
+        station_id = existing_assignment.station_id
+    else:
+        # Assign default station (Teardown Team)
+        s = Station.query.filter_by(station_name="Teardown Team").first()
+        station_id = s.station_id
 
     volunteers = Volunteer.query\
         .filter(Volunteer.deleted_at.is_(None))\
