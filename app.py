@@ -686,6 +686,9 @@ def volunteer_hours():
             station_data=station_data
         )
 
+    except Exception as e:
+        return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
+
 def seed_admin():
     
     email = "anthonyb@southwestern.edu"   # must match Google email
