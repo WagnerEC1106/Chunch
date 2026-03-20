@@ -753,7 +753,7 @@ def sync_volunteers():
     for row in rows:
         email = row["Email"].strip()
 
-        volunteer = Volunteer.query.filter_by(email=email, deleted_at=None).first()
+        volunteer = Volunteer.query.filter_by(email=email).first()
 
         if not volunteer:
             volunteer = Volunteer(
