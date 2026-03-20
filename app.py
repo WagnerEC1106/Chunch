@@ -210,6 +210,23 @@ def me():
         "email": session["email"],
         "role": session["role"]
     })
+
+@app.route("/api/schedule")
+def api_schedule():
+    date_str = request.args.get("date")
+    if not date_str:
+        return jsonify({"error": "Missing date"}), 400
+
+    stations = Station.query.order_by(Station.station_id).all()
+
+    results = []
+    for station in stations:
+        results.append({
+            "stationName": str(station.station_name),
+            "volunteers": []
+        })
+
+    return jsonify(results)
     
 @app.route("/admin")
 def admin_page():
