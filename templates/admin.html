@@ -147,7 +147,7 @@ body {
     </div>
 
     <div class="header-actions">
-        <button onclick="openInbox()">
+        <button onclick="window.location.href='/admin/inbox'">
             <span class="icon">📬</span>
             <span class="label">Inbox</span>
         </button>
@@ -252,10 +252,6 @@ async function loadSchedule() {
 function toggleView() {
     hourlyView = !hourlyView;
     loadSchedule();
-}
-
-function openInbox() {
-    alert("Inbox placeholder.");
 }
 
 function enableEdit() {
