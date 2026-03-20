@@ -507,6 +507,7 @@ def debug_assignments():
             {
                 "volunteer_id": v.id,
                 "name": f"{v.first_name} {v.last_name}"
+                "station_id": v.station_id
             }
             for v in volunteers[:50]
         ]
