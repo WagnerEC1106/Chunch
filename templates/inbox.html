@@ -14,6 +14,22 @@
             <td>{{ a.first_name }} {{ a.last_name }}</td>
             <td>{{ a.email }}</td>
             <td>{{ a.phone }}</td>
+            <td>
+              <form method = "POST" action = "/admin/inbox/accept/{{ a.id }}">
+                <button type ="submit"
+                  onclick="return confirm('Accept this applicant?')">
+                  Accept
+                </button>
+              </form>
+            </td>
+            <td>
+              <form method = "POST" action = "/admin/inbox/reject/{{ a.id }}">
+                <button type ="submit"
+                  onclick="return confirm('Reject this applicant?')">
+                  Reject
+                </button>
+              </form>
+            </td>
         </tr>
         {% endfor %}
     </table>
