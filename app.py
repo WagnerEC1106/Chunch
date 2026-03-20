@@ -405,7 +405,7 @@ def inbox():
 def accept_applicant(applicants_id):
     if "user_id" not in session:
         return redirect("/")
-    applicant = Applicants.query.get_or_404(applicants_id)
+    applicant = Applicant.query.get_or_404(applicants_id)
     if applicant:
         applicant.status = 'accepted'
         db.session.commit()
