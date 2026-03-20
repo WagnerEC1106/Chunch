@@ -235,62 +235,62 @@ def admin_page():
 
     return render_template("admin.html", volunteers=volunteers)
 
-@app.route("/debug/add-test-assignment")
-def add_test_assignment():
-    s = Station.query.filter_by(station_name="Line Servers").first()
+# @app.route("/debug/add-test-assignment")
+# def add_test_assignment():
+#     s = Station.query.filter_by(station_name="Line Servers").first()
 
-    volunteers = Volunteer.query\
-        .filter(Volunteer.deleted_at.is_(None))\
-        .order_by(Volunteer.id)\
-        .all()
+#     volunteers = Volunteer.query\
+#         .filter(Volunteer.deleted_at.is_(None))\
+#         .order_by(Volunteer.id)\
+#         .all()
 
-    v = None
-    for volunteer in volunteers:
-        valid_hours = []
-        for a in volunteer.availability:
-            if a.deleted_at is not None:
-                continue
-            try:
-                hour = int(str(a.hour).strip())
-            except (ValueError, TypeError):
-                continue
-            if 5 <= hour <= 16:
-                valid_hours.append(hour)
+#     v = None
+#     for volunteer in volunteers:
+#         valid_hours = []
+#         for a in volunteer.availability:
+#             if a.deleted_at is not None:
+#                 continue
+#             try:
+#                 hour = int(str(a.hour).strip())
+#             except (ValueError, TypeError):
+#                 continue
+#             if 5 <= hour <= 16:
+#                 valid_hours.append(hour)
 
-        if valid_hours:
-            v = volunteer
-            break
+#         if valid_hours:
+#             v = volunteer
+#             break
 
-    if not v or not s:
-        return "Missing volunteer with hours or station"
+#     if not v or not s:
+#         return "Missing volunteer with hours or station"
 
-    existing = Assignment.query.filter_by(
-        volunteer_id=v.id,
-        station_id=s.station_id,
-        schedule_id=None
-    ).first()
+#     existing = Assignment.query.filter_by(
+#         volunteer_id=v.id,
+#         station_id=s.station_id,
+#         schedule_id=None
+#     ).first()
 
-    if existing:
-        return {
-            "message": "Assignment already exists",
-            "volunteer": v.id,
-            "station": s.station_id
-        }
+#     if existing:
+#         return {
+#             "message": "Assignment already exists",
+#             "volunteer": v.id,
+#             "station": s.station_id
+#         }
 
-    assignment = Assignment(
-        volunteer_id=v.id,
-        station_id=s.station_id,
-        schedule_id=None
-    )
+#     assignment = Assignment(
+#         volunteer_id=v.id,
+#         station_id=s.station_id,
+#         schedule_id=None
+#     )
 
-    db.session.add(assignment)
-    db.session.commit()
+#     db.session.add(assignment)
+#     db.session.commit()
 
-    return {
-        "message": "Assignment added",
-        "volunteer": v.id,
-        "station": s.station_id
-    }
+#     return {
+#         "message": "Assignment added",
+#         "volunteer": v.id,
+#         "station": s.station_id
+#     }
 
 # Delete assignments based on assignment number
 #@app.route("/debug/delete-assignment/<int:assignment_id>/get")
@@ -652,19 +652,24 @@ def volunteer_hours():
                 "range_label": range_label
             }
 
-        assignments = Assignment.query.all()
+        assignments = Assignment.query\
+            .order_by(Assignment.assignment_id.asc())\
+            .all()
+
+        latest_station_by_volunteer = {}
+        for assignment in assignments:
+            if assignment.station_id is None or assignment.volunteer_id is None:
+                continue
+
+            latest_station_by_volunteer[assignment.volunteer_id] = assignment.station_id
 
         station_to_volunteer_ids = {}
         for station in stations:
             station_to_volunteer_ids[station.station_id] = set()
 
-        for assignment in assignments:
-            if assignment.station_id is None or assignment.volunteer_id is None:
-                continue
-
-            station_to_volunteer_ids.setdefault(
-                assignment.station_id, set()
-            ).add(assignment.volunteer_id)
+        for volunteer_id, station_id in latest_station_by_volunteer.items():
+            if station_id in station_to_volunteer_ids:
+                station_to_volunteer_ids[station_id].add(volunteer_id)
 
         for station in stations:
             station_name = str(station.station_name)
