@@ -211,7 +211,6 @@ def me():
         "role": session["role"]
     })
 
-    
 @app.route("/admin")
 def admin_page():
     if "user_id" not in session:
@@ -223,6 +222,28 @@ def admin_page():
         .all()
 
     return render_template("admin.html", volunteers=volunteers)
+
+@app.route("/debug/add-test-assignment")
+def add_test_assignment():
+    v = Volunteer.query.first()
+    s = Station.query.first()
+
+    if not v or not s:
+        return "Missing volunteer or station"
+
+    assignment = Assignment(
+        volunteer_id=v.id,
+        station_id=s.station_id,
+        schedule_id=None
+    )
+
+    db.session.add(assignment)
+    db.session.commit()
+
+    return {
+        "volunteer": v.id,
+        "station": s.station_id
+    }
 
 @app.route("/admin/master-list")
 def master_list():
