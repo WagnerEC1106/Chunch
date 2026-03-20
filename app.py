@@ -55,7 +55,7 @@ class Volunteer(db.Model, SoftDeleteMixin):
 
     email = Column(String(100), unique=True)
 
-# for people signing up to volunteer that will be placed in inbox
+#for people signing up to volunteer that will be placed in inbox
 class Applicant(db.Model, SoftDeleteMixin):
     __tablename__ = "applicants"
 
@@ -387,6 +387,11 @@ def debug_hourly_data():
         }
 
     return station_data
+
+@app.route("/admin/inbox")
+def inbox():
+    applicants = Applicant.query.all()
+    return render_template("inbox.html", applicants=applicant)
 
 @app.route("/admin/master-list")
 def master_list():
