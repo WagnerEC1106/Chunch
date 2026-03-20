@@ -399,7 +399,8 @@ def debug_hourly_data():
 @app.route("/admin/inbox")
 def inbox():
     applicants = Applicant.query.filter(Applicant.status == 'pending').all()
-    return render_template("inbox.html", applicants=applicants)
+    rejected = Applicant.query.filter(Applicant.status == 'rejected').all()
+    return render_template("inbox.html", applicants=applicants, rejected=rejected)
 
 @app.route("/admin/inbox/accept/<int:applicants_id>", methods=["POST"])
 def accept_applicant(applicants_id):
@@ -418,6 +419,16 @@ def reject_applicant(applicants_id):
     applicant = Applicant.query.get_or_404(applicants_id)
     if applicant:
         applicant.status = 'rejected'
+        db.session.commit()
+    return redirect("/admin/inbox")
+
+@app.route("/admin/inbox/pending/<int:applicants_id>", methods=["POST"])
+def undo_rejection(applicants_id):
+    if "user_id" not in session:
+        return redirect("/")
+    applicant = Applicant.query.get_or_404(applicants_id)
+    if applicant:
+        applicant.status = 'pending'
         db.session.commit()
     return redirect("/admin/inbox")
 
