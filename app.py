@@ -64,6 +64,14 @@ class Applicant(db.Model, SoftDeleteMixin):
     last_name = Column(String(50))
     email = Column(String(50))
     phone = Column(String(50))
+    status = Column(
+        Enum(
+            "accepted",
+            "rejected",
+            "pending",
+            name="status_enum"
+        ), nullable=False, default="pending"
+    )
     availability = Column(String(50))
     
 # creating user account class
