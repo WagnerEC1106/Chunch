@@ -234,63 +234,64 @@ def admin_page():
         .all()
 
     return render_template("admin.html", volunteers=volunteers)
-
 @app.route("/debug/add-test-assignment")
 def add_test_assignment():
-    s = Station.query.filter_by(station_name="Line Servers").first()
+    return {"message": "disabled"}
 
-    volunteers = Volunteer.query\
-        .filter(Volunteer.deleted_at.is_(None))\
-        .order_by(Volunteer.id)\
-        .all()
+#     s = Station.query.filter_by(station_name="Line Servers").first()
 
-    v = None
-    for volunteer in volunteers:
-        valid_hours = []
-        for a in volunteer.availability:
-            if a.deleted_at is not None:
-                continue
-            try:
-                hour = int(str(a.hour).strip())
-            except (ValueError, TypeError):
-                continue
-            if 5 <= hour <= 16:
-                valid_hours.append(hour)
+#     volunteers = Volunteer.query\
+#         .filter(Volunteer.deleted_at.is_(None))\
+#         .order_by(Volunteer.id)\
+#         .all()
 
-        if valid_hours:
-            v = volunteer
-            break
+#     v = None
+#     for volunteer in volunteers:
+#         valid_hours = []
+#         for a in volunteer.availability:
+#             if a.deleted_at is not None:
+#                 continue
+#             try:
+#                 hour = int(str(a.hour).strip())
+#             except (ValueError, TypeError):
+#                 continue
+#             if 5 <= hour <= 16:
+#                 valid_hours.append(hour)
 
-    if not v or not s:
-        return "Missing volunteer with hours or station"
+#         if valid_hours:
+#             v = volunteer
+#             break
 
-    existing = Assignment.query.filter_by(
-        volunteer_id=v.id,
-        station_id=s.station_id,
-        schedule_id=None
-    ).first()
+#     if not v or not s:
+#         return "Missing volunteer with hours or station"
 
-    if existing:
-        return {
-            "message": "Assignment already exists",
-            "volunteer": v.id,
-            "station": s.station_id
-        }
+#     existing = Assignment.query.filter_by(
+#         volunteer_id=v.id,
+#         station_id=s.station_id,
+#         schedule_id=None
+#     ).first()
 
-    assignment = Assignment(
-        volunteer_id=v.id,
-        station_id=s.station_id,
-        schedule_id=None
-    )
+#     if existing:
+#         return {
+#             "message": "Assignment already exists",
+#             "volunteer": v.id,
+#             "station": s.station_id
+#         }
 
-    db.session.add(assignment)
-    db.session.commit()
+#     assignment = Assignment(
+#         volunteer_id=v.id,
+#         station_id=s.station_id,
+#         schedule_id=None
+#     )
 
-    return {
-        "message": "Assignment added",
-        "volunteer": v.id,
-        "station": s.station_id
-    }
+#     db.session.add(assignment)
+#     db.session.commit()
+
+#     return {
+#         "message": "Assignment added",
+#         "volunteer": v.id,
+#         "station": s.station_id
+#     }
 
 # Delete assignments based on assignment number
 #@app.route("/debug/delete-assignment/<int:assignment_id>/get")
@@ -534,9 +535,6 @@ def debug_assignments():
             {
                 "volunteer_id": v.id,
                 "name": f"{v.first_name} {v.last_name}",
-
-                #"station_id": v.assignments[0].station_id if v.assignments else None,
-                #"station_name": str(v.assignments[0].station.station_name) if v.assignments else None
             }
             for v in volunteers[:50]
         ]
