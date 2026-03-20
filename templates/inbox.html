@@ -33,5 +33,36 @@
         </tr>
         {% endfor %}
     </table>
+    <table border="1" cellpadding="6">
+      <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone Number</th>
+        </tr>
+        
+        {% for r in rejected %}
+        <tr>
+            <td>{{ r.first_name }} {{ r.last_name }}</td>
+            <td>{{ r.email }}</td>
+            <td>{{ r.phone }}</td>
+            <td>
+              <form method = "POST" action = "/admin/inbox/accept/{{ r.id }}">
+                <button type ="submit"
+                  onclick="return confirm('Accept this applicant?')">
+                  Accept
+                </button>
+              </form>
+            </td>
+            <td>
+              <form method = "POST" action = "/admin/inbox/pending/{{ r.id }}">
+                <button type ="submit"
+                  onclick="return confirm('Undo this rejection?')">
+                  Undo
+                </button>
+              </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
   </body>
 </HTML>
