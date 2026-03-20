@@ -2,5 +2,20 @@
 <HTML>
   <body>
     <h1>This is the inbox</h1>
+     <table border="1" cellpadding="6">
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone Number</th>
+        </tr>
+
+        {% for a in applicants %}
+        <tr>
+            <td>{{ a.first_name }} {{ a.last_name }}</td>
+            <td>{{ a.email }}</td>
+            <td>{{ a.phone }}</td>
+        </tr>
+        {% endfor %}
+    </table>
   </body>
 </HTML>
