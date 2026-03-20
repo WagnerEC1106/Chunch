@@ -510,9 +510,9 @@ def debug_assignments():
             {
                 "volunteer_id": v.id,
                 "name": f"{v.first_name} {v.last_name}",
-                
-                "station_id": v.assignments[0].station_id if v.assignments else None,
-                "station_name": str(v.assignments[0].station.station_name) if v.assignments else None
+
+                #"station_id": v.assignments[0].station_id if v.assignments else None,
+                #"station_name": str(v.assignments[0].station.station_name) if v.assignments else None
             }
             for v in volunteers[:50]
         ]
