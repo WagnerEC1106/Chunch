@@ -402,7 +402,7 @@ def inbox():
     return render_template("inbox.html", applicants=applicants)
 
 @app.route("/admin/inbox/accept/<int:applicants_id>", methods=["POST"])
-def accept_applicant(applicants_id)
+def accept_applicant(applicants_id):
     if "user_id" not in session:
         return redirect("/")
     applicant = Applicants.query.get_or_404(applicants_id)
