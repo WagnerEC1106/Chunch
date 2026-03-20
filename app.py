@@ -391,7 +391,7 @@ def debug_hourly_data():
 @app.route("/admin/inbox")
 def inbox():
     applicants = Applicant.query.all()
-    return render_template("inbox.html", applicants=applicant)
+    return render_template("inbox.html", applicants=applicants)
 
 @app.route("/admin/master-list")
 def master_list():
