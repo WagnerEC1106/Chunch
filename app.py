@@ -834,52 +834,57 @@ def volunteer_hours():
         sheet = get_sheet()
         rows = sheet.get_all_records()
 
-        station_to_volunteer_ids = {}
-        for station in stations:
-            station_to_volunteer_ids[station.station_id] = set()
+        # station_to_volunteer_ids = {}
+        # for station in stations:
+        #     station_to_volunteer_ids[station.station_id] = set()
 
-        station_name_to_id = {
-            str(station.station_name).strip().lower(): station.station_id
-            for station in stations
+        # station_name_to_id = {
+        #     str(station.station_name).strip().lower(): station.station_id
+        #     for station in stations
+        # }
+
+        # volunteer_id_by_email = {
+        #     v.email.strip().lower(): v.id
+        #     for v in volunteers
+        #     if v.email
+        # }
+
+        # for row in rows:
+        #     email = str(row.get("Email", "")).strip().lower()
+        #     typical_station = str(row.get("Typical Station", "")).strip().lower()
+
+        #     if not email or not typical_station:
+        #         continue
+
+        #     if typical_station in {"reserve", "absent", "other"}:
+        #         continue
+
+        #     volunteer_id = volunteer_id_by_email.get(email)
+        #     station_id = station_name_to_id.get(typical_station)
+
+        #     if volunteer_id is None or station_id is None:
+        #         continue
+
+        #     station_to_volunteer_ids[station_id].add(volunteer_id)
+
+        # for station in stations:
+        #     station_name = str(station.station_name)
+        #     assigned_ids = station_to_volunteer_ids.get(station.station_id, set())
+
+        #     station_data[station_name] = [
+        #         volunteer_rows_by_id[vid]
+        #         for vid in assigned_ids
+        #         if vid in volunteer_rows_by_id
+        #     ]
+
+        #     station_data[station_name].sort(key=lambda x: x["name"])
+
+        # return station_data
+        return {
+            "sample_rows": rows[:10],
+            "station_name_to_id": station_name_to_id,
+            "volunteer_id_by_email_sample": list(volunteer_id_by_email.keys())[:20]
         }
-
-        volunteer_id_by_email = {
-            v.email.strip().lower(): v.id
-            for v in volunteers
-            if v.email
-        }
-
-        for row in rows:
-            email = str(row.get("Email", "")).strip().lower()
-            typical_station = str(row.get("Typical Station", "")).strip().lower()
-
-            if not email or not typical_station:
-                continue
-
-            if typical_station in {"reserve", "absent", "other"}:
-                continue
-
-            volunteer_id = volunteer_id_by_email.get(email)
-            station_id = station_name_to_id.get(typical_station)
-
-            if volunteer_id is None or station_id is None:
-                continue
-
-            station_to_volunteer_ids[station_id].add(volunteer_id)
-
-        for station in stations:
-            station_name = str(station.station_name)
-            assigned_ids = station_to_volunteer_ids.get(station.station_id, set())
-
-            station_data[station_name] = [
-                volunteer_rows_by_id[vid]
-                for vid in assigned_ids
-                if vid in volunteer_rows_by_id
-            ]
-
-            station_data[station_name].sort(key=lambda x: x["name"])
-
-        return station_data
 
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
