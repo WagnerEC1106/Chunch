@@ -12,7 +12,16 @@
             <td>{{ d.first_name }} {{ d.last_name }}</td>
             <td>{{ d.email }}</td>
             <td>{{ d.phone }}</td>
+            <td>
+              <form method = "POST" action = "/admin/master-list/deleted-volunteers/permadelete/{{ d.id }}">
+                <button type ="submit"
+                  onclick="return confirm('Permanently delete this volunteer?')">
+                  Permanently Delete
+                </button>
+              </form>
+            </td>
         </tr>
+        
         {% endfor %}
     </table>
 </html>
