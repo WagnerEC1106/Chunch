@@ -611,13 +611,10 @@ def volunteer_hours():
             "Desserts",
             "Busboys/sanitation",
             "Dishwashers",
-            "Reserve",
             "General Manager",
             "Greeters",
             "Baked Potato Bar",
-            "Salad Bar",
-            "Absent",
-            "Other"
+            "Salad Bar"
         ]
 
         existing_station_names = {
@@ -631,6 +628,9 @@ def volunteer_hours():
         db.session.commit()
 
         stations = Station.query\
+            .filter(
+                Station.station_name.notin_(["Reserve", "Absent", "Other"])
+            )\
             .order_by(Station.station_name)\
             .all()
 
@@ -726,6 +726,9 @@ def volunteer_hours():
             typical_station = str(row.get("Typical Station", "")).strip().lower()
 
             if not email or not typical_station:
+                continue
+
+            if typical_station in {"reserve", "absent", "other"}:
                 continue
 
             volunteer_id = volunteer_id_by_email.get(email)
