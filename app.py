@@ -325,6 +325,7 @@ def debug_hourly_final():
         .all()
 
     stations = Station.query\
+        .filter(Station.station_name != "Other")\
         .order_by(Station.station_name)\
         .all()
 
@@ -389,193 +390,62 @@ def debug_hourly_final():
 
         volunteer_rows_by_id[v.id] = {
             "name": f"{v.first_name} {v.last_name}",
+            "email": v.email,
             "hours": hours,
             "ranges": ranges,
             "range_label": range_label
         }
 
-    assignments = Assignment.query\
-        .order_by(Assignment.assignment_id.asc())\
-        .all()
-
-    latest_station_by_volunteer = {}
-    for assignment in assignments:
-        if assignment.station_id is None or assignment.volunteer_id is None:
-            continue
-        latest_station_by_volunteer[assignment.volunteer_id] = assignment.station_id
-
-    station_to_volunteer_ids = {}
-    for station in stations:
-        station_to_volunteer_ids[station.station_id] = set()
-
-    for volunteer_id, station_id in latest_station_by_volunteer.items():
-        if station_id in station_to_volunteer_ids:
-            station_to_volunteer_ids[station_id].add(volunteer_id)
-
-    assigned_volunteer_ids = set(latest_station_by_volunteer.keys())
-
-    other_station = next(
-        (station for station in stations if str(station.station_name) == "Other"),
-        None
-    )
-
-    if other_station is not None:
-        for volunteer_id in volunteer_rows_by_id.keys():
-            if volunteer_id not in assigned_volunteer_ids:
-                station_to_volunteer_ids[other_station.station_id].add(volunteer_id)
-
-    station_data = {}
-    for station in stations:
-        station_name = str(station.station_name)
-        assigned_ids = station_to_volunteer_ids.get(station.station_id, set())
-
-        station_data[station_name] = {
-            "station_id": station.station_id,
-            "assigned_ids": list(assigned_ids),
-            "volunteers": [
-                volunteer_rows_by_id[vid]["name"]
-                for vid in assigned_ids
-                if vid in volunteer_rows_by_id
-            ]
-        }
-
-    return station_data
-
-@app.route("/admin/debug-other-check")
-def debug_other_check():
-    volunteers = Volunteer.query\
-        .filter(Volunteer.deleted_at.is_(None))\
-        .order_by(Volunteer.id)\
-        .all()
-
-    assignments = Assignment.query\
-        .order_by(Assignment.assignment_id.asc())\
-        .all()
-
-    latest_station_by_volunteer = {}
-    for assignment in assignments:
-        if assignment.station_id is None or assignment.volunteer_id is None:
-            continue
-        latest_station_by_volunteer[assignment.volunteer_id] = assignment.station_id
-
-    assigned_volunteer_ids = set(latest_station_by_volunteer.keys())
-
-    return {
-        "assigned_volunteer_ids": list(assigned_volunteer_ids),
-        "volunteer_rows_by_id_keys": [v.id for v in volunteers],
-        "sample_pairs": [
-            {
-                "volunteer_id": v.id,
-                "is_assigned": v.id in assigned_volunteer_ids
-            }
-            for v in volunteers[:15]
-        ]
+    station_to_volunteer_ids = {
+        station.station_id: set()
+        for station in stations
     }
 
-@app.route("/admin/debug-hourly-data")
-def debug_hourly_data():
-    volunteers = Volunteer.query\
-        .filter(Volunteer.deleted_at.is_(None))\
-        .order_by(Volunteer.last_name, Volunteer.first_name)\
-        .all()
+    station_name_to_id = {
+        str(station.station_name).strip().lower(): station.station_id
+        for station in stations
+    }
 
-    stations = Station.query\
-        .order_by(Station.station_name)\
-        .all()
+    volunteer_id_by_email = {
+        v.email.strip().lower(): v.id
+        for v in volunteers
+        if v.email
+    }
 
-    def parse_hours(availability_rows):
-        cleaned_hours = []
+    sheet = get_sheet()
+    rows = sheet.get_all_records()
 
-        for row in availability_rows:
-            if row.deleted_at is not None:
-                continue
+    for row in rows:
+        email = str(row.get("Email", "")).strip().lower()
+        typical_station = str(row.get("Typical Station", "")).strip().lower()
 
-            try:
-                hour = int(str(row.hour).strip())
-            except (ValueError, TypeError):
-                continue
-
-            if 5 <= hour <= 16:
-                cleaned_hours.append(hour)
-
-        return sorted(set(cleaned_hours))
-
-    def build_ranges(hours):
-        if not hours:
-            return []
-
-        ranges = []
-        start = hours[0]
-        prev = hours[0]
-
-        for h in hours[1:]:
-            if h == prev + 1:
-                prev = h
-            else:
-                ranges.append([start, prev])
-                start = h
-                prev = h
-
-        ranges.append([start, prev])
-        return ranges
-
-    def format_hour(h):
-        if h == 0:
-            return "12AM"
-        elif h < 12:
-            return f"{h}AM"
-        elif h == 12:
-            return "12PM"
-        else:
-            return f"{h-12}PM"
-
-    volunteer_rows_by_id = {}
-    for v in volunteers:
-        hours = parse_hours(v.availability)
-        ranges = build_ranges(hours)
-
-        if ranges:
-            range_label = ", ".join(
-                f"{format_hour(start)}-{format_hour(end)}"
-                for start, end in ranges
-            )
-        else:
-            range_label = "N/A"
-
-        volunteer_rows_by_id[v.id] = {
-            "name": f"{v.first_name} {v.last_name}",
-            "hours": hours,
-            "ranges": ranges,
-            "range_label": range_label
-        }
-
-    assignments = Assignment.query.all()
-
-    station_to_volunteer_ids = {}
-    for station in stations:
-        station_to_volunteer_ids[station.station_id] = set()
-
-    for assignment in assignments:
-        if assignment.station_id is None or assignment.volunteer_id is None:
+        if not email or not typical_station or typical_station == "other":
             continue
 
-        station_to_volunteer_ids.setdefault(
-            assignment.station_id, set()
-        ).add(assignment.volunteer_id)
+        volunteer_id = volunteer_id_by_email.get(email)
+        station_id = station_name_to_id.get(typical_station)
+
+        if volunteer_id is None or station_id is None:
+            continue
+
+        station_to_volunteer_ids[station_id].add(volunteer_id)
 
     station_data = {}
     for station in stations:
         station_name = str(station.station_name)
         assigned_ids = station_to_volunteer_ids.get(station.station_id, set())
 
+        volunteers_for_station = [
+            volunteer_rows_by_id[vid]
+            for vid in assigned_ids
+            if vid in volunteer_rows_by_id
+        ]
+        volunteers_for_station.sort(key=lambda x: x["name"])
+
         station_data[station_name] = {
             "station_id": station.station_id,
             "assigned_ids": list(assigned_ids),
-            "volunteers": [
-                volunteer_rows_by_id[vid]
-                for vid in assigned_ids
-                if vid in volunteer_rows_by_id
-            ]
+            "volunteers": volunteers_for_station
         }
 
     return station_data
