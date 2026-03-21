@@ -999,6 +999,20 @@ def get_sheet():
     sheet = client.open("Chunch Volunteer Info").sheet1
     return sheet
 
+def get_applicant_sheet():
+    creds_dict = json.loads(os.environ["GOOGLE_SERVICE_JSON"])
+
+    scopes = [
+        "https://www.googleapis.com/auth/spreadsheets.readonly",
+        "https://www.googleapis.com/auth/drive"
+    ]
+    credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+
+    client = gspread.authorize(credentials)
+    spreadsheet = client.open("Chunch Volunteer Info")
+    sheet = spreadsheet.worksheet("applicants")
+    return sheet
+
 
 def get_drive_service():
     creds_dict = json.loads(os.environ["GOOGLE_DRIVE_JSON"])
