@@ -327,6 +327,11 @@ def add_test_assignment():
 #    db.session.commit()
 #    return {"message": f"Deleted {len(assignments)} assignments for volunteer {volunteer_id}"}
 
+@app.route("/test_absence")
+def test_absence():
+    v = Volunteer.query.first()
+    return str(v.is_absent)
+
 @app.route("/admin/debug-hourly-final")
 def debug_hourly_final():
     volunteers = Volunteer.query\
