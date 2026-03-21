@@ -662,6 +662,13 @@ def delete_volunteer(volunteer_id):
 
     return redirect("/admin/master-list")
 
+@app.route("/admin/master-list/deleted-volunteers")
+def view_deleted():
+    if "user_id" not in session:
+        return redirect("/")
+
+    deleted = Volunteer.query.filter(Volunteer.deleted_at.is_not(None))
+    return render_template("deleted-volunteers.html", deleted=deleted)
 @app.route("/admin/debug-assignments2")
 def debug_assignments():
     assignments = Assignment.query.all()
