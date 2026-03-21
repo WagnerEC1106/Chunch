@@ -879,10 +879,7 @@ def volunteer_hours():
 
             station_data[station_name].sort(key=lambda x: x["name"])
 
-        return render_template(
-            "volunteer-hours.html",
-            station_data=station_data
-        )
+        return station_data
 
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
