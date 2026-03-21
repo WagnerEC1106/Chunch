@@ -1028,7 +1028,7 @@ def sync_volunteers():
                 volunteer = Volunteer(
                     first_name=row["First Name"],
                     last_name=row["Last Name"],
-                    email=email
+                    email=email,
                     phone=phone
                 )
                 db.session.add(volunteer)
