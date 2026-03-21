@@ -680,6 +680,16 @@ def perma_delete(volunteer_id):
         db.session.commit()
     return redirect("/admin/master-list/deleted-volunteers")
 
+@app.route("/admin/master-list/deleted-volunteers/undo/<int:volunteer_id>", methods=["POST"])
+def undo_delete(volunteer_id):
+    if "user_id" not in session:
+        return redirect("/")
+    volunteer = Volunteer.query.get_or_404(volunteer_id)
+    if volunteer:
+        volunteer.deleted_at = None
+        db.session.commit()
+    return redirect("/admin/master-list/deleted-volunteers")
+    
 @app.route("/admin/debug-assignments2")
 def debug_assignments():
     assignments = Assignment.query.all()
