@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NOW TEST Scheduler</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<title>Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 * {
@@ -19,52 +19,68 @@ body {
     color: #1e293b;
 }
 
-/* HEADER */
 .header {
     background: #0f172a;
     color: white;
-    padding: 20px 40px;
+    padding: 24px 32px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 18px;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18);
 }
 
 .header-top {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
-.header-actions {
+.header-copy h1 {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.header-copy p {
+    color: #cbd5e1;
+    font-size: 15px;
+}
+
+.header-tools {
     display: flex;
+    align-items: center;
     gap: 10px;
     flex-wrap: wrap;
 }
 
+.date-picker {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    font-size: 14px;
+    background: white;
+    color: #0f172a;
+}
+
+.load-btn,
 .header button {
-    padding: 8px 16px;
-    border-radius: 20px;
+    padding: 10px 16px;
+    border-radius: 12px;
     border: none;
     background: #2563eb;
     color: white;
     font-weight: 600;
     cursor: pointer;
-    transition: 0.3s;
+    transition: 0.2s ease;
     font-size: 14px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
 }
 
-.icon {
-    font-size: 25px;
-}
-
-.label {
-    font-size: 20px;
-    font-weight: 500;
-}
-
+.load-btn:hover,
 .header button:hover {
     background: #1d4ed8;
 }
@@ -77,46 +93,205 @@ body {
     background: #334155 !important;
 }
 
-/* GRID */
-.grid {
-    padding: 40px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 30px;
+.header-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
-/* CARD */
-.card {
-    border-radius: 20px;
-    padding: 30px;
-    color: white;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-    transition: 0.3s ease;
+.icon {
+    font-size: 18px;
+    line-height: 1;
 }
 
-.card:hover {
-    transform: translateY(-5px);
+.label {
+    font-size: 14px;
+    font-weight: 600;
 }
 
-.card h2 {
-    font-size: 22px;
-    margin-bottom: 20px;
+.page {
+    padding: 32px;
 }
 
-.volunteer {
+.summary-bar {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.summary-card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px 20px;
+    min-width: 180px;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
+    border: 1px solid #e2e8f0;
+}
+
+.summary-label {
+    color: #64748b;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.summary-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.board-header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 8px;
+    align-items: center;
+    margin-bottom: 18px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.board-header h2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.board-header p {
+    color: #64748b;
     font-size: 14px;
 }
 
-/* STATION COLORS (ALL 14) */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 22px;
+}
+
+.card {
+    border-radius: 22px;
+    padding: 22px;
+    color: white;
+    box-shadow: 0 14px 32px rgba(0,0,0,0.12);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px rgba(0,0,0,0.16);
+}
+
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.card h3 {
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.station-count {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.volunteer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.volunteer-pill {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.empty-state {
+    margin-top: 6px;
+    background: rgba(255,255,255,0.12);
+    border: 1px dashed rgba(255,255,255,0.28);
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.9);
+}
+
+.coverage-box {
+    display: none;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 22px;
+    margin-top: 26px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.coverage-box h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+    color: #0f172a;
+}
+
+.coverage-box p {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 14px;
+}
+
+.coverage-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.coverage-box select {
+    min-width: 260px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    font-size: 14px;
+    background: white;
+}
+
+.coverage-box button {
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    background: #dc2626;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.coverage-box button:hover {
+    background: #b91c1c;
+}
+
+/* station colors */
 .setup { background: linear-gradient(135deg,#0ea5e9,#0284c7); }
 .teardown { background: linear-gradient(135deg,#6366f1,#4f46e5); }
 .servers { background: linear-gradient(135deg,#ef4444,#dc2626); }
 .kitchen { background: linear-gradient(135deg,#22c55e,#16a34a); }
 .drinks { background: linear-gradient(135deg,#f97316,#ea580c); }
-.desserts { background: linear-gradient(135deg,#facc15,#eab308); color:#1e293b; }
+.desserts { background: linear-gradient(135deg,#facc15,#eab308); color: #1e293b; }
 .busboys { background: linear-gradient(135deg,#ec4899,#db2777); }
 .dishes { background: linear-gradient(135deg,#06b6d4,#0891b2); }
 .reserve { background: linear-gradient(135deg,#94a3b8,#64748b); }
@@ -125,24 +300,47 @@ body {
 .potato { background: linear-gradient(135deg,#a16207,#854d0e); }
 .salad { background: linear-gradient(135deg,#65a30d,#4d7c0f); }
 .absent { background: linear-gradient(135deg,#dc2626,#7f1d1d); }
+.other { background: linear-gradient(135deg,#64748b,#475569); }
 
-.date-picker {
-    padding: 8px;
-    border-radius: 10px;
-    border: none;
-    font-size: 14px;
+.desserts .station-count,
+.desserts .volunteer-pill,
+.desserts .empty-state {
+    color: #1e293b;
+    background: rgba(255,255,255,0.4);
+    border-color: rgba(255,255,255,0.45);
+}
+
+@media (max-width: 768px) {
+    .header,
+    .page {
+        padding: 20px 16px;
+    }
+
+    .header-copy h1 {
+        font-size: 26px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
 </head>
-
 <body>
 
 <div class="header">
     <div class="header-top">
-        <h1>test admin View</h1>
-        <div>
+        <div class="header-copy">
+            <h1>Admin Dashboard</h1>
+            <p>Station overview, volunteer placement, and coverage tools.</p>
+        </div>
+
+        <div class="header-tools">
             <input type="date" id="datePicker" class="date-picker">
-            <button onclick="loadSchedule()">Load</button>
+            <button class="load-btn" onclick="loadSchedule()">
+                <span class="icon">📅</span>
+                <span class="label">Load Date</span>
+            </button>
         </div>
     </div>
 
@@ -151,49 +349,78 @@ body {
             <span class="icon">📬</span>
             <span class="label">Inbox</span>
         </button>
-    
+
         <button onclick="enableEdit()">
             <span class="icon">✏️</span>
             <span class="label">Edit</span>
         </button>
-    
+
         <button onclick="window.print()">
             <span class="icon">🖨️</span>
             <span class="label">Print</span>
         </button>
-    
+
         <button onclick="window.location.href='/admin/volunteer-hours'">
             <span class="icon">⏱️</span>
             <span class="label">Hourly View</span>
         </button>
-    
+
         <button class="secondary-btn" onclick="requestCoverage()">
             <span class="icon">🚨</span>
             <span class="label">Need Coverage?</span>
         </button>
 
-        <button onclick = "window.location.href='/admin/master-list'">Volunteer Master List</button>
+        <button onclick="window.location.href='/admin/master-list'">
+            <span class="icon">👥</span>
+            <span class="label">Volunteer Master List</span>
+        </button>
     </div>
 </div>
 
-<div class="grid" id="scheduleGrid"></div>
-<div id="coverageBox" style="display:none; padding:20px;">
-    <h3>Select absent volunteer:</h3>
+<div class="page">
+    <div class="summary-bar">
+        <div class="summary-card">
+            <div class="summary-label">Stations</div>
+            <div class="summary-value" id="stationCount">0</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Assigned Volunteers</div>
+            <div class="summary-value" id="assignedCount">0</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Unfilled Stations</div>
+            <div class="summary-value" id="emptyCount">0</div>
+        </div>
+    </div>
 
-    <select id="absentSelect">
-        {% for v in volunteers %}
-            <option value="{{ v.id }}">
-                {{ v.first_name }} {{ v.last_name }}
-            </option>
-        {% endfor %}
-    </select>
+    <div class="board-header">
+        <div>
+            <h2>Station Board</h2>
+            <p>All stations with the volunteers currently assigned to each one.</p>
+        </div>
+    </div>
 
-    <button onclick="submitAbsent()">Next</button>
+    <div class="grid" id="scheduleGrid"></div>
+
+    <div id="coverageBox" class="coverage-box">
+        <h3>Request Coverage</h3>
+        <p>Select the volunteer who will be absent.</p>
+
+        <div class="coverage-controls">
+            <select id="absentSelect">
+                {% for v in volunteers %}
+                    <option value="{{ v.id }}">
+                        {{ v.first_name }} {{ v.last_name }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button onclick="submitAbsent()">Next</button>
+        </div>
+    </div>
 </div>
 
 <script>
-let hourlyView = false;
-
 const stationClassMap = {
     "Setup Team": "setup",
     "Teardown Team": "teardown",
@@ -208,50 +435,102 @@ const stationClassMap = {
     "Greeters": "greeters",
     "Baked Potato Bar": "potato",
     "Salad Bar": "salad",
-    "Absent": "absent"
+    "Absent": "absent",
+    "Other": "other"
 };
+
+function formatCountLabel(count) {
+    return count === 1 ? "1 volunteer" : `${count} volunteers`;
+}
+
+function renderStationBoard(stationData) {
+    const grid = document.getElementById("scheduleGrid");
+    grid.innerHTML = "";
+
+    const stationNames = Object.keys(stationData);
+    let totalAssigned = 0;
+    let emptyStations = 0;
+
+    stationNames.forEach(stationName => {
+        const station = stationData[stationName];
+        const volunteers = station.volunteers || [];
+        totalAssigned += volunteers.length;
+
+        if (volunteers.length === 0) {
+            emptyStations += 1;
+        }
+
+        const card = document.createElement("div");
+        const cssClass = stationClassMap[stationName] || "other";
+        card.className = `card ${cssClass}`;
+
+        let volunteerHTML = "";
+
+        if (volunteers.length > 0) {
+            volunteerHTML = `
+                <div class="volunteer-list">
+                    ${volunteers.map(name => `
+                        <div class="volunteer-pill">${name}</div>
+                    `).join("")}
+                </div>
+            `;
+        } else {
+            volunteerHTML = `<div class="empty-state">No volunteers assigned</div>`;
+        }
+
+        card.innerHTML = `
+            <div class="card-top">
+                <h3>${stationName}</h3>
+                <div class="station-count">${formatCountLabel(volunteers.length)}</div>
+            </div>
+            ${volunteerHTML}
+        `;
+
+        grid.appendChild(card);
+    });
+
+    document.getElementById("stationCount").textContent = stationNames.length;
+    document.getElementById("assignedCount").textContent = totalAssigned;
+    document.getElementById("emptyCount").textContent = emptyStations;
+}
+
+async function loadStationBoard() {
+    try {
+        const response = await fetch("/admin/debug-hourly-final");
+        const stationData = await response.json();
+        renderStationBoard(stationData);
+    } catch (error) {
+        document.getElementById("scheduleGrid").innerHTML = `
+            <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
+                Failed to load station board.
+            </div>
+        `;
+    }
+}
 
 async function loadSchedule() {
     const date = document.getElementById("datePicker").value;
+
     if (!date) {
         alert("Please select a date.");
         return;
     }
 
-    const response = await fetch(`/api/schedule?date=${date}`);
-    const data = await response.json();
+    try {
+        const response = await fetch(`/api/schedule?date=${date}`);
+        const data = await response.json();
 
-    const grid = document.getElementById("scheduleGrid");
-    grid.innerHTML = "";
-
-    data.forEach(station => {
-        const card = document.createElement("div");
-        const cssClass = stationClassMap[station.stationName] || "reserve";
-        card.className = `card ${cssClass}`;
-
-        let volunteerHTML = "";
-        station.volunteers.forEach(v => {
-            volunteerHTML += `
-                <div class="volunteer">
-                    <span>${v.firstName} ${v.lastName}</span>
-                    <span>${v.time}</span>
-                    <span>${v.phone || ""}</span>
-                </div>
-            `;
+        const converted = {};
+        data.forEach(station => {
+            converted[station.stationName] = {
+                volunteers: (station.volunteers || []).map(v => `${v.firstName} ${v.lastName}`)
+            };
         });
 
-        card.innerHTML = `
-            <h2>${station.stationName}</h2>
-            ${volunteerHTML || "<p>No volunteers assigned</p>"}
-        `;
-
-        grid.appendChild(card);
-    });
-}
-
-function toggleView() {
-    hourlyView = !hourlyView;
-    loadSchedule();
+        renderStationBoard(converted);
+    } catch (error) {
+        alert("Could not load that schedule.");
+    }
 }
 
 function enableEdit() {
@@ -259,8 +538,15 @@ function enableEdit() {
 }
 
 function requestCoverage() {
-     document.getElementById("coverageBox").style.display = "block";
+    document.getElementById("coverageBox").style.display = "block";
 }
+
+function submitAbsent() {
+    const selected = document.getElementById("absentSelect").value;
+    alert(`Coverage flow placeholder for volunteer ID ${selected}`);
+}
+
+window.addEventListener("DOMContentLoaded", loadStationBoard);
 </script>
 
 </body>
