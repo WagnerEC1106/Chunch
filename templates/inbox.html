@@ -12,7 +12,9 @@
 
         {% for a in applicants %}
         <tr>
-            <td>{{ a.first_name }} {{ a.last_name }}</td>
+            <td>
+            <a href="/admin/inbox/{{ a.id }}">{{ a.first_name }} {{ a.last_name }}</a>
+            </td>
             <td>{{ a.email }}</td>
             <td>{{ a.phone }}</td>
             <td>
@@ -44,7 +46,9 @@
         
         {% for r in rejected %}
         <tr>
-            <td>{{ r.first_name }} {{ r.last_name }}</td>
+            <td>
+            <a href="/admin/inbox/{{ r.id }}">{{ r.first_name }} {{ r.last_name }}</a>
+            </td>
             <td>{{ r.email }}</td>
             <td>{{ r.phone }}</td>
             <td>
