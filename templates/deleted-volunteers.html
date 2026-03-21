@@ -20,6 +20,14 @@
                 </button>
               </form>
             </td>
+            <td>
+              <form method = "POST" action = "/admin/master-list/deleted-volunteers/undo/{{ d.id }}">
+                <button type ="submit"
+                  onclick="return confirm('Undo deletion of this volunteer?')">
+                  Undo Delete
+                </button>
+              </form>
+            </td>
         </tr>
         
         {% endfor %}
