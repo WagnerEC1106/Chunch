@@ -1013,6 +1013,11 @@ def get_applicant_sheet():
     sheet = spreadsheet.worksheet("Applicants")
     return sheet
 
+@app.route("/admin/inbox/<int:applicant_id>")
+def applicant_detail(applicant_id):
+    applicant = Applicant.query.get_or_404(applicant_id)
+    return render_template("applicant-detail.html", applicant=applicant)
+
 @app.route("/admin/sync-applicants", methods=["GET", "POST"])
 def sync_applicants():
     if "user_id" not in session:
