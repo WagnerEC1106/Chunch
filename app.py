@@ -1022,15 +1022,52 @@ def sync_applicants():
         sheet = get_applicant_sheet()
         values = sheet.get_all_values()
 
-        return {
-            "row_count_all_values": len(values),
-            "first_5_rows": values[:5]
-        }
+        if len(values) < 2:
+            return redirect("/admin/inbox")
+
+        headers = values[0]
+        data_rows = values[1:]
+
+        for row in data_rows:
+            row_dict = dict(zip(headers, row))
+
+            first_name = str(row_dict.get("First Name", "")).strip()
+            last_name = str(row_dict.get("Last Name", "")).strip()
+            email = str(row_dict.get("Email", "")).strip().lower()
+            phone = str(row_dict.get("Phone Number", "")).strip()
+            member = str(row_dict.get("Member", "")).strip()
+            unavailability = str(row_dict.get("Unavailability", "")).strip()
+            other_info = str(row_dict.get("Other Info", "")).strip()
+
+            if not email:
+                continue
+
+            existing = Applicant.query.filter_by(email=email).first()
+
+            if not existing:
+                applicant = Applicant(
+                    first_name=first_name,
+                    last_name=last_name,
+                    email=email,
+                    phone=phone,
+                    availability=member,
+                    unavailability=unavailability,
+                    status="pending"
+                )
+                db.session.add(applicant)
+            else:
+                existing.first_name = first_name
+                existing.last_name = last_name
+                existing.phone = phone
+                existing.availability = member
+                existing.unavailability = unavailability
+
+        db.session.commit()
+        return redirect("/admin/inbox")
 
     except Exception as e:
-        return {
-            "error": str(e)
-        }, 500
+        db.session.rollback()
+        return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
 # @app.route("/admin/sync-applicants", methods=["GET", "POST"])
 # def sync_applicants():
