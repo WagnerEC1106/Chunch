@@ -337,6 +337,15 @@ def debug_hourly_final():
             if account.volunteer_id is not None
         }
 
+        sheet = get_sheet()
+        rows = sheet.get_all_records()
+
+        sheet_row_by_email = {}
+        for row in rows:
+            email = str(row.get("Email", "")).strip().lower()
+            if email:
+                sheet_row_by_email[email] = row
+
         volunteer_rows_by_id = {}
 
         for v in volunteers:
@@ -344,12 +353,22 @@ def debug_hourly_final():
             if role_by_volunteer_id.get(v.id) == "captain":
                 captain_status = "Captain"
 
+            email_key = v.email.strip().lower() if v.email else ""
+            sheet_row = sheet_row_by_email.get(email_key, {})
+
             volunteer_rows_by_id[v.id] = {
                 "id": v.id,
                 "name": f"{v.first_name} {v.last_name}",
                 "email": v.email or "",
                 "phone": v.phone or "",
-                "captain_status": captain_status
+                "captain_status": captain_status,
+                "typical_shift": str(sheet_row.get("Typical Shift", "")).strip(),
+                "unavailability": str(sheet_row.get("Unavailability", "")).strip(),
+                "capability_restrictions": str(
+                    sheet_row.get("Capability Restrictions", "") or
+                    sheet_row.get("Restrictions", "") or
+                    sheet_row.get("Other Info", "")
+                ).strip()
             }
 
         station_to_volunteer_ids = {
@@ -367,9 +386,6 @@ def debug_hourly_final():
             for v in volunteers
             if v.email
         }
-
-        sheet = get_sheet()
-        rows = sheet.get_all_records()
 
         for row in rows:
             email = str(row.get("Email", "")).strip().lower()
