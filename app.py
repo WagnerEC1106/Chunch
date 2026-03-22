@@ -620,14 +620,14 @@ def master_list():
     volunteer_rows = []
     for v in volunteers:
         #role = role_by_volunteer_id.get(v.id, "volunteer")
-        role = UserAccount.query.filter(UserAccount.volunteer_id == v.id)
+        user = UserAccount.query.filter(UserAccount.volunteer_id == v.id)
         volunteer_rows.append({
             "id": v.id,
             "first_name": v.first_name,
             "last_name": v.last_name,
             "email": v.email,
             "phone": v.phone,
-            "captain_status": "Captain" if role else "Volunteer"
+            "captain_status": user.role if role.is_not(None) else "Volunteer"
         })
 
     return render_template("master-list.html", volunteers=volunteer_rows)
