@@ -609,7 +609,7 @@ def master_list():
         .filter(Volunteer.deleted_at.is_(None))\
         .order_by(Volunteer.last_name)\
         .all()
-
+    
     accounts = UserAccount.query.all()
     role_by_volunteer_id = {
         account.volunteer_id: account.role
@@ -619,16 +619,17 @@ def master_list():
 
     volunteer_rows = []
     for v in volunteers:
-        role = role_by_volunteer_id.get(v.id, "volunteer")
-
+        #role = role_by_volunteer_id.get(v.id, "volunteer")
+        role = UserAccount.query.filter_by(UserAccount.volunteer_id == v.id)
         volunteer_rows.append({
             "id": v.id,
             "first_name": v.first_name,
             "last_name": v.last_name,
             "email": v.email,
             "phone": v.phone,
-            "captain_status": "Captain" if role == "captain" else "Volunteer"
+            "captain_status": "Captain" if role else "Volunteer"
         })
+    a
 
     return render_template("master-list.html", volunteers=volunteer_rows)
     
