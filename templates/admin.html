@@ -379,12 +379,12 @@ body {
 <div class="page">
     <div class="summary-bar">
         <div class="summary-card">
-            <div class="summary-label">Available Reserves</div>
-            <div class="summary-value" id="reserveCount">0</div>
+            <div class="summary-label">Stations</div>
+            <div class="summary-value" id="stationCount">0</div>
         </div>
         <div class="summary-card">
-            <div class="summary-label">Available Reserves</div>
-            <div class="summary-value" id="reserveCount">0</div>
+            <div class="summary-label">Assigned Volunteers</div>
+            <div class="summary-value" id="assignedCount">0</div>
         </div>
         <div class="summary-card">
             <div class="summary-label">Unfilled Stations</div>
@@ -447,25 +447,20 @@ function renderStationBoard(stationData) {
     grid.innerHTML = "";
 
     const stationNames = Object.keys(stationData);
-    let reserveCount = 0;
+    let totalAssigned = 0;
     let emptyStations = 0;
 
     stationNames.forEach(stationName => {
-        if (stationName === "Other") return;
-
         const station = stationData[stationName];
         const volunteers = station.volunteers || [];
-        if (stationName === "Reserve") {
-            reserveCount = volunteers.length;
-        }
+        totalAssigned += volunteers.length;
 
         if (volunteers.length === 0) {
             emptyStations += 1;
         }
 
         const card = document.createElement("div");
-        const cssClass = stationClassMap[stationName];
-        if (!cssClass) return;
+        const cssClass = stationClassMap[stationName] || "other";
         card.className = `card ${cssClass}`;
 
         let volunteerHTML = "";
@@ -494,7 +489,7 @@ function renderStationBoard(stationData) {
     });
 
     document.getElementById("stationCount").textContent = stationNames.length;
-    document.getElementById("reserveCount").textContent = reserveCount;
+    document.getElementById("assignedCount").textContent = totalAssigned;
     document.getElementById("emptyCount").textContent = emptyStations;
 }
 
