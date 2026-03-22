@@ -136,9 +136,8 @@
                 label: "No scheduled hours",
                 data: volunteers.map(() => null),
                 borderWidth: 1,
-                barPercentage: 1.0,
-                categoryPercentage: 1.0,
-                barThickness: 'flex'
+                barPercentage: 0.6,
+                categoryPercentage: 0.7
             });
         }
 
@@ -178,12 +177,6 @@
                             }
                         }
                     },
-                    datasets: {
-                        bar: {
-                            barPercentage: 1.0,
-                            categoryPercentage: 1.0
-                        }
-                    }
                     title: {
                         display: true,
                         text: stationName
