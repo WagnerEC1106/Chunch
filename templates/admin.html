@@ -716,11 +716,13 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("detailEmail").textContent = volunteer.email || "None listed";
     document.getElementById("detailPhone").textContent = volunteer.phone || "None listed";
     document.getElementById("detailCaptain").textContent = volunteer.captain_status || "Volunteer";
+    document.getElementById("detailShift").textContent = volunteer.typical_shift || "None listed";
+    document.getElementById("detailUnavailability").textContent = volunteer.unavailability || "None listed";
+    document.getElementById("detailRestrictions").textContent = volunteer.capability_restrictions || "None listed";
 
     document.getElementById("detailPanel").classList.add("open");
     document.getElementById("detailOverlay").classList.add("open");
 }
-
 function closeVolunteerPanel() {
     document.getElementById("detailPanel").classList.remove("open");
     document.getElementById("detailOverlay").classList.remove("open");
@@ -732,6 +734,8 @@ function editVolunteer() {
 
 window.addEventListener("DOMContentLoaded", loadStationBoard);
 </script>
+<div id="detailOverlay" class="detail-overlay" onclick="closeVolunteerPanel()"></div>
+
 <div id="detailOverlay" class="detail-overlay" onclick="closeVolunteerPanel()"></div>
 
 <div id="detailPanel" class="detail-panel">
@@ -757,6 +761,21 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
         <div class="detail-card">
             <div class="detail-label">Captain Status</div>
             <div class="detail-value" id="detailCaptain">—</div>
+        </div>
+
+        <div class="detail-card">
+            <div class="detail-label">Typical Shift</div>
+            <div class="detail-value" id="detailShift">—</div>
+        </div>
+
+        <div class="detail-card">
+            <div class="detail-label">Unavailability</div>
+            <div class="detail-value" id="detailUnavailability">—</div>
+        </div>
+
+        <div class="detail-card">
+            <div class="detail-label">Capability Restrictions</div>
+            <div class="detail-value" id="detailRestrictions">—</div>
         </div>
     </div>
 </div>
