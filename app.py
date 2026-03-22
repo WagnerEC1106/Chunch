@@ -620,7 +620,7 @@ def master_list():
     volunteer_rows = []
     for v in volunteers:
         #role = role_by_volunteer_id.get(v.id, "volunteer")
-        user = UserAccount.query.filter(UserAccount.volunteer_id == v.id)
+        user = UserAccount.query.filter(UserAccount.volunteer_id == v.id).first()
         volunteer_rows.append({
             "id": v.id,
             "first_name": v.first_name,
