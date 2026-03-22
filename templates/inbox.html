@@ -226,11 +226,14 @@
                         <td class="muted">{{ a.phone }}</td>
                         <td colspan="2">
                             <div class="actions">
-                                <form method="POST" action="/admin/inbox/accept/{{ a.id }}">
-                                    <button class="btn-accept" type="submit" onclick="return confirm('Accept this applicant?')">
+                                <button class="btn-accept" 
+                                    onclick="openAssignmentModal(
+                                        {{ a.id }},
+                                        '{{ a.first_name }} {{ a.last_name }}',
+                                        '{{ a.phone }}'
+                                    )">
                                         Accept
                                     </button>
-                                </form>
 
                                 <form method="POST" action="/admin/inbox/reject/{{ a.id }}">
                                     <button class="btn-reject" type="submit" onclick="return confirm('Reject this applicant?')">
@@ -297,5 +300,50 @@
             {% endif %}
         </div>
     </div>
+    <div id="assignmentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+      <div style="background:white; padding:20px; width:400px; margin:10% auto; border-radius:10px;">
+    
+        <h3 id="modalName"></h3>
+
+        <form method="POST" action="/admin/inbox/accept-with-assignment">
+          <input type="hidden" name="applicant_id" id="modalApplicantId">
+
+          <label>Station:</label>
+          <select name="station_id" required>
+            {% for station in stations %}
+              <option value="{{ station.id }}">{{ station.name }}</option>
+            {% endfor %}
+          </select>
+
+          <br><br>
+
+          <label>Schedule:</label>
+            <select name="schedule_id" required>
+              {% for s in schedules %}
+                <option value="{{ s.schedule_id }}">
+                  {{ s.day }} - {{ s.hour }}:00
+                </option>
+              {% endfor %}
+            </select>
+
+          <br><br>
+
+          <button type="submit" class="btn-accept">Confirm Assignment</button>
+          <button type="button" onclick="closeModal()">Cancel</button>
+        </form>
+
+      </div>
+    </div>
+    <script>
+    function openAssignmentModal(id, name, phone) {
+        document.getElementById("assignmentModal").style.display = "block";
+        document.getElementById("modalApplicantId").value = id;
+        document.getElementById("modalName").innerText = name;
+    }
+
+    function closeModal() {
+        document.getElementById("assignmentModal").style.display = "none";
+    }
+    </script>
 </body>
 </html>
