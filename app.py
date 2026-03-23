@@ -264,16 +264,68 @@ def coverage_details():
     if not absent_row:
         return {"error": "Absent volunteer not found in sheet"}, 404
 
+    def parse_time_to_hour(time_str):
+        time_str = str(time_str).strip().upper().replace(" ", "")
+
+        if not time_str:
+            return None
+
+        if time_str.endswith("AM"):
+            raw = time_str[:-2]
+            if ":" in raw:
+                raw = raw.split(":")[0]
+            if not raw.isdigit():
+                return None
+            hour = int(raw)
+            return 0 if hour == 12 else hour
+
+        if time_str.endswith("PM"):
+            raw = time_str[:-2]
+            if ":" in raw:
+                raw = raw.split(":")[0]
+            if not raw.isdigit():
+                return None
+            hour = int(raw)
+            return hour if hour == 12 else hour + 12
+
+        return None
+
+    def parse_shift_hours(shift_text):
+        shift_text = str(shift_text).strip()
+        if not shift_text:
+            return []
+
+        normalized = shift_text.replace("–", "-").replace("—", "-")
+        parts = normalized.split("-", 1)
+
+        if len(parts) != 2:
+            return []
+
+        start_hour = parse_time_to_hour(parts[0])
+        end_hour = parse_time_to_hour(parts[1])
+
+        if start_hour is None or end_hour is None:
+            return []
+
+        if start_hour > end_hour:
+            return []
+
+        return list(range(start_hour, end_hour + 1))
+
+    typical_shift = str(absent_row.get("Typical Shift", "")).strip()
+    shift_hours = parse_shift_hours(typical_shift)
+
     return {
         "absent_volunteer": {
             "id": absent_volunteer.id,
             "name": f"{absent_volunteer.first_name} {absent_volunteer.last_name}",
             "email": absent_volunteer.email,
-            "typical_shift": str(absent_row.get("Typical Shift", "")).strip(),
+            "typical_shift": typical_shift,
+            "shift_hours": shift_hours,
             "unavailability": str(absent_row.get("Unavailability", "")).strip()
         }
     }
-
+    
 @app.route("/debug/add-test-assignment")
 def add_test_assignment():
     return {"message": "disabled"}
