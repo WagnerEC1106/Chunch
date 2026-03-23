@@ -234,6 +234,46 @@ def admin_page():
         .all()
 
     return render_template("admin.html", volunteers=volunteers)
+
+@app.route("/admin/coverage/details")
+def coverage_details():
+    volunteer_id = request.args.get("volunteer_id", type=int)
+
+    if not volunteer_id:
+        return {"error": "Missing volunteer_id"}, 400
+
+    absent_volunteer = Volunteer.query\
+        .filter(Volunteer.deleted_at.is_(None), Volunteer.id == volunteer_id)\
+        .first()
+
+    if not absent_volunteer:
+        return {"error": "Volunteer not found"}, 404
+
+    sheet = get_sheet()
+    rows = sheet.get_all_records()
+
+    row_by_email = {}
+    for row in rows:
+        email = str(row.get("Email", "")).strip().lower()
+        if email:
+            row_by_email[email] = row
+
+    absent_email = (absent_volunteer.email or "").strip().lower()
+    absent_row = row_by_email.get(absent_email)
+
+    if not absent_row:
+        return {"error": "Absent volunteer not found in sheet"}, 404
+
+    return {
+        "absent_volunteer": {
+            "id": absent_volunteer.id,
+            "name": f"{absent_volunteer.first_name} {absent_volunteer.last_name}",
+            "email": absent_volunteer.email,
+            "typical_shift": str(absent_row.get("Typical Shift", "")).strip(),
+            "unavailability": str(absent_row.get("Unavailability", "")).strip()
+        }
+    }
+
 @app.route("/debug/add-test-assignment")
 def add_test_assignment():
     return {"message": "disabled"}
@@ -316,45 +356,6 @@ def add_test_assignment():
 #
 #    db.session.commit()
 #    return {"message": f"Deleted {len(assignments)} assignments for volunteer {volunteer_id}"}
-
-@app.route("/admin/coverage/details")
-def coverage_details():
-    volunteer_id = request.args.get("volunteer_id", type=int)
-
-    if not volunteer_id:
-        return {"error": "Missing volunteer_id"}, 400
-
-    absent_volunteer = Volunteer.query\
-        .filter(Volunteer.deleted_at.is_(None), Volunteer.id == volunteer_id)\
-        .first()
-
-    if not absent_volunteer:
-        return {"error": "Volunteer not found"}, 404
-
-    sheet = get_sheet()
-    rows = sheet.get_all_records()
-
-    row_by_email = {}
-    for row in rows:
-        email = str(row.get("Email", "")).strip().lower()
-        if email:
-            row_by_email[email] = row
-
-    absent_email = (absent_volunteer.email or "").strip().lower()
-    absent_row = row_by_email.get(absent_email)
-
-    if not absent_row:
-        return {"error": "Absent volunteer not found in sheet"}, 404
-
-    return {
-        "absent_volunteer": {
-            "id": absent_volunteer.id,
-            "name": f"{absent_volunteer.first_name} {absent_volunteer.last_name}",
-            "email": absent_volunteer.email,
-            "typical_shift": str(absent_row.get("Typical Shift", "")).strip(),
-            "unavailability": str(absent_row.get("Unavailability", "")).strip()
-        }
-    }
 
 @app.route("/admin/debug-hourly-final")
 def debug_hourly_final():
