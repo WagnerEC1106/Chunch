@@ -271,6 +271,14 @@ def coverage_details():
     if not absent_volunteer:
         return {"error": "Volunteer not found"}, 404
 
+    latest_absence = Absence.query\
+        .filter(Absence.volunteer_id == volunteer_id)\
+        .order_by(Absence.absence_id.desc())\
+        .first()
+
+    if not latest_absence:
+        return "<pre>No absence record found for this volunteer.</pre>", 404
+
     sheet = get_sheet()
     rows = sheet.get_all_records()
 
@@ -381,7 +389,18 @@ def coverage_details():
         )
 
     typical_shift = str(absent_row.get("Typical Shift", "")).strip()
-    shift_hours = parse_hour_list(typical_shift)
+    full_shift_hours = parse_hour_list(typical_shift)
+
+    if latest_absence.is_partial:
+        shift_hours = list(range(
+            latest_absence.partial_start_hour,
+            latest_absence.partial_end_hour + 1
+        ))
+        shift_label = format_ranges(shift_hours)
+    else:
+        shift_hours = full_shift_hours
+        shift_label = typical_shift
+
     shift_hour_set = set(shift_hours)
 
     fully_available_reserves = []
@@ -434,13 +453,16 @@ def coverage_details():
             "id": absent_volunteer.id,
             "name": f"{absent_volunteer.first_name} {absent_volunteer.last_name}",
             "email": absent_volunteer.email,
-            "typical_shift": typical_shift,
-            "unavailability": str(absent_row.get("Unavailability", "")).strip()
+            "typical_shift": shift_label,
+            "unavailability": str(absent_row.get("Unavailability", "")).strip(),
+            "start_date": latest_absence.start_date,
+            "end_date": latest_absence.end_date,
+            "is_partial": latest_absence.is_partial,
+            "notes": latest_absence.notes or ""
         },
         fully_available_reserves=fully_available_reserves,
         partial_overlap_reserves=partial_overlap_reserves
     )
-
 @app.route("/admin/need-coverage/save", methods=["POST"])
 def save_need_coverage():
     if "user_id" not in session:
