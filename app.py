@@ -323,11 +323,8 @@ def coverage_details():
 
         return sorted(hours)
 
-    def parse_shift_hours(shift_text):
-        return parse_hour_list(shift_text)
-
     typical_shift = str(absent_row.get("Typical Shift", "")).strip()
-    shift_hours = parse_shift_hours(typical_shift)
+    shift_hours = parse_hour_list(typical_shift)
     shift_hour_set = set(shift_hours)
 
     fully_available_reserves = []
@@ -369,18 +366,18 @@ def coverage_details():
         else:
             partial_overlap_reserves.append(reserve_info)
 
-    return {
-        "absent_volunteer": {
+    return render_template(
+        "coverage-details.html",
+        absent_volunteer={
             "id": absent_volunteer.id,
             "name": f"{absent_volunteer.first_name} {absent_volunteer.last_name}",
             "email": absent_volunteer.email,
             "typical_shift": typical_shift,
-            "shift_hours": shift_hours,
             "unavailability": str(absent_row.get("Unavailability", "")).strip()
         },
-        "fully_available_reserves": fully_available_reserves,
-        "partial_overlap_reserves": partial_overlap_reserves
-    }
+        fully_available_reserves=fully_available_reserves,
+        partial_overlap_reserves=partial_overlap_reserves
+    )
 
 @app.route("/debug/add-test-assignment")
 def add_test_assignment():
