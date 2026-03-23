@@ -140,6 +140,8 @@ class Assignment(db.Model):
     
     created_by = Column(Integer, ForeignKey("user_account.user_id"))
 
+    is_absent = Column(Boolean, default = False)
+
    # original_station_id = Column(Integer, ForeignKey("station.station_id"))
 
     volunteer = relationship("Volunteer", backref = "assignments")
