@@ -323,6 +323,43 @@ def coverage_details():
 
         return sorted(hours)
 
+    def format_hour(h):
+        if h == 0:
+            return "12AM"
+        elif h < 12:
+            return f"{h}AM"
+        elif h == 12:
+            return "12PM"
+        else:
+            return f"{h-12}PM"
+
+    def build_ranges(hours):
+        if not hours:
+            return []
+
+        ranges = []
+        start = hours[0]
+        prev = hours[0]
+
+        for h in hours[1:]:
+            if h == prev + 1:
+                prev = h
+            else:
+                ranges.append((start, prev))
+                start = h
+                prev = h
+
+        ranges.append((start, prev))
+        return ranges
+
+    def format_ranges(hours):
+        ranges = build_ranges(hours)
+
+        return ", ".join(
+            f"{format_hour(start)}–{format_hour(end)}"
+            for start, end in ranges
+        )
+
     typical_shift = str(absent_row.get("Typical Shift", "")).strip()
     shift_hours = parse_hour_list(typical_shift)
     shift_hour_set = set(shift_hours)
@@ -362,7 +399,7 @@ def coverage_details():
             "phone": volunteer.phone,
             "typical_shift": str(row.get("Typical Shift", "")).strip(),
             "unavailability": unavailability_text,
-            "overlapping_hours": overlapping_hours,
+            "overlapping_label": format_ranges(overlapping_hours),
             "special_notes": str(row.get("Special Notes", "")).strip()
         }
 
