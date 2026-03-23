@@ -1338,8 +1338,15 @@ def sync_volunteers():
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
     
 @app.route("/admin/need-coverage")
-def need_coverage_page():
-    volunteers = Volunteer.query.filter(Volunteer.deleted_at.is_(None)).all()
+def need_coverage():
+    if "user_id" not in session:
+        return redirect("/")
+
+    volunteers = Volunteer.query\
+        .filter(Volunteer.deleted_at.is_(None))\
+        .order_by(Volunteer.last_name, Volunteer.first_name)\
+        .all()
+
     return render_template("need-coverage.html", volunteers=volunteers)
 
 #attempting to write a flask cli command to add admins
