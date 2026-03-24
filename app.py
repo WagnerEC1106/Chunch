@@ -465,55 +465,57 @@ def coverage_details():
     )
 @app.route("/admin/need-coverage/save", methods=["POST"])
 def save_need_coverage():
-    if "user_id" not in session:
-        return redirect("/")
-
-    volunteer_id = request.form.get("volunteer_id", type=int)
-    start_date_str = request.form.get("start_date", "").strip()
-    end_date_str = request.form.get("end_date", "").strip()
-    is_partial_str = request.form.get("is_partial", "false").strip().lower()
-    partial_start_hour = request.form.get("partial_start_hour", type=int)
-    partial_end_hour = request.form.get("partial_end_hour", type=int)
-    notes = request.form.get("notes", "").strip()
-
-    if not volunteer_id or not start_date_str or not end_date_str:
-        return "<pre>Missing required fields.</pre>", 400
-
     try:
+        if "user_id" not in session:
+            return redirect("/")
+
+        volunteer_id = request.form.get("volunteer_id", type=int)
+        start_date_str = request.form.get("start_date", "").strip()
+        end_date_str = request.form.get("end_date", "").strip()
+        is_partial_str = request.form.get("is_partial", "false").strip().lower()
+        partial_start_hour = request.form.get("partial_start_hour", type=int)
+        partial_end_hour = request.form.get("partial_end_hour", type=int)
+        notes = request.form.get("notes", "").strip()
+
+        if not volunteer_id or not start_date_str or not end_date_str:
+            return "<pre>Missing required fields.</pre>", 400
+
         start_date = date.fromisoformat(start_date_str)
         end_date = date.fromisoformat(end_date_str)
-    except ValueError:
-        return "<pre>Invalid date format.</pre>", 400
 
-    if end_date < start_date:
-        return "<pre>End date cannot be before start date.</pre>", 400
+        if end_date < start_date:
+            return "<pre>End date cannot be before start date.</pre>", 400
 
-    is_partial = (is_partial_str == "true")
+        is_partial = (is_partial_str == "true")
 
-    if is_partial:
-        if partial_start_hour is None or partial_end_hour is None:
-            return "<pre>Partial absences require both start and end hours.</pre>", 400
+        if is_partial:
+            if partial_start_hour is None or partial_end_hour is None:
+                return "<pre>Partial absences require both start and end hours.</pre>", 400
 
-        if partial_start_hour > partial_end_hour:
-            return "<pre>Partial start hour cannot be after partial end hour.</pre>", 400
-    else:
-        partial_start_hour = None
-        partial_end_hour = None
+            if partial_start_hour > partial_end_hour:
+                return "<pre>Partial start hour cannot be after partial end hour.</pre>", 400
+        else:
+            partial_start_hour = None
+            partial_end_hour = None
 
-    absence = Absence(
-        volunteer_id=volunteer_id,
-        start_date=start_date,
-        end_date=end_date,
-        is_partial=is_partial,
-        partial_start_hour=partial_start_hour,
-        partial_end_hour=partial_end_hour,
-        notes=notes or None
-    )
+        absence = Absence(
+            volunteer_id=volunteer_id,
+            start_date=start_date,
+            end_date=end_date,
+            is_partial=is_partial,
+            partial_start_hour=partial_start_hour,
+            partial_end_hour=partial_end_hour,
+            notes=notes or None
+        )
 
-    db.session.add(absence)
-    db.session.commit()
+        db.session.add(absence)
+        db.session.commit()
 
-    return redirect(f"/admin/coverage/details?volunteer_id={volunteer_id}")
+        return redirect(f"/admin/coverage/details?volunteer_id={volunteer_id}")
+
+    except Exception as e:
+        db.session.rollback()
+        return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
 #     s = Station.query.filter_by(station_name="Line Servers").first()
 
