@@ -95,8 +95,8 @@
     <form method="POST" action="/admin/need-coverage/save">
         <div class="field">
             <label for="volunteer_id">Volunteer</label>
-            <select id="volunteer_id" name="volunteer_id" class="searchable" required>
-                <option value="" selected disabled hidden>Select a volunteer</option>
+            <select id="volunteer_id" name="volunteer_id" required>
+                <option value="" ></option>
                 {% for v in volunteers %}
                     <option value="{{ v.id }}">
                         {{ v.first_name }} {{ v.last_name }}
@@ -164,13 +164,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const $select = $('#volunteer_id');
 
     $select.select2({
-        placeholder: "Search for a volunteer",
+        placeholder: "Select a volunteer",
         allowClear: true,
         width: '100%'
     });
 
-    // forces dropdown to start empty
-    $select.val(null).trigger('change');
+    setTimeout(() => {
+        $select.val(null).trigger('change');
+    }, 0);
 });
 
 </script>
