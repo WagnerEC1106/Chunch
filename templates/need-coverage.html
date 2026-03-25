@@ -161,11 +161,16 @@ function togglePartialFields() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    $('#volunteer_id').select2({
+    const $select = $('#volunteer_id');
+
+    $select.select2({
         placeholder: "Search for a volunteer",
         allowClear: true,
         width: '100%'
     });
+
+    // forces dropdown to start empty
+    $select.val(null).trigger('change');
 });
 
 </script>
