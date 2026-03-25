@@ -96,7 +96,7 @@
         <div class="field">
             <label for="volunteer_id">Volunteer</label>
             <select id="volunteer_id" name="volunteer_id" class="searchable" required>
-                <option value="" selected disabled hidden></option>
+                <option value="" selected disabled hidden>Select a volunteer</option>
                 {% for v in volunteers %}
                     <option value="{{ v.id }}">
                         {{ v.first_name }} {{ v.last_name }}
