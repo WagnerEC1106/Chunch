@@ -719,7 +719,29 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("detailCaptain").textContent = volunteer.captain_status || "Volunteer";
     document.getElementById("detailShift").textContent = volunteer.typical_shift || "None listed";
     document.getElementById("detailUnavailability").textContent = volunteer.unavailability || "None listed";
-    document.getElementById("detailRestrictions").textContent = volunteer.capability_restrictions || "None listed";
+document.getElementById("detailRestrictions").textContent = volunteer.capability_restrictions || "None listed";
+
+const absenceCard = document.getElementById("detailAbsenceCard");
+const absenceText = document.getElementById("detailAbsence");
+
+if (volunteer.absence_id) {
+    let text = "";
+
+    if (volunteer.absence_is_partial) {
+        const start = volunteer.absence_partial_start_hour;
+        const end = volunteer.absence_partial_end_hour;
+        text = `Partial: ${start}:00 - ${end}:00`;
+    } else {
+        const start = volunteer.absence_start_date;
+        const end = volunteer.absence_end_date;
+        text = `${start} → ${end}`;
+    }
+
+    absenceText.textContent = text;
+    absenceCard.style.display = "block";
+} else {
+    absenceCard.style.display = "none";
+}
 
     document.getElementById("detailPanel").classList.add("open");
     document.getElementById("detailOverlay").classList.add("open");
@@ -777,6 +799,11 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
         <div class="detail-card">
             <div class="detail-label">Capability Restrictions</div>
             <div class="detail-value" id="detailRestrictions">—</div>
+        </div>
+
+        <div class="detail-card" id="detailAbsenceCard" style="display:none;">
+            <div class="detail-label">Absence</div>
+            <div class="detail-value" id="detailAbsence">—</div>
         </div>
     </div>
 </div>
