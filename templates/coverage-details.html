@@ -126,57 +126,57 @@
         <div class="card">
             <h2>Fully Available Reserves</h2>
 
-            {% if fully_available_reserves %}
-                {% for r in fully_available_reserves %}
-                    <div class="reserve-card">
-                        <div class="reserve-name">{{ r.name }}</div>
-                        <div><strong>Email:</strong> {{ r.email or "None listed" }}</div>
-                        <div><strong>Phone:</strong> {{ r.phone or "None listed" }}</div>
-                        <div><strong>Unavailability:</strong> {{ r.unavailability or "None listed" }}</div>
+{% if fully_available_reserves %}
+    {% for r in fully_available_reserves %}
+        <div class="reserve-card">
+            <div class="reserve-name">{{ r.name }}</div>
+            <div><strong>Email:</strong> {{ r.email or "None listed" }}</div>
+            <div><strong>Phone:</strong> {{ r.phone or "None listed" }}</div>
+            <div><strong>Unavailability:</strong> {{ r.unavailability or "None listed" }}</div>
 
-                        {% if r.special_notes %}
-                            <div class="warning">⚠ {{ r.special_notes }}</div>
-                        {% endif %}
+            {% if r.special_notes %}
+                <div class="warning">⚠ {{ r.special_notes }}</div>
+            {% endif %}
 
-                        <form method="POST" action="/admin/coverage/assign">
-                            <input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}">
-                            <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
-                            <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
-                            <button type="submit">Assign This Reserve</button>
-                        </form>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p class="empty-state">No fully available reserves.</p>
-            {% endif %} 
+            <form method="POST" action="/admin/coverage/assign" style="margin-top: 10px;">
+                <input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}">
+                <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
+                <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
+                <button type="submit">Assign This Reserve</button>
+            </form>
+        </div>
+    {% endfor %}
+{% else %}
+    <p class="empty-state">No fully available reserves.</p>
+{% endif %}
         </div>
 
         <div class="card">
             <h2>Partially Available Reserves</h2>
 
-            {% if partial_overlap_reserves %}
-                {% for r in partial_overlap_reserves %}
-                    <div class="reserve-card">
-                        <div class="reserve-name">{{ r.name }}</div>
-                        <div><strong>Email:</strong> {{ r.email or "None listed" }}</div>
-                        <div><strong>Phone:</strong> {{ r.phone or "None listed" }}</div>
-                        <div><strong>Overlapping Time:</strong> {{ r.overlapping_label or "None listed" }}</div>
+{% if partial_overlap_reserves %}
+    {% for r in partial_overlap_reserves %}
+        <div class="reserve-card">
+            <div class="reserve-name">{{ r.name }}</div>
+            <div><strong>Email:</strong> {{ r.email or "None listed" }}</div>
+            <div><strong>Phone:</strong> {{ r.phone or "None listed" }}</div>
+            <div><strong>Overlapping Time:</strong> {{ r.overlapping_label or "None listed" }}</div>
 
-                        {% if r.special_notes %}
-                            <div class="warning">⚠ {{ r.special_notes }}</div>
-                        {% endif %}
-
-                        <form method="POST" action="/admin/coverage/assign">
-                            <input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}">
-                            <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
-                            <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
-                            <button type="submit">Assign This Reserve</button>
-                        </form>
-                    </div>
-                 {% endfor %}
-            {% else %}
-                <p class="empty-state">No partial options.</p>
+            {% if r.special_notes %}
+                <div class="warning">⚠ {{ r.special_notes }}</div>
             {% endif %}
+
+            <form method="POST" action="/admin/coverage/assign" style="margin-top: 10px;">
+                <input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}">
+                <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
+                <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
+                <button type="submit">Assign This Reserve</button>
+            </form>
+        </div>
+    {% endfor %}
+{% else %}
+    <p class="empty-state">No partial options.</p>
+{% endif %}
         </div>
     </div>
 
