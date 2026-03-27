@@ -95,7 +95,9 @@
     <form method="POST" action="/admin/need-coverage/save">
         <div class="field">
             <label for="volunteer_id">Volunteer</label>
-            <select id="volunteer_id" name="volunteer_id" required>
+            <!-- for only one name
+            <select id="volunteer_id" name="volunteer_id" required> -->
+            <select id="volunteer_id" name="volunteer_id[]" multiple required>
                 <option></option> <!-- placeholder -->
                 {% for v in volunteers %}
                     <option value="{{ v.id }}">
