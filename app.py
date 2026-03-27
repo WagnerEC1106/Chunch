@@ -786,6 +786,11 @@ def debug_hourly_final():
             email_key = v.email.strip().lower() if v.email else ""
             sheet_row = sheet_row_by_email.get(email_key, {})
 
+            latest_absence = Absence.query\
+                .filter(Absence.volunteer_id == v.id)\
+                .order_by(Absence.absence_id.desc())\
+                .first()
+
             volunteer_rows_by_id[v.id] = {
                 "id": v.id,
                 "name": f"{v.first_name} {v.last_name}",
@@ -798,7 +803,14 @@ def debug_hourly_final():
                     sheet_row.get("Capability Restrictions", "") or
                     sheet_row.get("Restrictions", "") or
                     sheet_row.get("Other Info", "")
-                ).strip()
+                ).strip(),
+                "absence_id": latest_absence.absence_id if latest_absence else None,
+                "absence_start_date": latest_absence.start_date.isoformat() if latest_absence and latest_absence.start_date else "",
+                "absence_end_date": latest_absence.end_date.isoformat() if latest_absence and latest_absence.end_date else "",
+                "absence_is_partial": latest_absence.is_partial if latest_absence else False,
+                "absence_partial_start_hour": latest_absence.partial_start_hour if latest_absence else None,
+                "absence_partial_end_hour": latest_absence.partial_end_hour if latest_absence else None,
+                "absence_notes": latest_absence.notes or "" if latest_absence else ""
             }
 
         station_to_volunteer_ids = {
