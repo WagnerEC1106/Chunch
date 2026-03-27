@@ -519,12 +519,45 @@ def assign_reserve_coverage():
             return "<pre>Absence record not found.</pre>", 404
 
         absent_assignment = Assignment.query.filter_by(
-            volunteer_id=absent_volunteer_id,
+            volunteer_id=absent_volunteer_id
         ).first()
 
         if not absent_assignment:
-            return "<pre>Absent volunteer assignment not found.</pre>", 404
+            absent_volunteer = Volunteer.query.get(absent_volunteer_id)
+            if not absent_volunteer:
+                return "<pre>Absent volunteer not found.</pre>", 404
 
+            sheet = get_sheet()
+            rows = sheet.get_all_records()
+
+            absent_row = None
+            absent_email = (absent_volunteer.email or "").strip().lower()
+
+            for row in rows:
+                row_email = str(row.get("Email", "")).strip().lower()
+                if row_email == absent_email:
+                    absent_row = row
+                    break
+
+            if not absent_row:
+                return "<pre>Absent volunteer assignment not found and volunteer is not in the sheet.</pre>", 404
+
+            typical_station_name = str(absent_row.get("Typical Station", "")).strip()
+
+            if not typical_station_name:
+                return "<pre>Absent volunteer has no typical station in the sheet.</pre>", 404
+
+            station = Station.query.filter_by(station_name=typical_station_name).first()
+            if not station:
+                return f"<pre>Station '{typical_station_name}' not found.</pre>", 404
+
+            absent_assignment = Assignment(
+                volunteer_id=absent_volunteer_id,
+                station_id=station.station_id,
+                schedule_id=None
+            )
+            db.session.add(absent_assignment)
+            db.session.flush()
         reserve_assignment = Assignment.query.filter_by(
             volunteer_id=reserve_volunteer_id,
         ).first()
