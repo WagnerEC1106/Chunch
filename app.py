@@ -460,13 +460,13 @@ def coverage_details():
         if not volunteer:
             continue
 
-        assignment = Assignment.query.filter_by(volunteer_id=volunteer.id).first()
+        assignment = Assignment.query\
+            .filter_by(volunteer_id=volunteer.id)\
+            .order_by(Assignment.assignment_id.desc())\
+            .first()
 
-        if assignment:
-            if assignment.is_covering:
-                continue
-            if reserve_station_id is not None and assignment.station_id != reserve_station_id:
-                continue
+        if assignment and reserve_station_id is not None and assignment.station_id != reserve_station_id:
+            continue
 
         unavailability_text = str(row.get("Unavailability", "")).strip()
         unavailable_hours = parse_hour_list(unavailability_text)
