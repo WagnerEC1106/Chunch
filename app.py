@@ -184,31 +184,30 @@ class Availability(db.Model, SoftDeleteMixin):
 
     volunteer = relationship("Volunteer", backref=backref("availability", cascade = "all, delete-orphan"))
 
-if os.environ.get("RUN_DB_INIT") == "1":
-    with app.app_context():
-        db.create_all()
+with app.app_context():
+    db.create_all()
 
-        db.session.execute(text("""
-            ALTER TABLE assignments
-            ADD COLUMN IF NOT EXISTS is_covering BOOLEAN NOT NULL DEFAULT FALSE
-        """))
+    db.session.execute(text("""
+        ALTER TABLE assignments
+        ADD COLUMN IF NOT EXISTS is_covering BOOLEAN NOT NULL DEFAULT FALSE
+    """))
 
-        db.session.execute(text("""
-            ALTER TABLE assignments
-            ADD COLUMN IF NOT EXISTS covering_for_volunteer_id INTEGER
-        """))
+    db.session.execute(text("""
+        ALTER TABLE assignments
+        ADD COLUMN IF NOT EXISTS covering_for_volunteer_id INTEGER
+    """))
 
-        db.session.execute(text("""
-            ALTER TABLE assignments
-            ADD COLUMN IF NOT EXISTS original_station_id INTEGER
-        """))
+    db.session.execute(text("""
+        ALTER TABLE assignments
+        ADD COLUMN IF NOT EXISTS original_station_id INTEGER
+    """))
 
-        db.session.execute(text("""
-            ALTER TABLE assignments
-            ADD COLUMN IF NOT EXISTS absence_id INTEGER
-        """))
+    db.session.execute(text("""
+        ALTER TABLE assignments
+        ADD COLUMN IF NOT EXISTS absence_id INTEGER
+    """))
 
-        db.session.commit()
+    db.session.commit()
         
 # Serve your existing HTML pages
 @app.route("/")
