@@ -161,6 +161,10 @@ class Assignment(db.Model):
     created_by = Column(Integer, ForeignKey("user_account.user_id"))
 
     is_absent = Column(Boolean, default = False)
+    is_covering = Column(Boolean, default=False, nullable=False)
+    covering_for_volunteer_id = Column(Integer, ForeignKey("volunteers.id"), nullable=True)
+    original_station_id = Column(Integer, ForeignKey("station.station_id"), nullable=True)
+    absence_id = Column(Integer, ForeignKey("absences.absence_id"), nullable=True)
 
    # original_station_id = Column(Integer, ForeignKey("station.station_id"))
 
