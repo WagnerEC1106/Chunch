@@ -777,7 +777,25 @@ function closeVolunteerPanel() {
 }
 
 function editVolunteer() {
-    alert("Edit feature not wired yet.");
+    if (!currentVolunteer || !currentVolunteer.absence_id) {
+        alert("This volunteer does not have an absence to edit.");
+        return;
+    }
+
+    document.getElementById("editAbsenceVolunteerName").textContent = currentVolunteer.name || "Volunteer";
+    document.getElementById("editAbsenceId").value = currentVolunteer.absence_id || "";
+    document.getElementById("editStartDate").value = currentVolunteer.absence_start_date || "";
+    document.getElementById("editEndDate").value = currentVolunteer.absence_end_date || "";
+    document.getElementById("editIsPartial").value = currentVolunteer.absence_is_partial ? "true" : "false";
+    document.getElementById("editPartialStartHour").value =
+        currentVolunteer.absence_partial_start_hour ?? "";
+    document.getElementById("editPartialEndHour").value =
+        currentVolunteer.absence_partial_end_hour ?? "";
+    document.getElementById("editNotes").value = currentVolunteer.absence_notes || "";
+
+    togglePartialEditFields();
+    document.getElementById("editAbsenceOverlay").classList.add("open");
+    document.getElementById("editAbsenceModal").classList.add("open");
 }
 
 window.addEventListener("DOMContentLoaded", loadStationBoard);
