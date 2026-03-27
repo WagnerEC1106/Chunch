@@ -710,8 +710,11 @@ function submitAbsent() {
     alert(`Coverage flow placeholder for volunteer ID ${selected}`);
 }
 
+let currentVolunteer = null;
+
 function openVolunteerPanel(volunteerJson) {
     const volunteer = JSON.parse(volunteerJson);
+    currentVolunteer = volunteer;
 
     document.getElementById("detailName").textContent = volunteer.name || "Volunteer";
     document.getElementById("detailEmail").textContent = volunteer.email || "None listed";
