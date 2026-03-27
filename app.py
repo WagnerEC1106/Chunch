@@ -446,6 +446,9 @@ def coverage_details():
         if v.email
     }
 
+    reserve_station = Station.query.filter_by(station_name="Reserve").first()
+    reserve_station_id = reserve_station.station_id if reserve_station else None
+
     for row in rows:
         email = str(row.get("Email", "")).strip().lower()
         typical_station = str(row.get("Typical Station", "")).strip().lower()
@@ -456,6 +459,14 @@ def coverage_details():
         volunteer = volunteer_by_email.get(email)
         if not volunteer:
             continue
+
+        assignment = Assignment.query.filter_by(volunteer_id=volunteer.id).first()
+
+        if assignment:
+            if assignment.is_covering:
+                continue
+            if reserve_station_id is not None and assignment.station_id != reserve_station_id:
+                continue
 
         unavailability_text = str(row.get("Unavailability", "")).strip()
         unavailable_hours = parse_hour_list(unavailability_text)
@@ -479,7 +490,6 @@ def coverage_details():
             fully_available_reserves.append(reserve_info)
         elif shift_length > 0 and (overlap_count / shift_length) < 0.5:
             partial_overlap_reserves.append(reserve_info)
-
     absent_assignment = Assignment.query.filter_by(
         volunteer_id=absent_volunteer.id
     ).first()
