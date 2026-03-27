@@ -724,17 +724,39 @@ document.getElementById("detailRestrictions").textContent = volunteer.capability
 const absenceCard = document.getElementById("detailAbsenceCard");
 const absenceText = document.getElementById("detailAbsence");
 
+function formatDatePretty(dateStr) {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    return d.toLocaleDateString(undefined, {
+        month: "long",
+        day: "numeric"
+    });
+}
+
+function formatHourPretty(h) {
+    if (h === null || h === undefined) return "";
+    if (h === 0) return "12 AM";
+    if (h < 12) return `${h} AM`;
+    if (h === 12) return "12 PM";
+    return `${h - 12} PM`;
+}
+
 if (volunteer.absence_id) {
     let text = "";
 
     if (volunteer.absence_is_partial) {
-        const start = volunteer.absence_partial_start_hour;
-        const end = volunteer.absence_partial_end_hour;
-        text = `Partial: ${start}:00 - ${end}:00`;
+        const start = formatHourPretty(volunteer.absence_partial_start_hour);
+        const end = formatHourPretty(volunteer.absence_partial_end_hour);
+        text = `Partial: ${start} – ${end}`;
     } else {
-        const start = volunteer.absence_start_date;
-        const end = volunteer.absence_end_date;
-        text = `${start} → ${end}`;
+        const start = formatDatePretty(volunteer.absence_start_date);
+        const end = formatDatePretty(volunteer.absence_end_date);
+
+        if (start === end) {
+            text = start;
+        } else {
+            text = `${start} – ${end}`;
+        }
     }
 
     absenceText.textContent = text;
