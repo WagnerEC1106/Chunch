@@ -562,10 +562,14 @@ def update_absence():
         if not new_end_date:
             return jsonify({"error": "Missing new end date"}), 400
 
+        try:
+            new_end_date = date.fromisoformat(new_end_date)
+        except ValueError:
+            return jsonify({"error": "Invalid new end date"}), 400
+
         absence.end_date = new_end_date
 
         if action == "move_now":
-            # reserve leaves EARLY (on new date)
             if reserve_assignment:
                 reserve_assignment.station_id = reserve_assignment.original_station_id
                 reserve_assignment.is_covering = False
