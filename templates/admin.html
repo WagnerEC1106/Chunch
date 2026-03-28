@@ -653,6 +653,11 @@ function closeAbsenceActionModal() {
     document.getElementById("absenceActionModal").classList.remove("open");
 }
 
+function closeReserveDecisionModal() {
+    document.getElementById("reserveDecisionOverlay").classList.remove("open");
+    document.getElementById("reserveDecisionModal").classList.remove("open");
+}
+
 function showAbsenceActionSection(sectionName) {
     document.getElementById("extendAbsenceSection").style.display = "none";
     document.getElementById("shortenAbsenceSection").style.display = "none";
@@ -714,7 +719,35 @@ function startShortenFlow() {
         return;
     }
 
-    alert("Shorten flow connected. Reserve options come next.");
+    const originalEndDate = currentAbsentEditVolunteer?.absence_end_date || "";
+    document.getElementById("reserveDecisionTitle").textContent = "Shorten Absence";
+    document.getElementById("reserveDecisionSummary").textContent =
+        `The reserve will otherwise move back on ${formatDatePretty(originalEndDate)}.`;
+
+    document.getElementById("reserveDecisionImmediateLabel").textContent =
+        "Move reserve back now";
+    document.getElementById("reserveDecisionDoubleLabel").textContent =
+        `Allow double coverage until ${formatDatePretty(originalEndDate)}`;
+
+    closeAbsenceActionModal();
+    document.getElementById("reserveDecisionOverlay").classList.add("open");
+    document.getElementById("reserveDecisionModal").classList.add("open");
+}
+
+function startEndAbsenceFlow() {
+    const originalEndDate = currentAbsentEditVolunteer?.absence_end_date || "";
+    document.getElementById("reserveDecisionTitle").textContent = "End Absence";
+    document.getElementById("reserveDecisionSummary").textContent =
+        `The reserve will otherwise move back on ${formatDatePretty(originalEndDate)}.`;
+
+    document.getElementById("reserveDecisionImmediateLabel").textContent =
+        "Move reserve back now";
+    document.getElementById("reserveDecisionDoubleLabel").textContent =
+        `Allow double coverage until ${formatDatePretty(originalEndDate)}`;
+
+    closeAbsenceActionModal();
+    document.getElementById("reserveDecisionOverlay").classList.add("open");
+    document.getElementById("reserveDecisionModal").classList.add("open");
 }
 
 function startEndAbsenceFlow() {
@@ -1084,5 +1117,34 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
     </div>
 </div>
 
+<div id="reserveDecisionOverlay" class="detail-overlay" onclick="closeReserveDecisionModal()"></div>
+
+<div id="reserveDecisionModal" class="detail-panel">
+    <div class="detail-panel-header">
+        <div class="detail-panel-title" id="reserveDecisionTitle">Reserve Decision</div>
+        <div class="detail-panel-actions">
+            <button class="detail-btn back" type="button" onclick="closeReserveDecisionModal()">Back</button>
+        </div>
+    </div>
+
+    <div class="detail-panel-body">
+        <div class="detail-card">
+            <div class="detail-label">Reserve Coverage</div>
+            <div class="detail-value" id="reserveDecisionSummary">—</div>
+        </div>
+
+        <div class="detail-card">
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="detail-btn edit" type="button" id="reserveDecisionImmediateLabel">
+                    Move reserve back now
+                </button>
+
+                <button class="detail-btn edit" type="button" id="reserveDecisionDoubleLabel">
+                    Allow double coverage
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
