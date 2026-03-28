@@ -617,6 +617,20 @@ function closeAbsenceActionModal() {
     document.getElementById("absenceActionModal").classList.remove("open");
 }
 
+function showAbsenceActionSection(sectionName) {
+    document.getElementById("extendAbsenceSection").style.display = "none";
+    document.getElementById("shortenAbsenceSection").style.display = "none";
+    document.getElementById("endAbsenceSection").style.display = "none";
+
+    if (sectionName === "extend") {
+        document.getElementById("extendAbsenceSection").style.display = "block";
+    } else if (sectionName === "shorten") {
+        document.getElementById("shortenAbsenceSection").style.display = "block";
+    } else if (sectionName === "end") {
+        document.getElementById("endAbsenceSection").style.display = "block";
+    }
+}
+
 let currentAbsentEditVolunteer = null;
 
 function startAbsentEdit() {
@@ -636,6 +650,13 @@ function startAbsentEdit() {
 
     document.getElementById("absenceActionVolunteerName").textContent =
         volunteer.name || "Volunteer";
+
+    document.getElementById("extendAbsenceNewEndDate").value =
+        volunteer.absence_end_date || "";
+    document.getElementById("shortenAbsenceNewEndDate").value =
+        volunteer.absence_end_date || "";
+
+    showAbsenceActionSection("extend");
 
     closeAbsentEditPicker();
     document.getElementById("absenceActionOverlay").classList.add("open");
@@ -1214,14 +1235,57 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
     </div>
 
     <div class="detail-panel-body">
-        <div class="detail-card">
-            <div class="detail-label">Choose Action</div>
-            <div style="display:flex; flex-direction:column; gap:10px;">
-                <button class="detail-btn edit" type="button" onclick="alert('Extend flow next')">Extend</button>
-                <button class="detail-btn edit" type="button" onclick="alert('Shorten flow next')">Shorten</button>
-                <button class="detail-btn edit" type="button" onclick="alert('Cancel flow next')">Cancel</button>
-            </div>
+<div class="detail-card">
+    <div class="detail-label">Choose Action</div>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+        <button class="detail-btn edit" type="button" onclick="showAbsenceActionSection('extend')">Extend</button>
+        <button class="detail-btn edit" type="button" onclick="showAbsenceActionSection('shorten')">Shorten</button>
+        <button class="detail-btn edit" type="button" onclick="showAbsenceActionSection('end')">End Absence</button>
+    </div>
+</div>
+
+<div class="detail-card" id="extendAbsenceSection" style="display:none;">
+    <div class="detail-label">Extend Absence</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+        <label>
+            <div class="detail-label" style="margin-bottom:4px;">New End Date</div>
+            <input type="date" id="extendAbsenceNewEndDate" class="date-picker" style="width:100%;">
+        </label>
+
+        <div class="detail-value" id="extendAbsenceSummary">
+            Choose a new end date for this absence.
         </div>
+
+        <button class="detail-btn edit" type="button" onclick="alert('Extend save flow next')">Next</button>
+    </div>
+</div>
+
+<div class="detail-card" id="shortenAbsenceSection" style="display:none;">
+    <div class="detail-label">Shorten Absence</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+        <label>
+            <div class="detail-label" style="margin-bottom:4px;">New End Date</div>
+            <input type="date" id="shortenAbsenceNewEndDate" class="date-picker" style="width:100%;">
+        </label>
+
+        <div class="detail-value">
+            After shortening, the admin will choose whether to move the reserve back immediately or allow double coverage until the original return date.
+        </div>
+
+        <button class="detail-btn edit" type="button" onclick="alert('Shorten save flow next')">Next</button>
+    </div>
+</div>
+
+<div class="detail-card" id="endAbsenceSection" style="display:none;">
+    <div class="detail-label">End Absence</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+        <div class="detail-value">
+            End this absence now and choose whether to move the reserve back immediately or allow double coverage until the original return date.
+        </div>
+
+        <button class="detail-btn edit" type="button" onclick="alert('End absence save flow next')">Next</button>
+    </div>
+</div>
     </div>
 </div>
 <div id="absenceActionOverlay" class="detail-overlay" onclick="closeAbsenceActionModal()"></div>
