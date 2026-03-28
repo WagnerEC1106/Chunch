@@ -146,6 +146,30 @@ body {
     color: #0f172a;
     word-break: break-word;
 }
+.absent-edit-btn {
+    border: 1px solid rgba(255,255,255,0.35);
+    background: rgba(255,255,255,0.14);
+    color: white;
+    border-radius: 999px;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.absent-edit-btn:hover {
+    background: rgba(255,255,255,0.28);
+    box-shadow: 0 0 14px rgba(255,255,255,0.45);
+    transform: translateY(-1px) scale(1.04);
+}
+
+.absent-edit-btn:focus {
+    outline: 2px solid rgba(255,255,255,0.7);
+    outline-offset: 2px;
+}
 
 .detail-overlay {
     position: fixed;
@@ -555,6 +579,9 @@ const stationClassMap = {
 function formatCountLabel(count) {
     return count === 1 ? "1 volunteer" : `${count} volunteers`;
 }
+function openAbsentEditPicker() {
+    alert("Absent edit picker comes next.");
+}
 
 function getVolunteerDisplayName(volunteer) {
     if (typeof volunteer === "string") return volunteer;
@@ -636,9 +663,25 @@ function renderStationBoard(stationData) {
             volunteerHTML = `<div class="empty-state">No volunteers assigned</div>`;
         }
 
+        const absentEditButton = stationName === "Absent"
+            ? `
+                <button
+                    class="absent-edit-btn"
+                    type="button"
+                    title="Edit Absences"
+                    onclick="openAbsentEditPicker()"
+                >
+                    ✏️
+                </button>
+            `
+            : "";
+
         card.innerHTML = `
             <div class="card-top">
-                <h3>${stationName}</h3>
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                    <h3>${stationName}</h3>
+                    ${absentEditButton}
+                </div>
                 <div class="station-count">${formatCountLabel(volunteers.length)}</div>
             </div>
             ${volunteerHTML}
