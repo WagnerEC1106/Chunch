@@ -712,6 +712,9 @@ function startExtendFlow() {
     alert("Extend flow connected. Save logic comes next.");
 }
 
+let pendingShortenDate = null;
+let currentActionMode = null;
+
 function startShortenFlow() {
     const newEndDate = document.getElementById("shortenAbsenceNewEndDate").value;
     if (!newEndDate) {
@@ -719,15 +722,21 @@ function startShortenFlow() {
         return;
     }
 
+    pendingShortenDate = newEndDate;
+    currentActionMode = "shorten";
+
     const originalEndDate = currentAbsentEditVolunteer?.absence_end_date || "";
+
     document.getElementById("reserveDecisionTitle").textContent = "Shorten Absence";
+
     document.getElementById("reserveDecisionSummary").textContent =
-        `The reserve will otherwise move back on ${formatDatePretty(originalEndDate)}.`;
+        `New return date: ${formatDatePretty(newEndDate)}. Original reserve return: ${formatDatePretty(originalEndDate)}.`;
 
     document.getElementById("reserveDecisionImmediateLabel").textContent =
-        "Move reserve back now";
+        `Move reserve back on ${formatDatePretty(newEndDate)}`;
+
     document.getElementById("reserveDecisionDoubleLabel").textContent =
-        `Allow double coverage until ${formatDatePretty(originalEndDate)}`;
+        `Allow double coverage from ${formatDatePretty(newEndDate)} to ${formatDatePretty(originalEndDate)}`;
 
     closeAbsenceActionModal();
     document.getElementById("reserveDecisionOverlay").classList.add("open");
@@ -735,13 +744,18 @@ function startShortenFlow() {
 }
 
 function startEndAbsenceFlow() {
+    currentActionMode = "end";
+
     const originalEndDate = currentAbsentEditVolunteer?.absence_end_date || "";
+
     document.getElementById("reserveDecisionTitle").textContent = "End Absence";
+
     document.getElementById("reserveDecisionSummary").textContent =
         `The reserve will otherwise move back on ${formatDatePretty(originalEndDate)}.`;
 
     document.getElementById("reserveDecisionImmediateLabel").textContent =
         "Move reserve back now";
+
     document.getElementById("reserveDecisionDoubleLabel").textContent =
         `Allow double coverage until ${formatDatePretty(originalEndDate)}`;
 
@@ -759,7 +773,9 @@ async function handleReserveDecision(choice) {
     try {
         const payload = {
             volunteer_id: currentAbsentEditVolunteer.id,
-            action: choice
+            action: choice,
+            mode: currentActionMode,
+            new_end_date: pendingShortenDate
         };
 
         const response = await fetch("/admin/absence/update", {
