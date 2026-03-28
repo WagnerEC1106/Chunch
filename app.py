@@ -934,18 +934,39 @@ def debug_hourly_final():
         db.session.commit()   
 
         for assignment in assignments:
-            if assignment.volunteer_id is None:
-                continue
+    if assignment.volunteer_id is None:
+        continue
 
-            for volunteer_ids in station_to_volunteer_ids.values():
-                volunteer_ids.discard(assignment.volunteer_id)
 
-            if assignment.is_absent and absent_station_id is not None:
-                station_to_volunteer_ids[absent_station_id].add(assignment.volunteer_id)
-            elif assignment.station_id is not None:
-                station_to_volunteer_ids.setdefault(
-                    assignment.station_id, set()
-                ).add(assignment.volunteer_id)
+    for volunteer_ids in station_to_volunteer_ids.values():
+        volunteer_ids.discard(assignment.volunteer_id)
+
+    absence = None
+    if assignment.absence_id:
+        absence = Absence.query.get(assignment.absence_id)
+
+
+    if absence and absence.is_partial and absent_station_id is not None:
+
+        station_to_volunteer_ids.setdefault(
+            absent_station_id, set()
+        ).add(assignment.volunteer_id)
+
+        # ALSO keep them in their station (they still work part of shift)
+        if assignment.station_id is not None:
+            station_to_volunteer_ids.setdefault(
+                assignment.station_id, set()
+            ).add(assignment.volunteer_id)
+
+    elif assignment.is_absent and absent_station_id is not None:
+        station_to_volunteer_ids.setdefault(
+            absent_station_id, set()
+        ).add(assignment.volunteer_id)
+
+    elif assignment.station_id is not None:
+        station_to_volunteer_ids.setdefault(
+            assignment.station_id, set()
+        ).add(assignment.volunteer_id)
         station_data = {}
 
         for station in stations:
