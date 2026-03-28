@@ -57,7 +57,9 @@ body {
     font-size: 14px;
     background: white;
     color: #0f172a;
+    width: 100%;
 }
+
 .detail-panel {
     position: fixed;
     top: 0;
@@ -146,6 +148,7 @@ body {
     color: #0f172a;
     word-break: break-word;
 }
+
 .absent-edit-btn {
     border: 1px solid rgba(255,255,255,0.35);
     background: rgba(255,255,255,0.14);
@@ -497,7 +500,6 @@ body {
             <span class="label">Hourly View</span>
         </button>
 
-        <!-- <button class="secondary-btn" onclick="requestCoverage()"> -->
         <button class="secondary-btn" onclick="window.location.href='/admin/need-coverage'">
             <span class="icon">🚨</span>
             <span class="label">Need Coverage?</span>
@@ -577,10 +579,43 @@ const stationClassMap = {
 };
 
 let currentStationData = {};
+let currentAbsentEditVolunteer = null;
 
 function formatCountLabel(count) {
     return count === 1 ? "1 volunteer" : `${count} volunteers`;
 }
+
+function getVolunteerDisplayName(volunteer) {
+    if (typeof volunteer === "string") return volunteer;
+    return volunteer.name || `${volunteer.firstName || ""} ${volunteer.lastName || ""}`.trim();
+}
+
+function isCaptain(volunteer) {
+    if (!volunteer || typeof volunteer === "string") return false;
+
+    const captainStatus = (volunteer.captain_status || volunteer.captainStatus || "").toString().toLowerCase();
+    const role = (volunteer.role || "").toString().toLowerCase();
+
+    return captainStatus === "captain" || role === "captain";
+}
+
+function formatDatePretty(dateStr) {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    return d.toLocaleDateString(undefined, {
+        month: "long",
+        day: "numeric"
+    });
+}
+
+function formatHourPretty(h) {
+    if (h === null || h === undefined) return "";
+    if (h === 0) return "12 AM";
+    if (h < 12) return `${h} AM`;
+    if (h === 12) return "12 PM";
+    return `${h - 12} PM`;
+}
+
 function openAbsentEditPicker() {
     const select = document.getElementById("absentVolunteerSelect");
     if (!select) return;
@@ -607,6 +642,7 @@ function openAbsentEditPicker() {
     document.getElementById("absentEditOverlay").classList.add("open");
     document.getElementById("absentEditModal").classList.add("open");
 }
+
 function closeAbsentEditPicker() {
     document.getElementById("absentEditOverlay").classList.remove("open");
     document.getElementById("absentEditModal").classList.remove("open");
@@ -630,8 +666,6 @@ function showAbsenceActionSection(sectionName) {
         document.getElementById("endAbsenceSection").style.display = "block";
     }
 }
-
-let currentAbsentEditVolunteer = null;
 
 function startAbsentEdit() {
     const select = document.getElementById("absentVolunteerSelect");
@@ -661,20 +695,6 @@ function startAbsentEdit() {
     closeAbsentEditPicker();
     document.getElementById("absenceActionOverlay").classList.add("open");
     document.getElementById("absenceActionModal").classList.add("open");
-}
-
-function getVolunteerDisplayName(volunteer) {
-    if (typeof volunteer === "string") return volunteer;
-    return volunteer.name || `${volunteer.firstName || ""} ${volunteer.lastName || ""}`.trim();
-}
-
-function isCaptain(volunteer) {
-    if (!volunteer || typeof volunteer === "string") return false;
-
-    const captainStatus = (volunteer.captain_status || volunteer.captainStatus || "").toString().toLowerCase();
-    const role = (volunteer.role || "").toString().toLowerCase();
-
-    return captainStatus === "captain" || role === "captain";
 }
 
 function renderStationBoard(stationData) {
@@ -844,28 +864,10 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("detailCaptain").textContent = volunteer.captain_status || "Volunteer";
     document.getElementById("detailShift").textContent = volunteer.typical_shift || "None listed";
     document.getElementById("detailUnavailability").textContent = volunteer.unavailability || "None listed";
-document.getElementById("detailRestrictions").textContent = volunteer.capability_restrictions || "None listed";
+    document.getElementById("detailRestrictions").textContent = volunteer.capability_restrictions || "None listed";
 
-const absenceCard = document.getElementById("detailAbsenceCard");
-const absenceText = document.getElementById("detailAbsence");
-
-function formatDatePretty(dateStr) {
-    if (!dateStr) return "";
-    const d = new Date(dateStr);
-    return d.toLocaleDateString(undefined, {
-        month: "long",
-        day: "numeric"
-    });
-}
-
-function formatHourPretty(h) {
-    if (h === null || h === undefined) return "";
-    if (h === 0) return "12 AM";
-    if (h < 12) return `${h} AM`;
-    if (h === 12) return "12 PM";
-    return `${h - 12} PM`;
-}
-
+    const absenceCard = document.getElementById("detailAbsenceCard");
+    const absenceText = document.getElementById("detailAbsence");
     const absenceMessageCard = document.getElementById("detailAbsenceMessageCard");
     const absenceMessage = document.getElementById("detailAbsenceMessage");
 
@@ -905,6 +907,7 @@ function formatHourPretty(h) {
     document.getElementById("detailPanel").classList.add("open");
     document.getElementById("detailOverlay").classList.add("open");
 }
+
 function closeVolunteerPanel() {
     document.getElementById("detailPanel").classList.remove("open");
     document.getElementById("detailOverlay").classList.remove("open");
@@ -916,7 +919,6 @@ function editVolunteer() {
 
 window.addEventListener("DOMContentLoaded", loadStationBoard);
 </script>
-<div id="detailOverlay" class="detail-overlay" onclick="closeVolunteerPanel()"></div>
 
 <div id="detailOverlay" class="detail-overlay" onclick="closeVolunteerPanel()"></div>
 
@@ -969,7 +971,6 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
             <div class="detail-label">Reason for Absence</div>
             <div class="detail-value" id="detailAbsenceMessage">—</div>
         </div>
-        </div>
     </div>
 </div>
 
@@ -987,55 +988,11 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
     <div class="detail-panel-body">
         <div class="detail-card">
             <div class="detail-label">Select Absent Volunteer</div>
-            <select id="absentVolunteerSelect" class="date-picker" style="width:100%;">
-            </select>
+            <select id="absentVolunteerSelect" class="date-picker" style="width:100%;"></select>
         </div>
-    </div>
-<div class="detail-card" id="extendAbsenceSection" style="display:none;">
-    <div class="detail-label">Extend Absence</div>
-    <div style="display:flex; flex-direction:column; gap:12px;">
-        <label>
-            <div class="detail-label" style="margin-bottom:4px;">New End Date</div>
-            <input type="date" id="extendAbsenceNewEndDate" class="date-picker" style="width:100%;">
-        </label>
-
-        <div class="detail-value" id="extendAbsenceSummary">
-            Choose a new end date for this absence.
-        </div>
-
-        <button class="detail-btn edit" type="button" onclick="alert('Extend save flow next')">Next</button>
     </div>
 </div>
 
-<div class="detail-card" id="shortenAbsenceSection" style="display:none;">
-    <div class="detail-label">Shorten Absence</div>
-    <div style="display:flex; flex-direction:column; gap:12px;">
-        <label>
-            <div class="detail-label" style="margin-bottom:4px;">New End Date</div>
-            <input type="date" id="shortenAbsenceNewEndDate" class="date-picker" style="width:100%;">
-        </label>
-
-        <div class="detail-value">
-            After shortening, the admin will choose whether to move the reserve back immediately or allow double coverage until the original return date.
-        </div>
-
-        <button class="detail-btn edit" type="button" onclick="alert('Shorten save flow next')">Next</button>
-    </div>
-</div>
-
-<div class="detail-card" id="endAbsenceSection" style="display:none;">
-    <div class="detail-label">End Absence</div>
-    <div style="display:flex; flex-direction:column; gap:12px;">
-        <div class="detail-value">
-            End this absence now and choose whether to move the reserve back immediately or allow double coverage until the original return date.
-        </div>
-
-        <button class="detail-btn edit" type="button" onclick="alert('End absence save flow next')">Next</button>
-    </div>
-</div>
-    </div>
-</div>
-<div id="absenceActionOverlay" class="detail-overlay" onclick="closeAbsenceActionModal()"></div>
 <div id="absenceActionOverlay" class="detail-overlay" onclick="closeAbsenceActionModal()"></div>
 
 <div id="absenceActionModal" class="detail-panel">
@@ -1070,7 +1027,7 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
                     Choose a new end date for this absence.
                 </div>
 
-                <button class="detail-btn edit" type="button" onclick="alert('Extend save flow next')">Next</button>
+                <button class="detail-btn edit" type="button">Next</button>
             </div>
         </div>
 
@@ -1086,7 +1043,7 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
                     After shortening, the admin will choose whether to move the reserve back immediately or allow double coverage until the original return date.
                 </div>
 
-                <button class="detail-btn edit" type="button" onclick="alert('Shorten save flow next')">Next</button>
+                <button class="detail-btn edit" type="button">Next</button>
             </div>
         </div>
 
@@ -1097,10 +1054,11 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
                     End this absence now and choose whether to move the reserve back immediately or allow double coverage until the original return date.
                 </div>
 
-                <button class="detail-btn edit" type="button" onclick="alert('End absence save flow next')">Next</button>
+                <button class="detail-btn edit" type="button">Next</button>
             </div>
         </div>
     </div>
 </div>
+
 </body>
 </html>
