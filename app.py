@@ -747,166 +747,180 @@ def save_need_coverage():
 #    db.session.commit()
 #    return {"message": f"Deleted {len(assignments)} assignments for volunteer {volunteer_id}"}
 
+# @app.route("/admin/debug-hourly-final")
+# def debug_hourly_final():
+#     try:
+#         volunteers = Volunteer.query\
+#             .filter(Volunteer.deleted_at.is_(None))\
+#             .order_by(Volunteer.last_name, Volunteer.first_name)\
+#             .all()
+
+#         stations = Station.query\
+#             .filter(Station.station_name != "Other")\
+#             .order_by(Station.station_name)\
+#             .all()
+
+#         accounts = UserAccount.query.all()
+#         role_by_volunteer_id = {
+#             account.volunteer_id: account.role
+#             for account in accounts
+#             if account.volunteer_id is not None
+#         }
+
+#         sheet = get_sheet()
+#         rows = sheet.get_all_records()
+
+#         sheet_row_by_email = {}
+#         for row in rows:
+#             email = str(row.get("Email", "")).strip().lower()
+#             if email:
+#                 sheet_row_by_email[email] = row
+
+#         volunteer_rows_by_id = {}
+
+#         for v in volunteers:
+#             captain_status = "Volunteer"
+#             if role_by_volunteer_id.get(v.id) == "captain":
+#                 captain_status = "Captain"
+
+#             email_key = v.email.strip().lower() if v.email else ""
+#             sheet_row = sheet_row_by_email.get(email_key, {})
+
+#             latest_absence = Absence.query\
+#                 .filter(Absence.volunteer_id == v.id)\
+#                 .order_by(Absence.absence_id.desc())\
+#                 .first()
+
+#             volunteer_rows_by_id[v.id] = {
+#                 "id": v.id,
+#                 "name": f"{v.first_name} {v.last_name}",
+#                 "email": v.email or "",
+#                 "phone": v.phone or "",
+#                 "captain_status": captain_status,
+#                 "typical_shift": str(sheet_row.get("Typical Shift", "")).strip(),
+#                 "unavailability": str(sheet_row.get("Unavailability", "")).strip(),
+#                 "capability_restrictions": str(
+#                     sheet_row.get("Capability Restrictions", "") or
+#                     sheet_row.get("Restrictions", "") or
+#                     sheet_row.get("Other Info", "")
+#                 ).strip(),
+#                 "absence_id": latest_absence.absence_id if latest_absence else None,
+#                 "absence_start_date": latest_absence.start_date.isoformat() if latest_absence and latest_absence.start_date else "",
+#                 "absence_end_date": latest_absence.end_date.isoformat() if latest_absence and latest_absence.end_date else "",
+#                 "absence_is_partial": latest_absence.is_partial if latest_absence else False,
+#                 "absence_partial_start_hour": latest_absence.partial_start_hour if latest_absence else None,
+#                 "absence_partial_end_hour": latest_absence.partial_end_hour if latest_absence else None,
+#                 "absence_notes": latest_absence.notes or "" if latest_absence else ""
+#             }
+
+#         station_to_volunteer_ids = {
+#             station.station_id: set()
+#             for station in stations
+#         }
+
+#         station_name_to_id = {
+#             str(station.station_name).strip().lower(): station.station_id
+#             for station in stations
+#         }
+
+#         volunteer_id_by_email = {
+#             v.email.strip().lower(): v.id
+#             for v in volunteers
+#             if v.email
+#         }
+
+#         for row in rows:
+#             email = str(row.get("Email", "")).strip().lower()
+#             typical_station = str(row.get("Typical Station", "")).strip().lower()
+
+#             if not email or not typical_station or typical_station == "other":
+#                 continue
+
+#             volunteer_id = volunteer_id_by_email.get(email)
+#             station_id = station_name_to_id.get(typical_station)
+
+#             if volunteer_id is None or station_id is None:
+#                 continue
+
+#             station_to_volunteer_ids[station_id].add(volunteer_id)
+
+#         absent_station = Station.query.filter_by(station_name="Absent").first()
+#         absent_station_id = absent_station.station_id if absent_station else None
+
+#         today = date.today()
+
+#         assignments = Assignment.query.all()
+
+#         for assignment in assignments:
+#             if assignment.is_covering and assignment.absence_id:
+#                 absence = Absence.query.get(assignment.absence_id)
+#                 if absence and absence.end_date < today:
+#                     if assignment.original_station_id is not None:
+#                         assignment.station_id = assignment.original_station_id
+
+#                     assignment.is_covering = False
+#                     assignment.covering_for_volunteer_id = None
+#                     assignment.original_station_id = None
+#                     assignment.absence_id = None
+
+#                     covered = Assignment.query.filter_by(
+#                         volunteer_id=absence.volunteer_id
+#                     ).first()
+
+#                     if covered:
+#                         covered.is_absent = False
+
+#         db.session.commit()   
+
+#         for assignment in assignments:
+#             if assignment.volunteer_id is None:
+#                 continue
+
+#             for volunteer_ids in station_to_volunteer_ids.values():
+#                 volunteer_ids.discard(assignment.volunteer_id)
+
+#             if assignment.is_absent and absent_station_id is not None:
+#                 station_to_volunteer_ids[absent_station_id].add(assignment.volunteer_id)
+#             elif assignment.station_id is not None:
+#                 station_to_volunteer_ids.setdefault(
+#                     assignment.station_id, set()
+#                 ).add(assignment.volunteer_id)
+#         station_data = {}
+
+#         for station in stations:
+#             station_name = str(station.station_name)
+#             assigned_ids = station_to_volunteer_ids.get(station.station_id, set())
+
+#             volunteers_for_station = [
+#                 volunteer_rows_by_id[vid]
+#                 for vid in assigned_ids
+#                 if vid in volunteer_rows_by_id
+#             ]
+
+#             volunteers_for_station.sort(key=lambda x: x["name"])
+
+#             station_data[station_name] = {
+#                 "volunteers": volunteers_for_station
+#             }
+
+#         return station_data
+
+#     except Exception as e:
+#         return {"error": str(e)}, 500
+
 @app.route("/admin/debug-hourly-final")
 def debug_hourly_final():
-    try:
-        volunteers = Volunteer.query\
-            .filter(Volunteer.deleted_at.is_(None))\
-            .order_by(Volunteer.last_name, Volunteer.first_name)\
-            .all()
-
-        stations = Station.query\
-            .filter(Station.station_name != "Other")\
-            .order_by(Station.station_name)\
-            .all()
-
-        accounts = UserAccount.query.all()
-        role_by_volunteer_id = {
-            account.volunteer_id: account.role
-            for account in accounts
-            if account.volunteer_id is not None
+    return {
+        "Absent": {
+            "volunteers": []
+        },
+        "Reserve": {
+            "volunteers": []
+        },
+        "Setup Team": {
+            "volunteers": []
         }
-
-        sheet = get_sheet()
-        rows = sheet.get_all_records()
-
-        sheet_row_by_email = {}
-        for row in rows:
-            email = str(row.get("Email", "")).strip().lower()
-            if email:
-                sheet_row_by_email[email] = row
-
-        volunteer_rows_by_id = {}
-
-        for v in volunteers:
-            captain_status = "Volunteer"
-            if role_by_volunteer_id.get(v.id) == "captain":
-                captain_status = "Captain"
-
-            email_key = v.email.strip().lower() if v.email else ""
-            sheet_row = sheet_row_by_email.get(email_key, {})
-
-            latest_absence = Absence.query\
-                .filter(Absence.volunteer_id == v.id)\
-                .order_by(Absence.absence_id.desc())\
-                .first()
-
-            volunteer_rows_by_id[v.id] = {
-                "id": v.id,
-                "name": f"{v.first_name} {v.last_name}",
-                "email": v.email or "",
-                "phone": v.phone or "",
-                "captain_status": captain_status,
-                "typical_shift": str(sheet_row.get("Typical Shift", "")).strip(),
-                "unavailability": str(sheet_row.get("Unavailability", "")).strip(),
-                "capability_restrictions": str(
-                    sheet_row.get("Capability Restrictions", "") or
-                    sheet_row.get("Restrictions", "") or
-                    sheet_row.get("Other Info", "")
-                ).strip(),
-                "absence_id": latest_absence.absence_id if latest_absence else None,
-                "absence_start_date": latest_absence.start_date.isoformat() if latest_absence and latest_absence.start_date else "",
-                "absence_end_date": latest_absence.end_date.isoformat() if latest_absence and latest_absence.end_date else "",
-                "absence_is_partial": latest_absence.is_partial if latest_absence else False,
-                "absence_partial_start_hour": latest_absence.partial_start_hour if latest_absence else None,
-                "absence_partial_end_hour": latest_absence.partial_end_hour if latest_absence else None,
-                "absence_notes": latest_absence.notes or "" if latest_absence else ""
-            }
-
-        station_to_volunteer_ids = {
-            station.station_id: set()
-            for station in stations
-        }
-
-        station_name_to_id = {
-            str(station.station_name).strip().lower(): station.station_id
-            for station in stations
-        }
-
-        volunteer_id_by_email = {
-            v.email.strip().lower(): v.id
-            for v in volunteers
-            if v.email
-        }
-
-        for row in rows:
-            email = str(row.get("Email", "")).strip().lower()
-            typical_station = str(row.get("Typical Station", "")).strip().lower()
-
-            if not email or not typical_station or typical_station == "other":
-                continue
-
-            volunteer_id = volunteer_id_by_email.get(email)
-            station_id = station_name_to_id.get(typical_station)
-
-            if volunteer_id is None or station_id is None:
-                continue
-
-            station_to_volunteer_ids[station_id].add(volunteer_id)
-
-        absent_station = Station.query.filter_by(station_name="Absent").first()
-        absent_station_id = absent_station.station_id if absent_station else None
-
-        today = date.today()
-
-        assignments = Assignment.query.all()
-
-        for assignment in assignments:
-            if assignment.is_covering and assignment.absence_id:
-                absence = Absence.query.get(assignment.absence_id)
-                if absence and absence.end_date < today:
-                    if assignment.original_station_id is not None:
-                        assignment.station_id = assignment.original_station_id
-
-                    assignment.is_covering = False
-                    assignment.covering_for_volunteer_id = None
-                    assignment.original_station_id = None
-                    assignment.absence_id = None
-
-                    covered = Assignment.query.filter_by(
-                        volunteer_id=absence.volunteer_id
-                    ).first()
-
-                    if covered:
-                        covered.is_absent = False
-
-        db.session.commit()   
-
-        for assignment in assignments:
-            if assignment.volunteer_id is None:
-                continue
-
-            for volunteer_ids in station_to_volunteer_ids.values():
-                volunteer_ids.discard(assignment.volunteer_id)
-
-            if assignment.is_absent and absent_station_id is not None:
-                station_to_volunteer_ids[absent_station_id].add(assignment.volunteer_id)
-            elif assignment.station_id is not None:
-                station_to_volunteer_ids.setdefault(
-                    assignment.station_id, set()
-                ).add(assignment.volunteer_id)
-        station_data = {}
-
-        for station in stations:
-            station_name = str(station.station_name)
-            assigned_ids = station_to_volunteer_ids.get(station.station_id, set())
-
-            volunteers_for_station = [
-                volunteer_rows_by_id[vid]
-                for vid in assigned_ids
-                if vid in volunteer_rows_by_id
-            ]
-
-            volunteers_for_station.sort(key=lambda x: x["name"])
-
-            station_data[station_name] = {
-                "volunteers": volunteers_for_station
-            }
-
-        return station_data
-
-    except Exception as e:
-        return {"error": str(e)}, 500
+    }
 
 @app.route("/admin/debug-other-check")
 def debug_other_check():
