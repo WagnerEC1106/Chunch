@@ -750,20 +750,39 @@ function startEndAbsenceFlow() {
     document.getElementById("reserveDecisionModal").classList.add("open");
 }
 
-function handleReserveDecision(choice) {
+async function handleReserveDecision(choice) {
     if (!currentAbsentEditVolunteer) {
-        alert("No absence is selected.");
+        alert("No absence selected.");
         return;
     }
 
-    if (choice === "move_now") {
-        alert("Move reserve back now selected. Save logic comes next.");
-        return;
-    }
+    try {
+        const payload = {
+            volunteer_id: currentAbsentEditVolunteer.id,
+            action: choice
+        };
 
-    if (choice === "double_coverage") {
-        alert("Double coverage selected. Save logic comes next.");
-        return;
+        const response = await fetch("/admin/absence/update", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Update failed");
+        }
+
+        closeReserveDecisionModal();
+
+        // reload board immediately
+        loadStationBoard();
+
+    } catch (err) {
+        alert(err.message || "Something went wrong");
     }
 }
 
