@@ -576,39 +576,37 @@ const stationClassMap = {
     "Other": "other"
 };
 
+let currentStationData = {};
+
 function formatCountLabel(count) {
     return count === 1 ? "1 volunteer" : `${count} volunteers`;
 }
 function openAbsentEditPicker() {
-    const absentCard = document.getElementById("absentVolunteerSelect");
-    absentCard.innerHTML = "";
+    const select = document.getElementById("absentVolunteerSelect");
+    if (!select) return;
 
-    const absentButtons = Array.from(
-        document.querySelectorAll('.card.absent .volunteer-pill')
-    );
+    select.innerHTML = "";
 
-    if (absentButtons.length === 0) {
+    const absentStation = currentStationData["Absent"] || { volunteers: [] };
+    const absentVolunteers = absentStation.volunteers || [];
+
+    if (absentVolunteers.length === 0) {
         const option = document.createElement("option");
         option.value = "";
         option.textContent = "No absent volunteers";
-        absentCard.appendChild(option);
+        select.appendChild(option);
     } else {
-        absentButtons.forEach(button => {
-            const volunteerJson = button.getAttribute("data-volunteer");
-            const volunteer = JSON.parse(volunteerJson);
-
+        absentVolunteers.forEach(volunteer => {
             const option = document.createElement("option");
-            option.value = volunteer.id || "";
+            option.value = String(volunteer.id || "");
             option.textContent = volunteer.name || "Volunteer";
-            option.setAttribute("data-volunteer", volunteerJson);
-            absentCard.appendChild(option);
+            select.appendChild(option);
         });
     }
 
     document.getElementById("absentEditOverlay").classList.add("open");
     document.getElementById("absentEditModal").classList.add("open");
 }
-
 function closeAbsentEditPicker() {
     document.getElementById("absentEditOverlay").classList.remove("open");
     document.getElementById("absentEditModal").classList.remove("open");
@@ -616,15 +614,19 @@ function closeAbsentEditPicker() {
 
 function startAbsentEdit() {
     const select = document.getElementById("absentVolunteerSelect");
-    const selected = select.options[select.selectedIndex];
+    if (!select) return;
 
-    if (!selected || !selected.getAttribute("data-volunteer")) {
-        return;
-    }
+    const selectedId = Number(select.value);
+    if (!selectedId) return;
 
-    const volunteerJson = selected.getAttribute("data-volunteer");
+    const absentStation = currentStationData["Absent"] || { volunteers: [] };
+    const absentVolunteers = absentStation.volunteers || [];
+
+    const volunteer = absentVolunteers.find(v => Number(v.id) === selectedId);
+    if (!volunteer) return;
+
     closeAbsentEditPicker();
-    openVolunteerPanel(volunteerJson);
+    openVolunteerPanel(JSON.stringify(volunteer));
 }
 
 function getVolunteerDisplayName(volunteer) {
@@ -642,6 +644,8 @@ function isCaptain(volunteer) {
 }
 
 function renderStationBoard(stationData) {
+    currentStationData = stationData || {};
+
     const grid = document.getElementById("scheduleGrid");
     grid.innerHTML = "";
 
