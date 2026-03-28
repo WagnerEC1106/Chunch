@@ -697,6 +697,30 @@ function startAbsentEdit() {
     document.getElementById("absenceActionModal").classList.add("open");
 }
 
+function startExtendFlow() {
+    const newEndDate = document.getElementById("extendAbsenceNewEndDate").value;
+    if (!newEndDate) {
+        alert("Please choose a new end date.");
+        return;
+    }
+
+    alert("Extend flow connected. Save logic comes next.");
+}
+
+function startShortenFlow() {
+    const newEndDate = document.getElementById("shortenAbsenceNewEndDate").value;
+    if (!newEndDate) {
+        alert("Please choose a new end date.");
+        return;
+    }
+
+    alert("Shorten flow connected. Reserve options come next.");
+}
+
+function startEndAbsenceFlow() {
+    alert("End absence flow connected. Reserve options come next.");
+}
+
 function renderStationBoard(stationData) {
     currentStationData = stationData || {};
 
@@ -1027,7 +1051,7 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
                     Choose a new end date for this absence.
                 </div>
 
-                <button class="detail-btn edit" type="button">Next</button>
+                <button class="detail-btn edit" type="button" onclick="startExtendFlow()">Next</button>
             </div>
         </div>
 
@@ -1040,10 +1064,10 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
                 </label>
 
                 <div class="detail-value">
-                    After shortening, the admin will choose whether to move the reserve back immediately or allow double coverage until the original return date.
+                    Choose whether to move the reserve back immediately or allow double coverage until the original return date
                 </div>
 
-                <button class="detail-btn edit" type="button">Next</button>
+                <button class="detail-btn edit" type="button" onclick="startShortenFlow()">Next</button>
             </div>
         </div>
 
@@ -1051,10 +1075,9 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
             <div class="detail-label">End Absence</div>
             <div style="display:flex; flex-direction:column; gap:12px;">
                 <div class="detail-value">
-                    End this absence now and choose whether to move the reserve back immediately or allow double coverage until the original return date.
-                </div>
+                    End this absence now. Decide whether to end the reserve's coverage or allow double coverage until the original return date.
 
-                <button class="detail-btn edit" type="button">Next</button>
+                <button class="detail-btn edit" type="button" onclick="startEndAbsenceFlow()">Next</button>
             </div>
         </div>
     </div>
