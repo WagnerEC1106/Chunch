@@ -521,41 +521,47 @@ def coverage_details():
 
 @app.route("/admin/absence/update", methods=["POST"])
 def update_absence():
+    from datetime import date
+
     data = request.get_json()
 
     volunteer_id = data.get("volunteer_id")
     action = data.get("action")
 
+    print("=== ABSENCE UPDATE DEBUG ===")
+    print("volunteer_id:", volunteer_id)
+    print("action:", action)
+
     absence = Absence.query.filter_by(volunteer_id=volunteer_id).first()
     if not absence:
         return jsonify({"error": "Absence not found"}), 404
 
-    assignment = Assignment.query.filter_by(volunteer_id=volunteer_id).first()
+    assignment = Assignment.query.filter_by(
+        volunteer_id=volunteer_id,
+        schedule_id=None
+    ).first()
 
     if action == "move_now":
-        # find reserve covering
         reserve_assignment = Assignment.query.filter_by(
             covering_for_volunteer_id=volunteer_id
         ).first()
 
         if reserve_assignment:
-            # move reserve back
             reserve_assignment.station_id = reserve_assignment.original_station_id
             reserve_assignment.is_covering = False
             reserve_assignment.covering_for_volunteer_id = None
             reserve_assignment.original_station_id = None
             reserve_assignment.absence_id = None
 
-        if assignment:
+        if assignment is not None:
             assignment.is_absent = False
 
         db.session.delete(absence)
 
     elif action == "double_coverage":
-        # just end absence early
         absence.end_date = date.today()
 
-        if assignment:
+        if assignment is not None:
             assignment.is_absent = False
 
     db.session.commit()
