@@ -560,6 +560,7 @@ body {
 </div>
 
 <script>
+let currentVolunteer = null;
 const stationClassMap = {
     "Setup Team": "setup",
     "Teardown Team": "teardown",
@@ -975,6 +976,7 @@ function submitAbsent() {
 
 function openVolunteerPanel(volunteerJson) {
     const volunteer = JSON.parse(volunteerJson);
+    currentVolunteer = volunteer;
 
     document.getElementById("detailName").textContent = volunteer.name || "Volunteer";
     document.getElementById("detailEmail").textContent = volunteer.email || "None listed";
@@ -1024,6 +1026,8 @@ function openVolunteerPanel(volunteerJson) {
 
     document.getElementById("detailPanel").classList.add("open");
     document.getElementById("detailOverlay").classList.add("open");
+    
+        
 }
 
 function closeVolunteerPanel() {
@@ -1032,7 +1036,49 @@ function closeVolunteerPanel() {
 }
 
 function editVolunteer() {
-    alert("Edit feature not wired yet.");
+    if(!currentVolunteer) return;
+    document.getElementById("detailName").style.display = "none";
+    document.getElementById("detailEmail").style.display = "none";
+    document.getElementById("detailPhone").style.display = "none";
+
+    const nameInput = document.getElementById("editName");
+    const emailInput = document.getElementById("editEmail");
+    const phoneInput = document.getElementById("editPhone");
+
+    nameInput.style.display = "block";
+    emailInput.style.display = "block";
+    phoneInput.style.display = "block";
+
+    nameInput.value = currentVolunteer.name || "";
+    emailInput.value = currentVolunteer.email || "";
+    phoneInput.value = currentVolunteer.phone || "";
+
+    const editBtn = document.getElementById("editButton");
+    editBtn.textContent = "Save";
+    editBtn.onclick = saveVolunteer;
+    
+}
+
+function saveVolunteer() {
+    const updatedData = {
+        id: currentVolunteer.id,
+        name: document.getElementById("editName").value,
+        email: document.getElementById("editEmail").value,
+        phone: document.getElementById("editPhone").value
+    };
+
+    fetch("/admin/edit-volunteer", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(updatedData)
+    })
+    .then(res => res.json())
+    .then(data => {
+        location.reload();
+    })
+    .catch(err => console.error(err));
 }
 
 window.addEventListener("DOMContentLoaded", loadStationBoard);
@@ -1042,7 +1088,10 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
 
 <div id="detailPanel" class="detail-panel">
     <div class="detail-panel-header">
-        <div class="detail-panel-title" id="detailName">Volunteer</div>
+        <div class="detail-panel-title">
+            <span id="detailName">Volunteer</span>
+            <input id="editName" style="display:none;">
+        </div>
         <div class="detail-panel-actions">
             <button class="detail-btn back" type="button" onclick="closeVolunteerPanel()">Back</button>
             <button class="detail-btn edit" type="button" onclick="editVolunteer()">Edit</button>
@@ -1052,12 +1101,18 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
     <div class="detail-panel-body">
         <div class="detail-card">
             <div class="detail-label">Email</div>
-            <div class="detail-value" id="detailEmail">—</div>
+            <div class="detail-value">
+                <span id="detailEmail">—</span>
+                <input id = "editEmail" style="display:none;">
+            </div>
         </div>
 
         <div class="detail-card">
             <div class="detail-label">Phone</div>
-            <div class="detail-value" id="detailPhone">—</div>
+            <div class="detail-value">
+                <span id="detailPhone">—</span>
+                <input id = "editPhone" style="display:none;">
+            </div>
         </div>
 
         <div class="detail-card">
