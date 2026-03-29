@@ -190,29 +190,11 @@ class Availability(db.Model, SoftDeleteMixin):
     volunteer = relationship("Volunteer", backref=backref("availability", cascade = "all, delete-orphan"))
 
 with app.app_context():
-    db.create_all()
-
-    db.session.execute(text("""
-        ALTER TABLE assignments
-        ADD COLUMN IF NOT EXISTS is_covering BOOLEAN NOT NULL DEFAULT FALSE
-    """))
-
-    db.session.execute(text("""
-        ALTER TABLE assignments
-        ADD COLUMN IF NOT EXISTS covering_for_volunteer_id INTEGER
-    """))
-
-    db.session.execute(text("""
-        ALTER TABLE assignments
-        ADD COLUMN IF NOT EXISTS original_station_id INTEGER
-    """))
-
-    db.session.execute(text("""
-        ALTER TABLE assignments
-        ADD COLUMN IF NOT EXISTS absence_id INTEGER
-    """))
-
-    db.session.commit()
+    try:
+        db.create_all()
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
         
 # Serve your existing HTML pages
 @app.route("/")
