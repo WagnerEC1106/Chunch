@@ -1123,8 +1123,7 @@ def debug_hourly_final():
             volunteer_row = volunteer_rows_by_id.get(volunteer_id)
             if not volunteer_row:
                 continue
-
-            linked_absence = Absence.query\
+            volunteer_absence = Absence.query\
                 .filter(
                     Absence.volunteer_id == volunteer_id,
                     Absence.start_date <= today,
@@ -1133,16 +1132,27 @@ def debug_hourly_final():
                 .order_by(Absence.absence_id.desc())\
                 .first()
 
-            absence_active_today = linked_absence is not None
+            volunteer_absence_active_today = volunteer_absence is not None
+
 
             if assignment.is_covering and assignment.station_id is not None:
                 remove_existing_entries(volunteer_id)
 
                 cover_row = dict(volunteer_row)
-                if linked_absence and linked_absence.is_partial and absence_active_today:
+
+
+                coverage_absence = None
+                if assignment.absence_id:
+                    coverage_absence = Absence.query.get(assignment.absence_id)
+
+                if (
+                    coverage_absence and
+                    coverage_absence.is_partial and
+                    coverage_absence.start_date <= today <= coverage_absence.end_date
+                ):
                     cover_row["display_time"] = format_hour_range(
-                        linked_absence.partial_start_hour,
-                        linked_absence.partial_end_hour
+                        coverage_absence.partial_start_hour,
+                        coverage_absence.partial_end_hour
                     )
                 else:
                     cover_row["display_time"] = ""
@@ -1151,17 +1161,18 @@ def debug_hourly_final():
                 processed_volunteer_ids.add(volunteer_id)
                 continue
 
+
             if (
-                linked_absence and
-                linked_absence.is_partial and
-                absence_active_today and
+                volunteer_absence and
+                volunteer_absence.is_partial and
+                volunteer_absence_active_today and
                 assignment.station_id is not None and
                 absent_station_id is not None
             ):
                 remove_existing_entries(volunteer_id)
 
-                absent_start = linked_absence.partial_start_hour
-                absent_end = linked_absence.partial_end_hour
+                absent_start = volunteer_absence.partial_start_hour
+                absent_end = volunteer_absence.partial_end_hour
                 full_shift_hours = volunteer_typical_shift_hours.get(volunteer_id, [])
 
                 absent_row = dict(volunteer_row)
@@ -1178,22 +1189,29 @@ def debug_hourly_final():
                 processed_volunteer_ids.add(volunteer_id)
                 continue
 
-            remove_existing_entries(volunteer_id)
-
-            if absence_active_today and not (linked_absence and linked_absence.is_partial) and absent_station_id is not None:
+            if (
+                volunteer_absence_active_today and
+                volunteer_absence and
+                not volunteer_absence.is_partial and
+                absent_station_id is not None
+            ):
                 remove_existing_entries(volunteer_id)
 
                 absent_row = dict(volunteer_row)
                 absent_row["display_time"] = ""
                 station_entries.setdefault(absent_station_id, []).append(absent_row)
+
                 processed_volunteer_ids.add(volunteer_id)
                 continue
+
+            remove_existing_entries(volunteer_id)
 
             if assignment.station_id is not None:
                 station_row = dict(volunteer_row)
                 station_row["display_time"] = ""
                 station_entries.setdefault(assignment.station_id, []).append(station_row)
-                processed_volunteer_ids.add(volunteer_id)
+
+            processed_volunteer_ids.add(volunteer_id)
 
         station_data = {}
 
