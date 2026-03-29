@@ -964,6 +964,7 @@ def debug_hourly_final():
                 return ""
             return f"{format_hour(start_hour)}–{format_hour(end_hour)}"
 
+        today = date.today()
         volunteer_rows_by_id = {}
 
         for v in volunteers:
@@ -975,7 +976,11 @@ def debug_hourly_final():
             sheet_row = sheet_row_by_email.get(email_key, {})
 
             latest_absence = Absence.query\
-                .filter(Absence.volunteer_id == v.id)\
+                .filter(
+                    Absence.volunteer_id == v.id,
+                    Absence.start_date <= today,
+                    Absence.end_date >= today
+                )\
                 .order_by(Absence.absence_id.desc())\
                 .first()
 
