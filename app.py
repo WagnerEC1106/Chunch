@@ -306,10 +306,14 @@ def coverage_details():
     if not absent_volunteer:
         return {"error": "Volunteer not found"}, 404
 
-    latest_absence = Absence.query\
-        .filter(Absence.volunteer_id == volunteer_id)\
-        .order_by(Absence.absence_id.desc())\
-        .first()
+        latest_absence = Absence.query\
+            .filter(
+                Absence.volunteer_id == v.id,
+                Absence.start_date <= today,
+                Absence.end_date >= today
+            )\
+            .order_by(Absence.absence_id.desc())\
+            .first()
 
     if not latest_absence:
         return "<pre>No absence record found for this volunteer.</pre>", 404
@@ -1113,16 +1117,16 @@ def debug_hourly_final():
             if not volunteer_row:
                 continue
 
-            linked_absence = None
-            if assignment.absence_id:
-                linked_absence = Absence.query.get(assignment.absence_id)
+            linked_absence = Absence.query\
+                .filter(
+                    Absence.volunteer_id == volunteer_id,
+                    Absence.start_date <= today,
+                    Absence.end_date >= today
+                )\
+                .order_by(Absence.absence_id.desc())\
+                .first()
 
-            absence_active_today = (
-                linked_absence is not None and
-                linked_absence.start_date is not None and
-                linked_absence.end_date is not None and
-                linked_absence.start_date <= today <= linked_absence.end_date
-            )
+            absence_active_today = linked_absence is not None
 
             if assignment.is_covering and assignment.station_id is not None:
                 remove_existing_entries(volunteer_id)
