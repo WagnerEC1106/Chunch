@@ -519,6 +519,38 @@ def coverage_details():
         partial_overlap_reserves=partial_overlap_reserves
     )
 
+@app.route("/debug/reset-all-covering")
+def reset_all_covering():
+    try:
+        reserve_station = Station.query.filter_by(station_name="Reserve").first()
+        if not reserve_station:
+            return {"error": "Reserve station not found"}, 404
+
+        covering_assignments = Assignment.query\
+            .filter_by(is_covering=True)\
+            .all()
+
+        reset_count = 0
+
+        for assignment in covering_assignments:
+            assignment.station_id = reserve_station.station_id
+            assignment.is_covering = False
+            assignment.covering_for_volunteer_id = None
+            assignment.original_station_id = None
+            assignment.absence_id = None
+            reset_count += 1
+
+        db.session.commit()
+
+        return {
+            "success": True,
+            "message": "All covering volunteers moved back to Reserve",
+            "reset_count": reset_count
+        }
+
+    except Exception as e:
+        db.session.rollback()
+        return {"error": str(e)}, 500
 
 @app.route("/admin/absence/update", methods=["POST"])
 def update_absence():
