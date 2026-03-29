@@ -1232,6 +1232,34 @@ def debug_hourly_final():
     except Exception as e:
         return {"error": str(e)}, 500
 
+@app.route("/debug/reset-all-covering")
+def reset_all_covering():
+    try:
+        covering_assignments = Assignment.query.filter_by(is_covering=True).all()
+
+        reset_count = 0
+
+        for assignment in covering_assignments:
+            if assignment.original_station_id is not None:
+                assignment.station_id = assignment.original_station_id
+
+            assignment.is_covering = False
+            assignment.covering_for_volunteer_id = None
+            assignment.original_station_id = None
+            assignment.absence_id = None
+            reset_count += 1
+
+        db.session.commit()
+
+        return {
+            "message": "All covering reserves reset",
+            "reset_count": reset_count
+        }
+
+    except Exception as e:
+        db.session.rollback()
+        return {"error": str(e)}, 500
+
 @app.route("/admin/debug-other-check")
 def debug_other_check():
     volunteers = Volunteer.query\
