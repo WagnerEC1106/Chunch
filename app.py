@@ -15,7 +15,7 @@ from flask import render_template
 from googleapiclient.discovery import build
 from flask_softdelete import SoftDeleteMixin
 from flask_migrate import Migrate
-from datetime import date
+from datetime import date, datetime
 from sqlalchemy import text
 from flask import render_template
 
@@ -533,7 +533,11 @@ def update_absence():
     mode = data.get("mode")
     new_end_date = data.get("new_end_date")
 
-    absence = Absence.query.filter_by(volunteer_id=volunteer_id).first()
+    absence = Absence.query\
+        .filter(Absence.volunteer_id == volunteer_id)\
+        .order_by(Absence.absence_id.desc())\
+        .first()
+
     if not absence:
         return jsonify({"error": "Absence not found"}), 404
 
@@ -542,15 +546,15 @@ def update_absence():
         schedule_id=None
     ).first()
 
-    reserve_assignment = Assignment.query.filter_by(
+    reserve_assignments = Assignment.query.filter_by(
         covering_for_volunteer_id=volunteer_id
-    ).first()
+    ).all()
 
     if mode == "end":
-
         if action == "move_now":
-            if reserve_assignment:
-                reserve_assignment.station_id = reserve_assignment.original_station_id
+            for reserve_assignment in reserve_assignments:
+                if reserve_assignment.original_station_id is not None:
+                    reserve_assignment.station_id = reserve_assignment.original_station_id
                 reserve_assignment.is_covering = False
                 reserve_assignment.covering_for_volunteer_id = None
                 reserve_assignment.original_station_id = None
@@ -558,11 +562,11 @@ def update_absence():
 
         if assignment:
             assignment.is_absent = False
+            assignment.absence_id = None
 
         db.session.delete(absence)
 
     elif mode == "shorten":
-
         if not new_end_date:
             return jsonify({"error": "Missing new end date"}), 400
 
@@ -573,16 +577,12 @@ def update_absence():
 
         absence.end_date = new_end_date
 
-        if action == "move_now":
-            if reserve_assignment:
-                reserve_assignment.station_id = reserve_assignment.original_station_id
-                reserve_assignment.is_covering = False
-                reserve_assignment.covering_for_volunteer_id = None
-                reserve_assignment.original_station_id = None
-                reserve_assignment.absence_id = None
+        # shorten should NOT move reserves back immediately here
+        # the auto-revert route will handle that when the new date/time is reached
 
-        elif action == "double_coverage":
-            pass
+        if assignment:
+            assignment.is_absent = True
+            assignment.absence_id = absence.absence_id
 
     db.session.commit()
 
@@ -1043,13 +1043,31 @@ def debug_hourly_final():
         absent_station = Station.query.filter_by(station_name="Absent").first()
         absent_station_id = absent_station.station_id if absent_station else None
 
-        today = date.today()
+        now = datetime.now()
+        today = now.date()
+        current_hour = now.hour
+
         assignments = Assignment.query.all()
 
         for assignment in assignments:
             if assignment.is_covering and assignment.absence_id:
                 absence = Absence.query.get(assignment.absence_id)
-                if absence and absence.end_date < today:
+                if not absence:
+                    continue
+
+                should_revert = False
+
+                if absence.end_date < today:
+                    should_revert = True
+                elif (
+                    absence.is_partial and
+                    absence.end_date == today and
+                    absence.partial_end_hour is not None and
+                    current_hour >= absence.partial_end_hour
+                ):
+                    should_revert = True
+
+                if should_revert:
                     if assignment.original_station_id is not None:
                         assignment.station_id = assignment.original_station_id
 
@@ -1059,11 +1077,17 @@ def debug_hourly_final():
                     assignment.absence_id = None
 
                     covered = Assignment.query.filter_by(
-                        volunteer_id=absence.volunteer_id
+                        volunteer_id=absence.volunteer_id,
+                        schedule_id=None
                     ).first()
 
-                    if covered:
+                    if covered and not Absence.query.filter(
+                        Absence.volunteer_id == absence.volunteer_id,
+                        Absence.start_date <= today,
+                        Absence.end_date >= today
+                    ).first():
                         covered.is_absent = False
+                        covered.absence_id = None
 
         db.session.commit()
 
@@ -1100,7 +1124,6 @@ def debug_hourly_final():
                 linked_absence.start_date <= today <= linked_absence.end_date
             )
 
-            # covering reserve must be handled first so it never lands in Absent
             if assignment.is_covering and assignment.station_id is not None:
                 remove_existing_entries(volunteer_id)
 
@@ -1117,7 +1140,6 @@ def debug_hourly_final():
                 processed_volunteer_ids.add(volunteer_id)
                 continue
 
-            # active partial absence: show volunteer in Absent and also in station
             if (
                 linked_absence and
                 linked_absence.is_partial and
