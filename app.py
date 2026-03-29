@@ -871,11 +871,48 @@ def save_need_coverage():
 #    return {"message": f"Deleted {len(assignments)} assignments for volunteer {volunteer_id}"}
 @app.route("/admin/debug-hourly-final")
 def debug_hourly_final():
-    return {
-        "Greeters": {"volunteers": []},
-        "Absent": {"volunteers": []},
-        "Reserve": {"volunteers": []}
+    volunteers = Volunteer.query\
+        .filter(Volunteer.deleted_at.is_(None))\
+        .all()
+
+    stations = Station.query\
+        .filter(Station.station_name != "Other")\
+        .all()
+
+    station_data = {}
+
+    for station in stations:
+        station_data[str(station.station_name)] = {
+            "volunteers": []
+        }
+
+    assignments = Assignment.query.all()
+
+    volunteer_by_id = {
+        v.id: f"{v.first_name} {v.last_name}"
+        for v in volunteers
     }
+
+    for a in assignments:
+        if not a.station_id or not a.volunteer_id:
+            continue
+
+        station = next(
+            (s for s in stations if s.station_id == a.station_id),
+            None
+        )
+        if not station:
+            continue
+
+        station_name = str(station.station_name)
+
+        station_data[station_name]["volunteers"].append({
+            "id": a.volunteer_id,
+            "name": volunteer_by_id.get(a.volunteer_id, "Unknown"),
+            "display_time": ""
+        })
+
+    return station_data
 # @app.route("/admin/debug-hourly-final")
 # def debug_hourly_final():
 #     try:
