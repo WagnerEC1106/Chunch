@@ -172,8 +172,8 @@ class Assignment(db.Model):
     original_station_id = Column(Integer, ForeignKey("station.station_id"), nullable=True)
     absence_id = Column(Integer, ForeignKey("absences.absence_id"), nullable=True)
 
-    volunteer = relationship("Volunteer", foreign_keys=[volunteer_id])
-    station = relationship("Station", foreign_keys=[station_id])
+    volunteer = relationship("Volunteer", foreign_keys=[volunteer_id], backref="assignments")
+    station = relationship("Station", foreign_keys=[station_id], backref="assignments")
     schedule = relationship("Schedule", backref="assignments")
 
 # creating a class that will store the availiablity hours for each person
