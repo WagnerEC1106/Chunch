@@ -725,6 +725,53 @@ def save_need_coverage():
         )
 
         db.session.add(absence)
+        db.session.flush()
+
+        assignment = Assignment.query.filter_by(
+            volunteer_id=volunteer_id,
+            schedule_id=None
+        ).first()
+
+        if not assignment:
+            volunteer = Volunteer.query.get(volunteer_id)
+            if not volunteer:
+                return "<pre>Volunteer not found.</pre>", 404
+
+            sheet = get_sheet()
+            rows = sheet.get_all_records()
+
+            volunteer_row = None
+            volunteer_email = (volunteer.email or "").strip().lower()
+
+            for row in rows:
+                row_email = str(row.get("Email", "")).strip().lower()
+                if row_email == volunteer_email:
+                    volunteer_row = row
+                    break
+
+            if not volunteer_row:
+                return "<pre>Volunteer assignment not found and volunteer is not in the sheet.</pre>", 404
+
+            typical_station_name = str(volunteer_row.get("Typical Station", "")).strip()
+
+            if not typical_station_name:
+                return "<pre>Volunteer has no typical station in the sheet.</pre>", 404
+
+            station = Station.query.filter_by(station_name=typical_station_name).first()
+            if not station:
+                return f"<pre>Station '{typical_station_name}' not found.</pre>", 404
+
+            assignment = Assignment(
+                volunteer_id=volunteer_id,
+                station_id=station.station_id,
+                schedule_id=None
+            )
+            db.session.add(assignment)
+            db.session.flush()
+
+        assignment.absence_id = absence.absence_id
+        assignment.is_absent = True
+
         db.session.commit()
 
         return redirect(f"/admin/coverage/details?volunteer_id={volunteer_id}")
