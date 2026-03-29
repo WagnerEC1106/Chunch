@@ -860,26 +860,98 @@ def debug_hourly_final():
         sheet = get_sheet()
         rows = sheet.get_all_records()
 
-        # Map email -> sheet row
         sheet_row_by_email = {
             str(row.get("Email", "")).strip().lower(): row
             for row in rows
             if row.get("Email")
         }
 
-        # Build station structure
         station_data = {
             str(s.station_name): {"volunteers": []}
             for s in stations
         }
 
-        # Map station name -> id
         station_name_map = {
             str(s.station_name).strip().lower(): str(s.station_name)
             for s in stations
         }
 
-        # STEP 1: Put ALL volunteers in their typical station
+        def parse_time_to_hour(time_str):
+            time_str = str(time_str).strip().upper().replace(" ", "")
+            if not time_str:
+                return None
+
+            if time_str.endswith("AM"):
+                raw = time_str[:-2]
+                if ":" in raw:
+                    raw = raw.split(":")[0]
+                if not raw.isdigit():
+                    return None
+                hour = int(raw)
+                return 0 if hour == 12 else hour
+
+            if time_str.endswith("PM"):
+                raw = time_str[:-2]
+                if ":" in raw:
+                    raw = raw.split(":")[0]
+                if not raw.isdigit():
+                    return None
+                hour = int(raw)
+                return hour if hour == 12 else hour + 12
+
+            return None
+
+        def parse_hour_list(text):
+            text = str(text).strip()
+            if not text:
+                return []
+
+            normalized = text.replace("–", "-").replace("—", "-")
+            parts = [part.strip() for part in normalized.split(",") if part.strip()]
+
+            hours = set()
+
+            for part in parts:
+                if "-" in part:
+                    start_str, end_str = part.split("-", 1)
+                    start_hour = parse_time_to_hour(start_str)
+                    end_hour = parse_time_to_hour(end_str)
+
+                    if start_hour is None or end_hour is None:
+                        continue
+
+                    if start_hour > end_hour:
+                        continue
+
+                    for hour in range(start_hour, end_hour + 1):
+                        hours.add(hour)
+                else:
+                    single_hour = parse_time_to_hour(part)
+                    if single_hour is not None:
+                        hours.add(single_hour)
+
+            return sorted(hours)
+
+        def format_hour(h):
+            if h is None:
+                return ""
+            if h == 0:
+                return "12AM"
+            if h < 12:
+                return f"{h}AM"
+            if h == 12:
+                return "12PM"
+            return f"{h-12}PM"
+
+        def format_hour_range(start_hour, end_hour):
+            if start_hour is None or end_hour is None:
+                return ""
+            return f"{format_hour(start_hour)}–{format_hour(end_hour)}"
+
+        volunteer_by_id = {v.id: v for v in volunteers}
+        today = date.today()
+
+        # STEP 1: Put all volunteers in their typical station
         for v in volunteers:
             email = (v.email or "").strip().lower()
             row = sheet_row_by_email.get(email)
@@ -900,34 +972,89 @@ def debug_hourly_final():
                 "display_time": ""
             })
 
-        # STEP 2: Override with assignments
+        # STEP 2: Apply normal assignment overrides
         assignments = Assignment.query.all()
 
         for a in assignments:
             if not a.station_id or not a.volunteer_id:
                 continue
 
-            volunteer = next((v for v in volunteers if v.id == a.volunteer_id), None)
+            volunteer = volunteer_by_id.get(a.volunteer_id)
             station = next((s for s in stations if s.station_id == a.station_id), None)
 
             if not volunteer or not station:
                 continue
 
-            name = f"{volunteer.first_name} {volunteer.last_name}"
             station_name = str(station.station_name)
 
-            # remove from all stations first
             for s in station_data.values():
                 s["volunteers"] = [
                     v for v in s["volunteers"] if v["id"] != volunteer.id
                 ]
 
-            # add to assigned station
             station_data[station_name]["volunteers"].append({
                 "id": volunteer.id,
-                "name": name,
+                "name": f"{volunteer.first_name} {volunteer.last_name}",
                 "display_time": ""
             })
+
+        # STEP 3: Apply partial absences last
+        absent_station_name = "Absent"
+
+        for v in volunteers:
+            absence = Absence.query\
+                .filter(
+                    Absence.volunteer_id == v.id,
+                    Absence.start_date <= today,
+                    Absence.end_date >= today
+                )\
+                .order_by(Absence.absence_id.desc())\
+                .first()
+
+            if not absence or not absence.is_partial:
+                continue
+
+            email = (v.email or "").strip().lower()
+            row = sheet_row_by_email.get(email)
+            if not row:
+                continue
+
+            typical_station = str(row.get("Typical Station", "")).strip().lower()
+            if typical_station not in station_name_map:
+                continue
+
+            station_name = station_name_map[typical_station]
+            full_shift_hours = parse_hour_list(str(row.get("Typical Shift", "")).strip())
+
+            absent_start = absence.partial_start_hour
+            absent_end = absence.partial_end_hour
+
+            if absent_start is None or absent_end is None:
+                continue
+
+            # remove volunteer from everywhere first
+            for s in station_data.values():
+                s["volunteers"] = [
+                    entry for entry in s["volunteers"] if entry["id"] != v.id
+                ]
+
+            # add absent segment
+            station_data.setdefault(absent_station_name, {"volunteers": []})
+            station_data[absent_station_name]["volunteers"].append({
+                "id": v.id,
+                "name": f"{v.first_name} {v.last_name}",
+                "display_time": format_hour_range(absent_start, absent_end)
+            })
+
+            # add working segment
+            if full_shift_hours:
+                shift_end = max(full_shift_hours)
+                if absent_end <= shift_end:
+                    station_data[station_name]["volunteers"].append({
+                        "id": v.id,
+                        "name": f"{v.first_name} {v.last_name}",
+                        "display_time": format_hour_range(absent_end, shift_end)
+                    })
 
         return station_data
 
