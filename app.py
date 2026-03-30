@@ -881,6 +881,16 @@ def debug_hourly_final():
             .order_by(Volunteer.last_name, Volunteer.first_name)\
             .all()
 
+        volunteer_lookup = {}
+
+        for v in volunteers:
+            key = (
+                (v.first_name or "").strip().lower(),
+                (v.last_name or "").strip().lower(),
+                (v.email or "").strip().lower()
+            )
+        volunteer_lookup[key] = v.id
+
         stations = Station.query\
             .filter(Station.station_name != "Other")\
             .order_by(Station.station_name)\
@@ -962,19 +972,23 @@ def debug_hourly_final():
         #}
 
         for row in rows:
+            first_name = str(row.get("First Name", "")).strip().lower()
+            last_name = str(row.get("Last Name", "")).strip().lower()
             email = str(row.get("Email", "")).strip().lower()
             typical_station = str(row.get("Typical Station", "")).strip().lower()
+            key = (first_name, last_name, email)
+            volunteer_id = volunteer_lookup.get(key)
 
             if not email or not typical_station or typical_station == "other":
                 continue
 
-            volunteer_ids = volunteer_ids_by_email.get(email, [])
+            
             station_id = station_name_to_id.get(typical_station)
 
-            if not volunteer_ids or station_id is None:
+            if volunteer_id is None or station_id is None:
                 continue
-            for vid in volunteer_ids:
-                station_to_volunteer_ids[station_id].add(vid)
+                
+            station_to_volunteer_ids[station_id].add(volunteer_id)
 
         absent_station = Station.query.filter_by(station_name="Absent").first()
         absent_station_id = absent_station.station_id if absent_station else None
