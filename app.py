@@ -948,12 +948,18 @@ def debug_hourly_final():
             str(station.station_name).strip().lower(): station.station_id
             for station in stations
         }
-
-        volunteer_id_by_email = {
-            v.email.strip().lower(): v.id
-            for v in volunteers
-            if v.email
-        }
+        from collections import defaultdict
+        volunteer_ids_by_email = defaultdict(list)
+        for v in volunteers:
+            if v.email:
+                email_key = v.email.strip().lower()
+                volunteer_ids_by_email[email_key].append(v.id)
+                
+        #volunteer_id_by_email = {
+            #v.email.strip().lower(): v.id
+            #for v in volunteers
+            #if v.email
+        #}
 
         for row in rows:
             email = str(row.get("Email", "")).strip().lower()
@@ -962,13 +968,13 @@ def debug_hourly_final():
             if not email or not typical_station or typical_station == "other":
                 continue
 
-            volunteer_id = volunteer_id_by_email.get(email)
+            volunteer_ids = volunteer_ids_by_email.get(email, [])
             station_id = station_name_to_id.get(typical_station)
 
-            if volunteer_id is None or station_id is None:
+            if not volunteer_ids or station_id is None:
                 continue
-
-            station_to_volunteer_ids[station_id].add(volunteer_id)
+            for vid in volunteer_ids:
+                station_to_volunteer_ids[station_id].add(vid)
 
         absent_station = Station.query.filter_by(station_name="Absent").first()
         absent_station_id = absent_station.station_id if absent_station else None
