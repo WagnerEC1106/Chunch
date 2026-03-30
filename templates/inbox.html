@@ -237,13 +237,13 @@
                         <td class="muted">{{ a.phone }}</td>
                         <td colspan="2">
                             <div class="actions">
-                                <button class="btn-accept" 
-                                    onclick="openAssignmentModal(
-                                        '{{ a.id }}',
-                                        '{{ a.first_name }} {{ a.last_name }}',
-                                        '{{ a.phone }}',
+                                <button type = "button" class="btn-accept" 
+                                    onclick='openAssignmentModal(
+                                        {{ a.id }},
+                                        {{ (a.first_name + " " + a.last_name) | tojson }},
+                                        {{ a.phone | tojson }},
                                         {{ a.availability | tojson }}
-                                    )">
+                                    )'>
                                         Accept
                                     </button>
 
