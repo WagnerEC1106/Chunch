@@ -1282,9 +1282,9 @@ def add_volunteer():
     if "user_id" not in session:
         return redirect("/")
     
-    first_name = request.form.get("first_name").strip()
-    last_name = request.form.get("last_name").strip()
-    email = request.form.get("email").strip().lower()
+    first_name = request.form.get("first_name", "").strip()
+    last_name = request.form.get("last_name", "").strip()
+    email = request.form.get("email", "").strip().lower()
 
     existing = Volunteer.query.filter_by(first_name = first_name, email=email).first()
     if existing:
@@ -1874,7 +1874,7 @@ def sync_volunteers():
             if not first_name:
                 continue
             
-            volunteer = Volunteer.query.filter_by(first_name, email=email).first()
+            volunteer = Volunteer.query.filter_by(first_name = first_name, email=email).first()
 
             if not volunteer:
                 volunteer = Volunteer(
