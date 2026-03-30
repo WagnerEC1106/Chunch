@@ -785,7 +785,8 @@ function renderStationBoard(stationData) {
         const station = stationData[stationName];
         const volunteers = station.volunteers || [];
 
-        stationString += {station}.toString() + " ";
+        stationString += station.toString();
+        stationString += " ";
 
         totalVolunteers += volunteers.length;
 
