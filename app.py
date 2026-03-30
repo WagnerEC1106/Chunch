@@ -1169,9 +1169,9 @@ def inbox():
 def accept_applicant(applicants_id):
     if "user_id" not in session:
         return redirect("/")
-    applicants_id = request.form.get("applicant_id")
-    station_id = request.form.get("station_id")
-    schedule_id = request.form.get("schedule_id")
+    applicants_id = int(request.form.get("applicant_id"))
+    station_id = int(request.form.get("station_id"))
+    schedule_id = int(request.form.get("schedule_id"))
     
     applicant = Applicant.query.get_or_404(applicants_id)
     volunteer = Volunteer(
