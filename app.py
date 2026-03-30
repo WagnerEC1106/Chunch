@@ -168,10 +168,13 @@ class Assignment(db.Model):
     covering_for_volunteer_id = Column(Integer, ForeignKey("volunteers.id"), nullable=True)
     original_station_id = Column(Integer, ForeignKey("station.station_id"), nullable=True)
     absence_id = Column(Integer, ForeignKey("absences.absence_id"), nullable=True)
+    cover_start_hour = Column(Integer, nullable=True)
+    cover_end_hour = Column(Integer, nullable=True)
 
     volunteer = relationship("Volunteer", foreign_keys=[volunteer_id])
     station = relationship("Station", foreign_keys=[station_id])
     schedule = relationship("Schedule", backref="assignments")
+    
 
 # creating a class that will store the availiablity hours for each person
 class Availability(db.Model, SoftDeleteMixin):
@@ -206,6 +209,15 @@ with app.app_context():
     db.session.execute(text("""
         ALTER TABLE assignments
         ADD COLUMN IF NOT EXISTS absence_id INTEGER
+    """))
+    db.session.execute(text("""
+    ALTER TABLE assignments
+    ADD COLUMN IF NOT EXISTS cover_start_hour INTEGER
+    """))
+
+    db.session.execute(text("""
+        ALTER TABLE assignments
+        ADD COLUMN IF NOT EXISTS cover_end_hour INTEGER
     """))
 
     db.session.commit()
@@ -1665,6 +1677,7 @@ def volunteer_hours():
 
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
+
 @app.route("/admin/debug-hourly-matches")
 def debug_hourly_matches():
     volunteers = Volunteer.query\
