@@ -1400,9 +1400,9 @@ def student_spotlight():
                 continue
 
             spotlight_entries.append({
-                "Name": name,
-                "Year": year,
-                "Quote": quote
+                "name": name,
+                "year": year,
+                "quote": quote
             })
 
         random.shuffle(spotlight_entries)
