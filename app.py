@@ -1487,6 +1487,9 @@ def volunteer_hours():
             .order_by(Station.station_name)\
             .all()
 
+        sheet = get_sheet()
+        rows = sheet.get_all_records()
+
         def parse_hours(availability_rows):
             cleaned_hours = []
             for row in availability_rows:
@@ -1530,6 +1533,8 @@ def volunteer_hours():
                 return f"{h-12}PM"
 
         volunteer_rows_by_id = {}
+        volunteer_lookup = {}
+
         for v in volunteers:
             hours = parse_hours(v.availability)
             ranges = build_ranges(hours)
@@ -1550,16 +1555,42 @@ def volunteer_hours():
                 "range_label": range_label
             }
 
+            key = (
+                (v.first_name or "").strip().lower(),
+                (v.last_name or "").strip().lower(),
+                (v.email or "").strip().lower()
+            )
+            volunteer_lookup[key] = v.id
+
         station_to_volunteer_ids = {
             station.station_id: set()
             for station in stations
         }
 
-        absent_station = Station.query.filter_by(station_name="Absent").first()
-        absent_station_id = absent_station.station_id if absent_station else None
+        station_name_to_id = {
+            str(station.station_name).strip().lower(): station.station_id
+            for station in stations
+        }
+
+        for row in rows:
+            first_name = str(row.get("First Name", "")).strip().lower()
+            last_name = str(row.get("Last Name", "")).strip().lower()
+            email = str(row.get("Email", "")).strip().lower()
+            typical_station = str(row.get("Typical Station", "")).strip().lower()
+
+            if not typical_station or typical_station in ["reserve", "absent", "other"]:
+                continue
+
+            key = (first_name, last_name, email)
+            volunteer_id = volunteer_lookup.get(key)
+            station_id = station_name_to_id.get(typical_station)
+
+            if volunteer_id is None or station_id is None:
+                continue
+
+            station_to_volunteer_ids[station_id].add(volunteer_id)
 
         today = date.today()
-
         assignments = Assignment.query.all()
 
         for assignment in assignments:
@@ -1590,11 +1621,12 @@ def volunteer_hours():
             if assignment.volunteer_id not in volunteer_rows_by_id:
                 continue
 
-            # do not show absent people in the hourly station view
+            for volunteer_ids in station_to_volunteer_ids.values():
+                volunteer_ids.discard(assignment.volunteer_id)
+
             if assignment.is_absent:
                 continue
 
-            # do not show Reserve / Absent / Other in this page
             if assignment.station_id is None:
                 continue
 
@@ -1602,7 +1634,7 @@ def volunteer_hours():
             if not station:
                 continue
 
-            station_name = str(station.station_name)
+            station_name = str(station.station_name).strip()
             if station_name in ["Reserve", "Absent", "Other"]:
                 continue
 
@@ -1611,6 +1643,7 @@ def volunteer_hours():
             ).add(assignment.volunteer_id)
 
         station_data = {}
+
         for station in stations:
             station_name = str(station.station_name)
             assigned_ids = station_to_volunteer_ids.get(station.station_id, set())
@@ -1632,7 +1665,6 @@ def volunteer_hours():
 
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
-        
 @app.route("/admin/debug-hourly-matches")
 def debug_hourly_matches():
     volunteers = Volunteer.query\
