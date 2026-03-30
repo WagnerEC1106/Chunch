@@ -1053,16 +1053,19 @@ function editVolunteer() {
     emailInput.value = currentVolunteer.email || "";
     phoneInput.value = currentVolunteer.phone || "";
 
-    const editBtn = document.getElementById("editButton");
-    editBtn.textContent = "Save";
-    editBtn.onclick = saveVolunteer;
+    document.getElementById("editBtn").style.display = "none";
+    document.getElementById("saveBtn").style.display = "inline-block";
     
 }
 
 function saveVolunteer() {
+    const fullName = document.getElementById("editName").value.trim();
+    const [firstName, ...rest] = fullName.split(" ");
+    const lastName = rest.join(" ");
     const updatedData = {
         id: currentVolunteer.id,
-        name: document.getElementById("editName").value,
+        first_name: firstName,
+        last_name: lastName,
         email: document.getElementById("editEmail").value,
         phone: document.getElementById("editPhone").value
     };
@@ -1094,7 +1097,8 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
         </div>
         <div class="detail-panel-actions">
             <button class="detail-btn back" type="button" onclick="closeVolunteerPanel()">Back</button>
-            <button class="detail-btn edit" type="button" onclick="editVolunteer()">Edit</button>
+            <button class="detail-btn edit" type="button" id = "editBtn" onclick="editVolunteer()">Edit</button>
+            <button class="detail-btn save" type="submit" id="saveBtn" onclick="saveVolunteer()" style="display:none;">Save changes</button>
         </div>
     </div>
 
