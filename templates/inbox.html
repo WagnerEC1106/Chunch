@@ -241,7 +241,8 @@
                                     onclick="openAssignmentModal(
                                         '{{ a.id }}',
                                         '{{ a.first_name }} {{ a.last_name }}',
-                                        '{{ a.phone }}'
+                                        '{{ a.phone }}',
+                                        {{ a.availability | tojson }}
                                     )">
                                         Accept
                                     </button>
@@ -346,10 +347,22 @@
       </div>
     </div>
     <script>
-    function openAssignmentModal(id, name, phone) {
+    function openAssignmentModal(id, name, phone, availability) {
         document.getElementById("assignmentModal").style.display = "block";
         document.getElementById("modalApplicantId").value = id;
         document.getElementById("modalName").innerText = name;
+
+        const scheduleSelect = document.querySelector("select[name='schedule_id']");
+
+        for (let option of scheduleSelect.options) {
+            const hour = parseInt(option.text.match(/\d+/));
+
+            if(availability.includes(hour)) {
+                option.style.display = "block";
+            } else {
+                option.style.display = "none";
+            }
+        }
     }
 
     function closeModal() {
