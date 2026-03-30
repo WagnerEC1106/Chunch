@@ -1166,7 +1166,7 @@ def inbox():
                            stations=stations, schedules=schedules)
 
 @app.route("/admin/inbox/accept-with-assignment", methods=["POST"])
-def accept_applicant(applicants_id):
+def accept_applicant():
     if "user_id" not in session:
         return redirect("/")
     applicants_id = int(request.form.get("applicant_id"))
