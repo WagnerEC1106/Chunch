@@ -319,6 +319,7 @@
 
         <form method="POST" action="/admin/inbox/accept-with-assignment">
           <input type="hidden" name="applicant_id" id="modalApplicantId">
+            
 
           <label>Station:</label>
           <select name="station_id" required>
@@ -333,12 +334,13 @@
             <select name="schedule_id" required>
               {% for s in schedules %}
                 <option value="{{ s.schedule_id }}">
-                  {{ s.day }} - {{ s.hour }}:00
+                    {{ s.day }} - {{ s.start_hour }}:00 → {{ s.end_hour }}:00
                 </option>
               {% endfor %}
             </select>
 
           <br><br>
+            <div id="availabilityDisplay" style="margin-bottom:15px;"></div> 
 
           <button type="submit" class="btn-accept">Confirm Assignment</button>
           <button type="button" onclick="closeModal()">Cancel</button>
@@ -352,17 +354,18 @@
         document.getElementById("modalApplicantId").value = id;
         document.getElementById("modalName").innerText = name;
 
-        const scheduleSelect = document.querySelector("select[name='schedule_id']");
-
-        for (let option of scheduleSelect.options) {
-            const hour = parseInt(option.text.match(/\d+/));
-
-            if(availability.includes(hour)) {
-                option.style.display = "block";
-            } else {
-                option.style.display = "none";
-            }
+        const availabilityDiv = document.getElementById("availabilityDisplay");
+        if (!availability || availability.length === 0) {
+        availabilityDiv.innerHTML = "<strong>No unavailability listed</strong>";
+        return;
         }
+
+        availabilityDiv.innerHTML = `
+            <strong>Applicant Unavailability:</strong>
+            <ul>
+                ${availability.map(h => `<li>${h}:00</li>`).join("")}
+            </ul>
+        ;
     }
 
     function closeModal() {
