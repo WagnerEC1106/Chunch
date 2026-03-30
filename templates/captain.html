@@ -867,14 +867,16 @@ async function loadStationBoard() {
         const stationData = await response.json();
 
         if (!response.ok || stationData.error) {
-            throw new Error(stationData.error || "Failed to load station board not ok.");
+            throw new Error(stationData.error || "Failed to load station board.");
         }
+
+        console.log("passed initial");
 
         renderStationBoard(stationData);
     } catch (error) {
         document.getElementById("scheduleGrid").innerHTML = `
             <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
-                Failed to load station board error.
+                Failed to load station board.
             </div>
         `;
     }
