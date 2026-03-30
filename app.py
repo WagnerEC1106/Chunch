@@ -889,7 +889,7 @@ def debug_hourly_final():
                 (v.last_name or "").strip().lower(),
                 (v.email or "").strip().lower()
             )
-        volunteer_lookup[key] = v.id
+            volunteer_lookup[key] = v.id
 
         stations = Station.query\
             .filter(Station.station_name != "Other")\
@@ -1038,16 +1038,6 @@ def debug_hourly_final():
 
         unassigned_ids = set(volunteer_rows_by_id.keys()) - all_assigned_ids
 
-
-        if unassigned_ids:
-            station_data = {}  # ensure exists if not yet
-            station_data["Unassigned"] = {
-                "volunteers": [
-                    volunteer_rows_by_id[vid]
-                    for vid in unassigned_ids
-                    if vid in volunteer_rows_by_id
-                ]
-        }
         station_data = {}
 
         for station in stations:
