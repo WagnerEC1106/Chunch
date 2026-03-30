@@ -510,7 +510,7 @@ body {
             <span class="label">Volunteer Master List</span>
         </button>
 
-        <button onclick="window.location.href='captain.html'">
+        <button onclick="window.location.href='/captain'">
             <span class=""label">Captain View</span>
         </button>
     </div>
@@ -965,6 +965,7 @@ async function loadSchedule() {
     }
 }
 
+// TODO make this allow editing on admin page
 function enableEdit() {
     alert("Edit mode placeholder.");
 }
@@ -1068,6 +1069,8 @@ function closeVolunteerPanel() {
     currentVolunteer = null;
     
 }
+
+// TODO possible add change volunteer status so that volunteer can become captains
 
 function editVolunteer() {
     if(!currentVolunteer) return;

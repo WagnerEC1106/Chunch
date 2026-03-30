@@ -284,6 +284,11 @@ def edit_volunteer():
     db.session.commit()
 
     return {"success": True}
+@app.route("/captain")
+def captain_page():
+    if "user_id" not in session:
+            return redirect("/")
+    return render_template("captain.html")
     
 @app.route("/admin")
 def admin_page():
@@ -1166,22 +1171,14 @@ def inbox():
                            stations=stations, schedules=schedules)
 
 @app.route("/admin/inbox/accept-with-assignment", methods=["POST"])
-def accept_applicant(applicants_id):
+def accept_applicant():
     if "user_id" not in session:
         return redirect("/")
-    applicants_id = int(request.form.get("applicant_id"))
-    station_id = int(request.form.get("station_id"))
-    start_hour = int(request.form["start_hour"])
-    end_hour = int(request.form["end_hour"])
-
-    if end_hour <= start_hour:
-        return "Invalid time range", 400
-        
-    for hour in range(start_hour, end_hour):
-        availability = Availability(
-            volunteer_id=volunteer_id,
-            hour=hour
-    )
+    applicants_id = request.form.get("applicant_id", type=int)
+    station_id = request.form.get("station_id", type=int)
+    start_hour = request.form.get("start_hour", type=int)
+    end_hour = request.form.get("end_hour", type=int)
+  
     applicant = Applicant.query.get_or_404(applicants_id)
     volunteer = Volunteer(
         first_name=applicant.first_name,
@@ -1193,9 +1190,12 @@ def accept_applicant(applicants_id):
     db.session.add(volunteer)
     db.session.flush()  
     
+    if end_hour <= start_hour:
+        return "Invalid time range", 400
+        
     for hour in range(start_hour, end_hour):
         availability = Availability(
-            volunteer_id=volunteer_id,
+            volunteer_id=volunteer.id,
             hour=hour
     )
     db.session.add(availability)
@@ -1270,7 +1270,7 @@ def add_volunteer():
     last_name = request.form.get("last_name").strip()
     email = request.form.get("email").strip().lower()
 
-    existing = Volunteer.query.filter_by(email=email).first()
+    existing = Volunteer.query.filter_by(first_name = first_name, email=email).first()
     if existing:
         flash("Volunteer with that email already exists.")
         return redirect("/admin/master-list")
@@ -1854,10 +1854,11 @@ def sync_volunteers():
         for row in rows:
             email = str(row.get("Email", "")).strip().lower()
             phone = str(row.get("Phone Number", "")).strip()
-            if not email:
+            first_name = str(row.get("First Name", "")).strip()
+            if not first_name:
                 continue
             
-            volunteer = Volunteer.query.filter_by(email=email).first()
+            volunteer = Volunteer.query.filter_by(first_name, email=email).first()
 
             if not volunteer:
                 volunteer = Volunteer(
@@ -1869,6 +1870,8 @@ def sync_volunteers():
                 db.session.add(volunteer)
             if not volunteer.phone and phone:
                 volunteer.phone = phone
+            if not volunteer.email and email:
+                volunteer.email = email
             
         db.session.commit()
 
