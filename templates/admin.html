@@ -981,7 +981,7 @@ function enableEdit() {
         btn.innerHTML = `<span class="icon">❌</span><span class="label">Cancel</span>`;
         document.body.classList.add("edit-mode");
         document.body.classList.add("selection-locked");
-        editVolunteer();
+
     } else {
         btn.innerHTML = `<span class="icon">✏️</span><span class="label">Edit</span>`;
         document.body.classList.remove("edit-mode");
@@ -1028,6 +1028,23 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("detailShift").textContent = volunteer.typical_shift || "None listed";
     document.getElementById("detailUnavailability").textContent = volunteer.unavailability || "None listed";
     document.getElementById("detailRestrictions").textContent = volunteer.capability_restrictions || "None listed";
+
+    // added for edit
+    if (isEditMode) {
+        // Show input fields and save button
+        inputFields.forEach(id => document.getElementById(id).style.display = "block");
+        viewFields.forEach(id => document.getElementById(id).style.display = "none");
+
+        editBtn.style.display = "inline-block"; // still visible if you want
+        saveBtn.style.display = "inline-block";
+    } else {
+        // Regular view mode
+        inputFields.forEach(id => document.getElementById(id).style.display = "none");
+        viewFields.forEach(id => document.getElementById(id).style.display = "block");
+
+        editBtn.style.display = "inline-block";
+        saveBtn.style.display = "none";
+    }
 
     const absenceCard = document.getElementById("detailAbsenceCard");
     const absenceText = document.getElementById("detailAbsence");
