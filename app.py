@@ -1093,6 +1093,7 @@ def debug_hourly_final():
                 sheet_row_by_email[email] = row
 
         volunteer_rows_by_id = {}
+        today = date.today()
 
         for v in volunteers:
             captain_status = "Volunteer"
@@ -1103,7 +1104,11 @@ def debug_hourly_final():
             sheet_row = sheet_row_by_email.get(email_key, {})
 
             latest_absence = Absence.query\
-                .filter(Absence.volunteer_id == v.id)\
+                .filter(
+                    Absence.volunteer_id == v.id,
+                    Absence.start_date <= today,
+                    Absence.end_date >= today
+                )\
                 .order_by(Absence.absence_id.desc())\
                 .first()
 
@@ -1177,8 +1182,6 @@ def debug_hourly_final():
 
         absent_station = Station.query.filter_by(station_name="Absent").first()
         absent_station_id = absent_station.station_id if absent_station else None
-
-        today = date.today()
 
         assignments = Assignment.query.all()
 
