@@ -1050,6 +1050,7 @@ def debug_hourly_final():
                 "phone": v.phone or "",
                 "captain_status": captain_status,
                 "typical_shift": str(sheet_row.get("Typical Shift", "")).strip(),
+                "display_time": "",   # <-- ADDED
                 "unavailability": str(sheet_row.get("Unavailability", "")).strip(),
                 "capability_restrictions": str(
                     sheet_row.get("Capability Restrictions", "") or
@@ -1065,6 +1066,16 @@ def debug_hourly_final():
                 "absence_notes": latest_absence.notes or "" if latest_absence else ""
             }
 
+        def format_hour_label(h):
+            if h == 0:
+                return "12AM"
+            elif h < 12:
+                return f"{h}AM"
+            elif h == 12:
+                return "12PM"
+            else:
+                return f"{h-12}PM"
+
         station_to_volunteer_ids = {
             station.station_id: set()
             for station in stations
@@ -1074,36 +1085,31 @@ def debug_hourly_final():
             str(station.station_name).strip().lower(): station.station_id
             for station in stations
         }
+
         from collections import defaultdict
         volunteer_ids_by_email = defaultdict(list)
         for v in volunteers:
             if v.email:
                 email_key = v.email.strip().lower()
                 volunteer_ids_by_email[email_key].append(v.id)
-                
-        #volunteer_id_by_email = {
-            #v.email.strip().lower(): v.id
-            #for v in volunteers
-            #if v.email
-        #}
 
         for row in rows:
             first_name = str(row.get("First Name", "")).strip().lower()
             last_name = str(row.get("Last Name", "")).strip().lower()
             email = str(row.get("Email", "")).strip().lower()
             typical_station = str(row.get("Typical Station", "")).strip().lower()
+
             key = (first_name, last_name, email)
             volunteer_id = volunteer_lookup.get(key)
 
             if not email or not typical_station or typical_station == "other":
                 continue
 
-            
             station_id = station_name_to_id.get(typical_station)
 
             if volunteer_id is None or station_id is None:
                 continue
-                
+
             station_to_volunteer_ids[station_id].add(volunteer_id)
 
         absent_station = Station.query.filter_by(station_name="Absent").first()
@@ -1113,6 +1119,7 @@ def debug_hourly_final():
 
         assignments = Assignment.query.all()
 
+        # reset expired coverage
         for assignment in assignments:
             if assignment.is_covering and assignment.absence_id:
                 absence = Absence.query.get(assignment.absence_id)
@@ -1132,8 +1139,9 @@ def debug_hourly_final():
                     if covered:
                         covered.is_absent = False
 
-        db.session.commit()   
+        db.session.commit()
 
+        # apply assignments + set display_time
         for assignment in assignments:
             if assignment.volunteer_id is None:
                 continue
@@ -1141,14 +1149,26 @@ def debug_hourly_final():
             for volunteer_ids in station_to_volunteer_ids.values():
                 volunteer_ids.discard(assignment.volunteer_id)
 
+            # 🔥 THIS IS THE IMPORTANT PART
+            if (
+                assignment.is_covering and
+                assignment.volunteer_id in volunteer_rows_by_id and
+                assignment.cover_start_hour is not None and
+                assignment.cover_end_hour is not None
+            ):
+                volunteer_rows_by_id[assignment.volunteer_id]["display_time"] = (
+                    f"{format_hour_label(assignment.cover_start_hour)} - "
+                    f"{format_hour_label(assignment.cover_end_hour)}"
+                )
+
             if assignment.is_absent and absent_station_id is not None:
                 station_to_volunteer_ids[absent_station_id].add(assignment.volunteer_id)
             elif assignment.station_id is not None:
                 station_to_volunteer_ids.setdefault(
                     assignment.station_id, set()
                 ).add(assignment.volunteer_id)
-        all_assigned_ids = set()
 
+        all_assigned_ids = set()
         for ids in station_to_volunteer_ids.values():
             all_assigned_ids.update(ids)
 
@@ -1172,19 +1192,13 @@ def debug_hourly_final():
                 "volunteers": volunteers_for_station
             }
 
-        all_assigned_ids = set()
-        for ids in station_to_volunteer_ids.values():
-            all_assigned_ids.update(ids)
-
-        unassigned_ids = set(volunteer_rows_by_id.keys()) - all_assigned_ids
-
         if unassigned_ids:
             station_data["Unassigned"] = {
                 "volunteers": sorted(
                     [volunteer_rows_by_id[vid] for vid in unassigned_ids],
                     key=lambda x: x["name"]
-            )
-        }
+                )
+            }
 
         return station_data
 
