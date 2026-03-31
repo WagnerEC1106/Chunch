@@ -268,6 +268,7 @@
 let activeAssignForm = null;
 let activeReserveName = "";
 let activeStationName = "";
+let addAnotherAfterSubmit = false;
 let parsedShiftHours = [];
 let selectedCoverageStart = null;
 let selectedCoverageEnd = null;
@@ -472,12 +473,7 @@ function chooseMoreCoverage(choice) {
     activeAssignForm.querySelector(".cover-start-hour").value = selectedCoverageStart;
     activeAssignForm.querySelector(".cover-end-hour").value = selectedCoverageEnd;
 
-    if (choice === "add") {
-        activeAssignForm.action =
-            `/admin/coverage/assign?add_more=1&volunteer_id={{ absent_volunteer.id }}`;
-    } else {
-        activeAssignForm.action = `/admin/coverage/assign`;
-    }
+    addAnotherAfterSubmit = (choice === "add");
 
     closeMoreCoveragePopup();
     openAssignPopup();
