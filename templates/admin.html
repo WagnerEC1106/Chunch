@@ -981,6 +981,7 @@ function enableEdit() {
         btn.innerHTML = `<span class="icon">❌</span><span class="label">Cancel</span>`;
         document.body.classList.add("edit-mode");
         document.body.classList.add("selection-locked");
+        editVolunteer();
     } else {
         btn.innerHTML = `<span class="icon">✏️</span><span class="label">Edit</span>`;
         document.body.classList.remove("edit-mode");
