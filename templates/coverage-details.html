@@ -508,6 +508,13 @@ function submitAssignWithEmail(choice) {
     if (!activeAssignForm) return;
 
     activeAssignForm.querySelector('input[name="send_email"]').value = choice;
+
+    if (addAnotherAfterSubmit) {
+        activeAssignForm.action = `/admin/coverage/assign?add_more=1&volunteer_id={{ absent_volunteer.id }}`;
+    } else {
+        activeAssignForm.action = `/admin/coverage/assign`;
+    }
+
     document.getElementById("assignPopup").style.display = "none";
     activeAssignForm.submit();
 }
