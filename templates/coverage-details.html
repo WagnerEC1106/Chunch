@@ -467,37 +467,18 @@ function closeMoreCoveragePopup() {
 }
 
 function chooseMoreCoverage(choice) {
+    if (!activeAssignForm) return;
+
+    activeAssignForm.querySelector(".cover-start-hour").value = selectedCoverageStart;
+    activeAssignForm.querySelector(".cover-end-hour").value = selectedCoverageEnd;
+
     if (choice === "add") {
-        coverageSelections.push({
-            reserveName: activeReserveName,
-            stationName: activeStationName,
-            startHour: selectedCoverageStart,
-            endHour: selectedCoverageEnd
-        });
-
-        if (selectedCoverageEnd < fullShiftEnd) {
-            remainingCoverageStart = selectedCoverageEnd + 1;
-            remainingCoverageEnd = fullShiftEnd;
-        } else if (selectedCoverageStart > fullShiftStart) {
-            remainingCoverageStart = fullShiftStart;
-            remainingCoverageEnd = selectedCoverageStart - 1;
-        } else {
-            remainingCoverageStart = null;
-            remainingCoverageEnd = null;
-            alert("The full shift is already covered.");
-            closeMoreCoveragePopup();
-            return;
-        }
-
-        closeMoreCoveragePopup();
-        alert(
-            `Now choose another reserve for the remaining time: ${formatRange(remainingCoverageStart, remainingCoverageEnd)}`
-        );
-        return;
+        activeAssignForm.action =
+            `/admin/coverage/assign?add_more=1&volunteer_id={{ absent_volunteer.id }}`;
+    } else {
+        activeAssignForm.action = `/admin/coverage/assign`;
     }
 
-    remainingCoverageStart = null;
-    remainingCoverageEnd = null;
     closeMoreCoveragePopup();
     openAssignPopup();
 }
