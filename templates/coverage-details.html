@@ -371,8 +371,21 @@ function openCoverageHourModal(form, reserveName, stationName, shiftText) {
     fullShiftStart = shiftStart;
     fullShiftEnd = shiftEnd;
 
-    const defaultStart = remainingCoverageStart !== null ? remainingCoverageStart : shiftStart;
-    const defaultEnd = remainingCoverageEnd !== null ? remainingCoverageEnd : shiftEnd;
+    const coveredStart = {{ absent_volunteer.covered_start|tojson }};
+    const coveredEnd = {{ absent_volunteer.covered_end|tojson }};
+
+    let defaultStart = shiftStart;
+    let defaultEnd = shiftEnd;
+
+    if (coveredStart !== null && coveredEnd !== null) {
+        if (coveredStart <= shiftStart && coveredEnd < shiftEnd) {
+            defaultStart = coveredEnd;
+            defaultEnd = shiftEnd;
+        } else if (coveredStart > shiftStart && coveredEnd >= shiftEnd) {
+            defaultStart = shiftStart;
+            defaultEnd = coveredStart;
+        }
+    }
 
     document.getElementById("coverageHourSummary").textContent =
         `Set the coverage hours for ${reserveName} at ${stationName}.`;
