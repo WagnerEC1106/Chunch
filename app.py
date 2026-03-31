@@ -1789,36 +1789,26 @@ def volunteer_hours():
         today = date.today()
         assignments = Assignment.query.all()
 
-        for assignment in assignments:
-            if assignment.is_covering and assignment.absence_id:
-                absence = Absence.query.get(assignment.absence_id)
-                if absence and absence.end_date < today:
-                    if assignment.original_station_id is not None:
-                        assignment.station_id = assignment.original_station_id
-
-                    assignment.is_covering = False
-                    assignment.covering_for_volunteer_id = None
-                    assignment.original_station_id = None
-                    assignment.absence_id = None
-
-                    covered = Assignment.query.filter_by(
-                        volunteer_id=absence.volunteer_id
-                    ).first()
-
-                    if covered:
-                        covered.is_absent = False
-
-        db.session.commit()
-
+        latest_assignment_by_volunteer = {}
         for assignment in assignments:
             if assignment.volunteer_id is None:
                 continue
 
-            if assignment.volunteer_id not in volunteer_rows_by_id:
+            current = latest_assignment_by_volunteer.get(assignment.volunteer_id)
+            if current is None or assignment.assignment_id > current.assignment_id:
+                latest_assignment_by_volunteer[assignment.volunteer_id] = assignment
+
+        for volunteer_id, assignment in latest_assignment_by_volunteer.items():
+            if volunteer_id not in volunteer_rows_by_id:
                 continue
 
             for volunteer_ids in station_to_volunteer_ids.values():
-                volunteer_ids.discard(assignment.volunteer_id)
+                volunteer_ids.discard(volunteer_id)
+
+            if assignment.is_covering and assignment.absence_id:
+                absence = Absence.query.get(assignment.absence_id)
+                if absence and absence.end_date < today:
+                    continue
 
             if assignment.is_absent:
                 continue
@@ -1830,16 +1820,29 @@ def volunteer_hours():
             if not station:
                 continue
 
-            station_name = str(station.station_name).strip()
+            station_name = str(station.station_name)
             if station_name in ["Reserve", "Absent", "Other"]:
                 continue
 
+            if (
+                assignment.is_covering and
+                assignment.cover_start_hour is not None and
+                assignment.cover_end_hour is not None
+            ):
+                start_hour = assignment.cover_start_hour
+                end_hour = assignment.cover_end_hour
+                coverage_hours = list(range(start_hour, end_hour + 1))
+                volunteer_rows_by_id[volunteer_id]["hours"] = coverage_hours
+                volunteer_rows_by_id[volunteer_id]["ranges"] = [[start_hour, end_hour]]
+                volunteer_rows_by_id[volunteer_id]["range_label"] = (
+                    f"{format_hour(start_hour)}-{format_hour(end_hour)}"
+                )
+
             station_to_volunteer_ids.setdefault(
                 assignment.station_id, set()
-            ).add(assignment.volunteer_id)
+            ).add(volunteer_id)
 
         station_data = {}
-
         for station in stations:
             station_name = str(station.station_name)
             assigned_ids = station_to_volunteer_ids.get(station.station_id, set())
