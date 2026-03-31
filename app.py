@@ -571,6 +571,43 @@ def coverage_details():
         partial_overlap_reserves=partial_overlap_reserves
     )
 
+@app.route("/debug/restore-reserve/<int:volunteer_id>")
+def restore_reserve(volunteer_id):
+    try:
+        reserve_station = Station.query.filter_by(station_name="Reserve").first()
+        if not reserve_station:
+            return {"error": "Reserve station not found"}, 404
+
+        assignments = Assignment.query.filter_by(volunteer_id=volunteer_id).all()
+
+        for assignment in assignments:
+            db.session.delete(assignment)
+
+        clean_assignment = Assignment(
+            volunteer_id=volunteer_id,
+            station_id=reserve_station.station_id,
+            schedule_id=None,
+            is_absent=False,
+            is_covering=False,
+            covering_for_volunteer_id=None,
+            original_station_id=None,
+            absence_id=None,
+            cover_start_hour=None,
+            cover_end_hour=None
+        )
+        db.session.add(clean_assignment)
+        db.session.commit()
+
+        return {
+            "success": True,
+            "message": "Volunteer restored to Reserve",
+            "volunteer_id": volunteer_id
+        }
+
+    except Exception as e:
+        db.session.rollback()
+        return {"error": str(e)}, 500
+
 @app.route("/debug/reset-all-covering")
 def reset_all_covering():
     try:
