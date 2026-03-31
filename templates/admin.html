@@ -1106,17 +1106,26 @@ function closeVolunteerPanel() {
     document.getElementById("editName").style.display = "none";
     document.getElementById("editEmail").style.display = "none";
     document.getElementById("editPhone").style.display = "none";
+    document.getElementById("editShift").style.display = "none";
+    document.getElementById("editUnavailability").style.display = "none";
+    document.getElementById("editRestrictions").style.display = "none";
 
     document.getElementById("detailName").style.display = "inline";
     document.getElementById("detailEmail").style.display = "block";
     document.getElementById("detailPhone").style.display = "block";
-
+    document.getElemenyById("detailShift").style.display = "block";
+    document.getElemenyById("detailUnavailability").style.display = "block";
+    document.getElemenyById("detailRestrictions").style.display = "block";
+    
     document.getElementById("editBtn").style.display = "inline-block";
     document.getElementById("saveBtn").style.display = "none";
 
     document.getElementById("editName").value = "";
     document.getElementById("editEmail").value = "";
     document.getElementById("editPhone").value = "";
+    document.getElemenyById("editShift").value = "";
+    document.getElemenyById("editUnavailability").value = "";
+    document.getElemenyById("editRestrictions").value = "";
 
     currentVolunteer = null;
     
@@ -1129,18 +1138,31 @@ function editVolunteer() {
     document.getElementById("detailName").style.display = "none";
     document.getElementById("detailEmail").style.display = "none";
     document.getElementById("detailPhone").style.display = "none";
+    document.getElemenyById("detailShift").style.display = "none";
+    document.getElemenyById("detailUnavailability").style.display = "none";
+    document.getElemenyById("detailRestrictions").style.display = "none";
+
 
     const nameInput = document.getElementById("editName");
     const emailInput = document.getElementById("editEmail");
     const phoneInput = document.getElementById("editPhone");
+    const shiftInput = document.getElementById("editShift");
+    const unavailabilityInput = document.getElementById("editUnavailability");
+    const restrictionsInput = document.getElementById("editRestrictions");
 
     nameInput.style.display = "block";
     emailInput.style.display = "block";
     phoneInput.style.display = "block";
+    shiftInput.style.display = "block";
+    unavailabilityInput.style.display = "block";
+    restrictionsInput.style.display = "block";
 
     nameInput.value = currentVolunteer.name || "";
     emailInput.value = currentVolunteer.email || "";
     phoneInput.value = currentVolunteer.phone || "";
+    shiftInput.value = currentVolunteer.typical_shift || "";
+    unavailabilityInput.value = currentVolunteer.unavailability || "";
+    restrictionsInput.value = currentVolunteer.capability_restrictions || "";
 
     document.getElementById("editBtn").style.display = "none";
     document.getElementById("saveBtn").style.display = "inline-block";
@@ -1156,7 +1178,10 @@ function saveVolunteer() {
         first_name: firstName,
         last_name: lastName,
         email: document.getElementById("editEmail").value,
-        phone: document.getElementById("editPhone").value
+        phone: document.getElementById("editPhone").value, 
+        typical_shift: document.getElementById("editShift").value,
+        unavailability: document.getElementById("editUnavailability").value,
+        capability_restrictions: document.getElementById("editRestrictions").value
     };
 
     fetch("/admin/edit-volunteer", {
@@ -1234,19 +1259,27 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
 
         <div class="detail-card">
             <div class="detail-label">Typical Shift</div>
-            <div class="detail-value" id="detailShift">—</div>
+            <div class="detail-value">
+                <span id="detailShift">—</span>
+                <input id="editShift" style="display:none;">
+            </div>
         </div>
-
+        
         <div class="detail-card">
             <div class="detail-label">Unavailability</div>
-            <div class="detail-value" id="detailUnavailability">—</div>
+            <div class="detail-value">
+                <span id="detailUnavailability">—</span>
+                <input id="editUnavailability" style="display:none;">
+            </div>
         </div>
-
+        
         <div class="detail-card">
             <div class="detail-label">Capability Restrictions</div>
-            <div class="detail-value" id="detailRestrictions">—</div>
+            <div class="detail-value">
+                <span id="detailRestrictions">—</span>
+                <input id="editRestrictions" style="display:none;">
+            </div>
         </div>
-
         <div class="detail-card" id="detailAbsenceCard" style="display:none;">
             <div class="detail-label">Absence</div>
             <div class="detail-value" id="detailAbsence">—</div>
