@@ -271,6 +271,11 @@ let activeStationName = "";
 let parsedShiftHours = [];
 let selectedCoverageStart = null;
 let selectedCoverageEnd = null;
+let fullShiftStart = null;
+let fullShiftEnd = null;
+let remainingCoverageStart = null;
+let remainingCoverageEnd = null;
+let coverageSelections = [];
 
 function parseTimeToHour(timeStr) {
     timeStr = String(timeStr).trim().toUpperCase().replace(/\s+/g, "");
@@ -362,6 +367,12 @@ function openCoverageHourModal(form, reserveName, stationName, shiftText) {
     const shiftStart = Math.min(...parsedShiftHours);
     const shiftEnd = Math.max(...parsedShiftHours);
 
+    fullShiftStart = shiftStart;
+    fullShiftEnd = shiftEnd;
+
+    const defaultStart = remainingCoverageStart !== null ? remainingCoverageStart : shiftStart;
+    const defaultEnd = remainingCoverageEnd !== null ? remainingCoverageEnd : shiftEnd;
+
     document.getElementById("coverageHourSummary").textContent =
         `Set the coverage hours for ${reserveName} at ${stationName}.`;
 
@@ -369,7 +380,7 @@ function openCoverageHourModal(form, reserveName, stationName, shiftText) {
         `Usual shift: ${formatRange(shiftStart, shiftEnd)}`;
 
     document.getElementById("coverFullShiftText").textContent =
-        `Cover full shift (${formatRange(shiftStart, shiftEnd)})`;
+        `Cover full remaining shift (${formatRange(defaultStart, defaultEnd)})`;
 
     const startSelect = document.getElementById("coverStartHour");
     const endSelect = document.getElementById("coverEndHour");
@@ -377,8 +388,8 @@ function openCoverageHourModal(form, reserveName, stationName, shiftText) {
     fillHourSelect(startSelect, 5, 16);
     fillHourSelect(endSelect, 5, 16);
 
-    startSelect.value = shiftStart;
-    endSelect.value = shiftEnd;
+    startSelect.value = defaultStart;
+    endSelect.value = defaultEnd;
 
     document.getElementById("coverFullShiftCheckbox").checked = true;
     document.getElementById("customHourFields").style.display = "none";
@@ -400,12 +411,11 @@ document.getElementById("coverFullShiftCheckbox").addEventListener("change", fun
 function goToEmailPopup() {
     if (!activeAssignForm) return;
 
-    const shiftStart = Math.min(...parsedShiftHours);
-    const shiftEnd = Math.max(...parsedShiftHours);
+    const shiftStart = remainingCoverageStart !== null ? remainingCoverageStart : Math.min(...parsedShiftHours);
+    const shiftEnd = remainingCoverageEnd !== null ? remainingCoverageEnd : Math.max(...parsedShiftHours);
 
     let startHour = shiftStart;
     let endHour = shiftEnd;
-
     const fullShift = document.getElementById("coverFullShiftCheckbox").checked;
 
     if (!fullShift) {
@@ -458,11 +468,36 @@ function closeMoreCoveragePopup() {
 
 function chooseMoreCoverage(choice) {
     if (choice === "add") {
+        coverageSelections.push({
+            reserveName: activeReserveName,
+            stationName: activeStationName,
+            startHour: selectedCoverageStart,
+            endHour: selectedCoverageEnd
+        });
+
+        if (selectedCoverageEnd < fullShiftEnd) {
+            remainingCoverageStart = selectedCoverageEnd + 1;
+            remainingCoverageEnd = fullShiftEnd;
+        } else if (selectedCoverageStart > fullShiftStart) {
+            remainingCoverageStart = fullShiftStart;
+            remainingCoverageEnd = selectedCoverageStart - 1;
+        } else {
+            remainingCoverageStart = null;
+            remainingCoverageEnd = null;
+            alert("The full shift is already covered.");
+            closeMoreCoveragePopup();
+            return;
+        }
+
         closeMoreCoveragePopup();
-        alert("Adding another reserve is the next step.");
+        alert(
+            `Now choose another reserve for the remaining time: ${formatRange(remainingCoverageStart, remainingCoverageEnd)}`
+        );
         return;
     }
 
+    remainingCoverageStart = null;
+    remainingCoverageEnd = null;
     closeMoreCoveragePopup();
     openAssignPopup();
 }
