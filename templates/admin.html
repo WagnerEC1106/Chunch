@@ -1030,7 +1030,7 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("detailRestrictions").textContent = volunteer.capability_restrictions || "None listed";
 
     // added for edit mode
-    if (isEditMode) {
+    /*if (isEditMode) {
         document.getElementById("editName").style.display = "block";
         document.getElementById("editEmail").style.display = "block";
         document.getElementById("editPhone").style.display = "block";
@@ -1053,6 +1053,7 @@ function openVolunteerPanel(volunteerJson) {
         document.getElementById("editBtn").style.display = "inline-block";
         document.getElementById("saveBtn").style.display = "none";
     }
+    */
 
     const absenceCard = document.getElementById("detailAbsenceCard");
     const absenceText = document.getElementById("detailAbsence");
