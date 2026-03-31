@@ -673,46 +673,6 @@ def update_absence():
 
     return jsonify({"success": True})
 
-@app.route("/debug/reset-covering-for-volunteer/<int:volunteer_id>")
-def reset_covering_for_volunteer(volunteer_id):
-    try:
-        reserve_station = Station.query.filter_by(station_name="Reserve").first()
-        if not reserve_station:
-            return {"error": "Reserve station not found"}, 404
-
-        covering_assignments = Assignment.query.filter_by(
-            covering_for_volunteer_id=volunteer_id,
-            is_covering=True
-        ).all()
-
-        if not covering_assignments:
-            return {
-                "success": True,
-                "message": "No covering assignments found for that volunteer",
-                "reset_count": 0
-            }
-
-        for assignment in covering_assignments:
-            assignment.station_id = reserve_station.station_id
-            assignment.is_covering = False
-            assignment.covering_for_volunteer_id = None
-            assignment.original_station_id = None
-            assignment.absence_id = None
-            assignment.cover_start_hour = None
-            assignment.cover_end_hour = None
-
-        db.session.commit()
-
-        return {
-            "success": True,
-            "message": "Covering assignments moved back to Reserve",
-            "reset_count": len(covering_assignments)
-        }
-
-    except Exception as e:
-        db.session.rollback()
-        return {"error": str(e)}, 500
-
 @app.route("/admin/coverage/assign", methods=["POST"])
 def assign_reserve_coverage():
     try:
