@@ -374,8 +374,8 @@ function openCoverageHourModal(form, reserveName, stationName, shiftText) {
     const startSelect = document.getElementById("coverStartHour");
     const endSelect = document.getElementById("coverEndHour");
 
-    fillHourSelect(startSelect, shiftStart, 16);
-    fillHourSelect(endSelect, shiftStart, 16);
+    fillHourSelect(startSelect, 5, 16);
+    fillHourSelect(endSelect, 5, 16);
 
     startSelect.value = shiftStart;
     endSelect.value = shiftEnd;
