@@ -608,6 +608,24 @@ def restore_reserve(volunteer_id):
         db.session.rollback()
         return {"error": str(e)}, 500
 
+@app.route("/debug/find-volunteer/<name>")
+def find_volunteer(name):
+    matches = Volunteer.query\
+        .filter(Volunteer.deleted_at.is_(None))\
+        .all()
+
+    result = []
+    for v in matches:
+        full_name = f"{v.first_name} {v.last_name}".strip()
+        if name.lower() in full_name.lower():
+            result.append({
+                "id": v.id,
+                "name": full_name,
+                "email": v.email
+            })
+
+    return {"matches": result}
+
 @app.route("/debug/reset-all-covering")
 def reset_all_covering():
     try:
