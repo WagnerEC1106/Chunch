@@ -622,19 +622,24 @@ def update_absence():
         schedule_id=None
     ).first()
 
-    reserve_assignment = Assignment.query.filter_by(
+    reserve_assignments = Assignment.query.filter_by(
         covering_for_volunteer_id=volunteer_id
-    ).first()
+    ).all()
 
     if mode == "end":
 
         if action == "move_now":
-            if reserve_assignment:
-                reserve_assignment.station_id = reserve_assignment.original_station_id
+            for reserve_assignment in reserve_assignments:
+                reserve_station = Station.query.filter_by(station_name="Reserve").first()
+                if reserve_station:
+                    reserve_assignment.station_id = reserve_station.station_id
+
                 reserve_assignment.is_covering = False
                 reserve_assignment.covering_for_volunteer_id = None
                 reserve_assignment.original_station_id = None
                 reserve_assignment.absence_id = None
+                reserve_assignment.cover_start_hour = None
+                reserve_assignment.cover_end_hour = None
 
         if assignment:
             assignment.is_absent = False
@@ -649,13 +654,17 @@ def update_absence():
         absence.end_date = new_end_date
 
         if action == "move_now":
-            # reserve leaves EARLY (on new date)
-            if reserve_assignment:
-                reserve_assignment.station_id = reserve_assignment.original_station_id
+            for reserve_assignment in reserve_assignments:
+                reserve_station = Station.query.filter_by(station_name="Reserve").first()
+                if reserve_station:
+                    reserve_assignment.station_id = reserve_station.station_id
+
                 reserve_assignment.is_covering = False
                 reserve_assignment.covering_for_volunteer_id = None
                 reserve_assignment.original_station_id = None
                 reserve_assignment.absence_id = None
+                reserve_assignment.cover_start_hour = None
+                reserve_assignment.cover_end_hour = None
 
         elif action == "double_coverage":
             pass
