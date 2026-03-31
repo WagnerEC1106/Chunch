@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Request Coverage</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 24px;
+            background: #f4f6f8;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        p {
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        .field {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        select,
+        input,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .inline-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .secondary {
+            background: #64748b;
+            color: white;
+        }
+
+        #partialFields {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Request Coverage</h2>
+    <p>Select the volunteer and absence details.</p>
+
+    <form method="POST" action="/admin/need-coverage/save">
+        <div class="field">
+            <label for="volunteer_id">Volunteer</label>
+            <!-- for only one name
+            <select id="volunteer_id" name="volunteer_id" required> -->
+            <!--<select id="volunteer_id" name="volunteer_id[]" multiple required>
+                <option></option> <!-- placeholder -->
+                <!--{% for v in volunteers %}
+                    <option value="{{ v.id }}">
+                        {{ v.first_name }} {{ v.last_name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div> -->
+        <select id="volunteer_id" name="volunteer_id" required>
+    <option></option> <!-- placeholder -->
+    {% for v in volunteers %}
+        <option value="{{ v.id }}">
+            {{ v.first_name }} {{ v.last_name }}
+        </option>
+    {% endfor %}
+</select>
+
+        <div class="inline-row">
+            <div class="field">
+                <label for="start_date">Start Date</label>
+                <input type="date" id="start_date" name="start_date" required>
+            </div>
+
+            <div class="field">
+                <label for="end_date">End Date</label>
+                <input type="date" id="end_date" name="end_date" required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="is_partial">Absence Type</label>
+            <select id="is_partial" name="is_partial" onchange="togglePartialFields()" required>
+                <option value="false">Full Shift</option>
+                <option value="true">Partial Shift</option>
+            </select>
+        </div>
+
+        <div id="partialFields">
+            <div class="inline-row">
+                <div class="field">
+                    <label for="partial_start_hour">Partial Start Hour</label>
+                    <input type="number" id="partial_start_hour" name="partial_start_hour" min="5" max="16">
+                </div>
+
+                <div class="field">
+                    <label for="partial_end_hour">Partial End Hour</label>
+                    <input type="number" id="partial_end_hour" name="partial_end_hour" min="5" max="16">
+                </div>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="notes">Notes</label>
+            <textarea id="notes" name="notes" rows="3" placeholder="Optional"></textarea>
+        </div>
+
+        <div class="actions">
+            <button class="primary" type="submit">Save Absence</button>
+            <button class="secondary" type="button" onclick="window.location.href='/admin'">Back</button>
+        </div>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+function togglePartialFields() {
+    const isPartial = document.getElementById("is_partial").value === "true";
+    document.getElementById("partialFields").style.display = isPartial ? "block" : "none";
+}
+
+$(document).ready(function() {
+    $('#volunteer_id').select2({
+        placeholder: "Type to search a volunteer",
+        allowClear: true,
+        width: '100%',
+
+        matcher: function(params, data) {
+            // If no search term, show all options
+            if ($.trim(params.term) === '') {
+                return data;
+            }
+
+            const query = params.term.toLowerCase();
+            const text = data.text.toLowerCase();
+
+            // Split full name into parts
+            const parts = text.split(" ");
+
+            // Check if ANY part starts with the query
+            const match = parts.some(part => part.startsWith(query));
+
+            return match ? data : null;
+        }
+    });
+});
+
+</script>
+
+</body>
+</html>

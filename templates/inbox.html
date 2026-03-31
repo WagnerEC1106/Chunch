@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applicant Inbox</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #1f2937;
+        }
+
+        .page {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .page-header p {
+            margin: 8px 0 0;
+            color: #6b7280;
+            font-size: 15px;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+            padding: 20px;
+            margin-bottom: 28px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .badge.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge.rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        th {
+            text-align: left;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #6b7280;
+            padding: 14px 12px;
+            border-bottom: 2px solid #e5e7eb;
+            background: #f9fafb;
+        }
+
+        td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: #f9fafb;
+        }
+
+        .name-link {
+            text-decoration: none;
+            color: #111827;
+            font-weight: 600;
+        }
+
+        .name-link:hover {
+            color: #2563eb;
+        }
+
+        .muted {
+            color: #6b7280;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        form {
+            margin: 0;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .btn-accept {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-accept:hover {
+            background: #15803d;
+        }
+
+        .btn-reject {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #b91c1c;
+        }
+
+        .btn-undo {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .btn-undo:hover {
+            background: #d1d5db;
+        }
+
+        .empty-state {
+            padding: 24px 8px 8px;
+            color: #6b7280;
+            font-size: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .page {
+                margin: 24px auto;
+                padding: 0 14px;
+            }
+
+            .page-header h1 {
+                font-size: 26px;
+            }
+
+            .section {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="page-header">
+            <h1>Applicant Inbox</h1>
+            <p>Review, approve, or manage application decisions.</p>
+        </div>
+        
+        <div class="top-actions">
+            <button class="secondary" onclick="window.location.href='/admin'">Back</button>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2>Pending Applicants</h2>
+                <span class="badge pending">{{ applicants|length }} Pending</span>
+            </div>
+
+            {% if applicants %}
+            <div class="table-wrap">
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone Number</th>
+                        <th colspan="2">Actions</th>
+                    </tr>
+
+                    {% for a in applicants %}
+                    <tr>
+                        <td>
+                          <a class="name-link view-link" href="/admin/inbox/{{ a.id }}">
+                          <span class="applicant-name">{{ a.first_name }} {{ a.last_name }}</span>
+                          <span class="view-indicator">
+                            👁 View
+                          </span>
+                          </a>
+                        </td>
+                        <td class="muted">{{ a.email }}</td>
+                        <td class="muted">{{ a.phone }}</td>
+                        <td colspan="2">
+                            <div class="actions">
+                                <button type = "button" class="btn-accept" 
+                                    onclick='openAssignmentModal(
+                                        {{ a.id }},
+                                        {{ (a.first_name + " " + a.last_name) | tojson }},
+                                        {{ a.phone | tojson }},
+                                        {{ a.availability | tojson }}
+                                    )'>
+                                        Accept
+                                    </button>
+
+                                <form method="POST" action="/admin/inbox/reject/{{ a.id }}">
+                                    <button class="btn-reject" type="submit" onclick="return confirm('Reject this applicant?')">
+                                        Reject
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">There are no pending applicants.</div>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2>Rejected Applicants</h2>
+                <span class="badge rejected">{{ rejected|length }} Rejected</span>
+            </div>
+
+            {% if rejected %}
+            <div class="table-wrap">
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone Number</th>
+                        <th colspan="2">Actions</th>
+                    </tr>
+
+                    {% for r in rejected %}
+                    <tr>
+                        <td>
+                            <a class="name-link" href="/admin/inbox/{{ r.id }}">
+                                {{ r.first_name }} {{ r.last_name }}
+                            </a>
+                        </td>
+                        <td class="muted">{{ r.email }}</td>
+                        <td class="muted">{{ r.phone }}</td>
+                        <td colspan="2">
+                            <div class="actions">
+                                <form method="POST" action="/admin/inbox/accept/{{ r.id }}">
+                                    <button class="btn-accept" type="submit" onclick="return confirm('Accept this applicant?')">
+                                        Accept
+                                    </button>
+                                </form>
+
+                                <form method="POST" action="/admin/inbox/pending/{{ r.id }}">
+                                    <button class="btn-undo" type="submit" onclick="return confirm('Undo this rejection?')">
+                                        Undo
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">There are no rejected applicants.</div>
+            {% endif %}
+        </div>
+    </div>
+    <div id="assignmentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+      <div style="background:white; padding:20px; width:400px; margin:10% auto; border-radius:10px;">
+    
+        <h3 id="modalName"></h3>
+
+        <form method="POST" action="/admin/inbox/accept-with-assignment">
+          <input type="hidden" name="applicant_id" id="modalApplicantId">
+            
+
+          <label>Station:</label>
+          <select name="station_id" required>
+              <option value="" disabled selected>Select a station</option>
+            {% for station in stations %}
+              <option value="{{ station.id }}">{{ station.station_name }}</option>
+            {% endfor %}
+          </select>
+
+          <br><br>
+
+            <label>Start Hour:</label>
+            <select name="start_hour" required>
+                {% for h in range(0, 24) %}
+                    <option value="{{ h }}">{{ h }}:00</option>
+                {% endfor %}
+            </select>
+
+            <br><br>
+            <label>End Hour:</label>
+            <select name="end_hour" required>
+                {% for h in range(1, 25) %}
+                    <option value="{{ h }}">{{ h }}:00</option>
+                {% endfor %}
+            </select>
+
+          <br><br>
+            <div id="availabilityDisplay" style="margin-bottom:15px;"></div> 
+
+          <button type="submit" class="btn-accept">Confirm Assignment</button>
+          <button type="button" onclick="closeModal()">Cancel</button>
+        </form>
+
+      </div>
+    </div>
+    <script>
+    function openAssignmentModal(id, name, phone, availability) {
+        document.getElementById("assignmentModal").style.display = "block";
+        document.getElementById("modalApplicantId").value = id;
+        document.getElementById("modalName").innerText = name;
+
+        const availabilityDiv = document.getElementById("availabilityDisplay");
+        if (!availability || availability.length === 0) {
+        availabilityDiv.innerHTML = "<strong>No unavailability listed</strong>";
+        return;
+        }
+
+        availabilityDiv.innerHTML = `
+            <strong>Applicant Unavailability:</strong>
+            <ul>
+                ${availability.map(h => `<li>${h}:00</li>`).join("")}
+            </ul>
+        `;
+    }
+
+    function closeModal() {
+        document.getElementById("assignmentModal").style.display = "none";
+    }
+    </script>
+</body>
+</html>

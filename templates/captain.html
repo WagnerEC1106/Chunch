@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Captain Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: #f3f6fb;
+    color: #1e293b;
+}
+
+.header {
+    background: #0f172a;
+    color: white;
+    padding: 24px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18);
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.header-copy h1 {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.header-tools {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.date-picker {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    font-size: 14px;
+    background: white;
+    color: #0f172a;
+    width: 100%;
+}
+
+.detail-panel {
+    position: fixed;
+    top: 0;
+    right: -460px;
+    width: 420px;
+    max-width: 92vw;
+    height: 100vh;
+    background: white;
+    box-shadow: -10px 0 30px rgba(15, 23, 42, 0.2);
+    z-index: 1000;
+    transition: right 0.25s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-panel.open {
+    right: 0;
+}
+
+.detail-panel-header {
+    padding: 22px 22px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+}
+
+.detail-panel-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.detail-panel-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.detail-btn {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.detail-btn.back {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.detail-btn.edit {
+    background: #2563eb;
+    color: white;
+}
+
+.detail-panel-body {
+    padding: 22px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.detail-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 16px;
+    background: #f8fafc;
+}
+
+.detail-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 6px;
+}
+
+.detail-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0f172a;
+    word-break: break-word;
+}
+
+.absent-edit-btn {
+    border: 1px solid rgba(255,255,255,0.35);
+    background: rgba(255,255,255,0.14);
+    color: white;
+    border-radius: 999px;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.absent-edit-btn:hover {
+    background: rgba(255,255,255,0.28);
+    box-shadow: 0 0 14px rgba(255,255,255,0.45);
+    transform: translateY(-1px) scale(1.04);
+}
+
+.absent-edit-btn:focus {
+    outline: 2px solid rgba(255,255,255,0.7);
+    outline-offset: 2px;
+}
+
+.detail-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.28);
+    z-index: 999;
+    display: none;
+}
+
+.detail-overlay.open {
+    display: block;
+}
+
+.load-btn,
+.header button {
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: none;
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.load-btn:hover,
+.header button:hover {
+    background: #1d4ed8;
+}
+
+.secondary-btn {
+    background: #475569 !important;
+}
+
+.secondary-btn:hover {
+    background: #334155 !important;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.icon {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.page {
+    padding: 32px;
+}
+
+.summary-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.summary-card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
+    border: 1px solid #e2e8f0;
+}
+
+.summary-label {
+    color: #64748b;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.summary-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.board-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.board-header h2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.board-header p {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 22px;
+}
+
+.card {
+    border-radius: 22px;
+    padding: 22px;
+    color: white;
+    box-shadow: 0 14px 32px rgba(0,0,0,0.12);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px rgba(0,0,0,0.16);
+}
+
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.card h3 {
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.station-count {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.volunteer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.volunteer-pill {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+    width: 100%;
+    text-align: left;
+    color: inherit;
+    cursor: pointer;
+    transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.volunteer-pill:hover {
+    transform: translateY(-2px);
+    background: rgba(255,255,255,0.28);
+    border-color: rgba(255,255,255,0.4);
+}
+
+.volunteer-pill:focus {
+    outline: 2px solid rgba(255,255,255,0.65);
+    outline-offset: 2px;
+}
+
+.empty-state {
+    margin-top: 6px;
+    background: rgba(255,255,255,0.12);
+    border: 1px dashed rgba(255,255,255,0.28);
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.9);
+}
+
+.coverage-box {
+    display: none;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 22px;
+    margin-top: 26px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.coverage-box h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+    color: #0f172a;
+}
+
+.coverage-box p {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 14px;
+}
+
+.coverage-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.coverage-box select {
+    min-width: 260px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    font-size: 14px;
+    background: white;
+}
+
+.coverage-box button {
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    background: #dc2626;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.coverage-box button:hover {
+    background: #b91c1c;
+}
+
+.setup { background: linear-gradient(135deg,#0ea5e9,#0284c7); }
+.teardown { background: linear-gradient(135deg,#6366f1,#4f46e5); }
+.servers { background: linear-gradient(135deg,#ef4444,#dc2626); }
+.kitchen { background: linear-gradient(135deg,#22c55e,#16a34a); }
+.drinks { background: linear-gradient(135deg,#f97316,#ea580c); }
+.desserts { background: linear-gradient(135deg,#facc15,#eab308); color: #1e293b; }
+.busboys { background: linear-gradient(135deg,#ec4899,#db2777); }
+.dishes { background: linear-gradient(135deg,#06b6d4,#0891b2); }
+.reserve { background: linear-gradient(135deg,#94a3b8,#64748b); }
+.manager { background: linear-gradient(135deg,#111827,#1f2937); }
+.greeters { background: linear-gradient(135deg,#14b8a6,#0d9488); }
+.potato { background: linear-gradient(135deg,#a16207,#854d0e); }
+.salad { background: linear-gradient(135deg,#65a30d,#4d7c0f); }
+.absent { background: linear-gradient(135deg,#dc2626,#7f1d1d); }
+.other { background: linear-gradient(135deg,#64748b,#475569); }
+
+.desserts .station-count,
+.desserts .volunteer-pill,
+.desserts .empty-state {
+    color: #1e293b;
+    background: rgba(255,255,255,0.4);
+    border-color: rgba(255,255,255,0.45);
+}
+
+@media (max-width: 768px) {
+    .header,
+    .page {
+        padding: 20px 16px;
+    }
+
+    .header-copy h1 {
+        font-size: 26px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-top">
+        <div class="header-copy">
+            <h1>Captain Dashboard</h1>
+        </div>
+
+        <div class="header-tools">
+            <input type="date" id="datePicker" class="date-picker">
+            <button class="load-btn" onclick="loadSchedule()">
+                <span class="icon">📅</span>
+                <span class="label">Load Date</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="header-actions">
+        <button onclick="window.print()">
+            <span class="icon">🖨️</span>
+            <span class="label">Print</span>
+        </button>
+
+        <button onclick="window.location.href='/admin/volunteer-hours'">
+            <span class="icon">⏱️</span>
+            <span class="label">Hourly View</span>
+        </button>
+    </div>
+</div>
+
+<div class="page">
+    <div class="board-header">
+        <div>
+            <h2>Station Board</h2>
+            <p>All stations with the volunteers currently assigned to each one.</p>
+        </div>
+    </div>
+
+    <div class="grid" id="scheduleGrid"></div>
+    <div class="grid" id="passing"></div>"
+</div>
+
+<script>
+let currentVolunteer = null;
+const stationClassMap = {
+    "Setup Team": "setup",
+    "Teardown Team": "teardown",
+    "Line Servers": "servers",
+    "Kitchen": "kitchen",
+    "Drink Station": "drinks",
+    "Desserts": "desserts",
+    "Busboys/sanitation": "busboys",
+    "Dishwashers": "dishes",
+    "Reserve": "reserve",
+    "General Manager": "manager",
+    "Greeters": "greeters",
+    "Baked Potato Bar": "potato",
+    "Salad Bar": "salad",
+    "Absent": "absent",
+    "Other": "other"
+};
+
+// Initialize station data empty
+let currentStationData = {};
+let currentAbsentEditVolunteer = null;
+
+function formatCountLabel(count) {
+    return count === 1 ? "1 volunteer" : `${count} volunteers`;
+}
+
+function getVolunteerDisplayName(volunteer) {
+    if (typeof volunteer === "string") return volunteer;
+    return volunteer.name || `${volunteer.firstName || ""} ${volunteer.lastName || ""}`.trim();
+}
+
+function isCaptain(volunteer) {
+    if (!volunteer || typeof volunteer === "string") return false;
+
+    const captainStatus = (volunteer.captain_status || volunteer.captainStatus || "").toString().toLowerCase();
+    const role = (volunteer.role || "").toString().toLowerCase();
+
+    return captainStatus === "captain" || role === "captain";
+}
+
+function formatDatePretty(dateStr) {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    return d.toLocaleDateString(undefined, {
+        month: "long",
+        day: "numeric"
+    });
+}
+
+function formatHourPretty(h) {
+    if (h === null || h === undefined) return "";
+    if (h === 0) return "12 AM";
+    if (h < 12) return `${h} AM`;
+    if (h === 12) return "12 PM";
+    return `${h - 12} PM`;
+}
+
+// function openAbsentEditPicker() {
+//     const select = document.getElementById("absentVolunteerSelect");
+//     if (!select) return;
+
+//     select.innerHTML = "";
+
+//     const absentStation = currentStationData["Absent"] || { volunteers: [] };
+//     const absentVolunteers = absentStation.volunteers || [];
+
+//     if (absentVolunteers.length === 0) {
+//         const option = document.createElement("option");
+//         option.value = "";
+//         option.textContent = "No absent volunteers";
+//         select.appendChild(option);
+//     } else {
+//         absentVolunteers.forEach(volunteer => {
+//             const option = document.createElement("option");
+//             option.value = String(volunteer.id || "");
+//             option.textContent = volunteer.name || "Volunteer";
+//             select.appendChild(option);
+//         });
+//     }
+
+//     document.getElementById("absentEditOverlay").classList.add("open");
+//     document.getElementById("absentEditModal").classList.add("open");
+// }
+
+// function closeAbsentEditPicker() {
+//     document.getElementById("absentEditOverlay").classList.remove("open");
+//     document.getElementById("absentEditModal").classList.remove("open");
+// }
+
+// function closeAbsenceActionModal() {
+//     document.getElementById("absenceActionOverlay").classList.remove("open");
+//     document.getElementById("absenceActionModal").classList.remove("open");
+// }
+
+// function closeReserveDecisionModal() {
+//     document.getElementById("reserveDecisionOverlay").classList.remove("open");
+//     document.getElementById("reserveDecisionModal").classList.remove("open");
+// }
+
+// function showAbsenceActionSection(sectionName) {
+//     document.getElementById("extendAbsenceSection").style.display = "none";
+//     document.getElementById("shortenAbsenceSection").style.display = "none";
+//     document.getElementById("endAbsenceSection").style.display = "none";
+
+//     if (sectionName === "extend") {
+//         document.getElementById("extendAbsenceSection").style.display = "block";
+//     } else if (sectionName === "shorten") {
+//         document.getElementById("shortenAbsenceSection").style.display = "block";
+//     } else if (sectionName === "end") {
+//         document.getElementById("endAbsenceSection").style.display = "block";
+//     }
+// }
+
+// function startAbsentEdit() {
+//     const select = document.getElementById("absentVolunteerSelect");
+//     if (!select) return;
+
+//     const selectedId = Number(select.value);
+//     if (!selectedId) return;
+
+//     const absentStation = currentStationData["Absent"] || { volunteers: [] };
+//     const absentVolunteers = absentStation.volunteers || [];
+
+//     const volunteer = absentVolunteers.find(v => Number(v.id) === selectedId);
+//     if (!volunteer) return;
+
+//     currentAbsentEditVolunteer = volunteer;
+
+//     document.getElementById("absenceActionVolunteerName").textContent =
+//         volunteer.name || "Volunteer";
+
+//     document.getElementById("extendAbsenceNewEndDate").value =
+//         volunteer.absence_end_date || "";
+//     document.getElementById("shortenAbsenceNewEndDate").value =
+//         volunteer.absence_end_date || "";
+
+//     showAbsenceActionSection("extend");
+
+//     closeAbsentEditPicker();
+//     document.getElementById("absenceActionOverlay").classList.add("open");
+//     document.getElementById("absenceActionModal").classList.add("open");
+// }
+
+// function startExtendFlow() {
+//     const newEndDate = document.getElementById("extendAbsenceNewEndDate").value;
+//     if (!newEndDate) {
+//         alert("Please choose a new end date.");
+//         return;
+//     }
+
+//     alert("Extend flow connected. Save logic comes next.");
+// }
+
+let pendingShortenDate = null;
+let currentActionMode = null;
+
+// function startShortenFlow() {
+//     const newEndDate = document.getElementById("shortenAbsenceNewEndDate").value;
+//     if (!newEndDate) {
+//         alert("Please choose a new end date.");
+//         return;
+//     }
+
+//     pendingShortenDate = newEndDate;
+//     currentActionMode = "shorten";
+
+//     const originalEndDate = currentAbsentEditVolunteer?.absence_end_date || "";
+
+//     const prettyNew = formatDatePretty(newEndDate);
+//     const prettyOriginal = formatDatePretty(originalEndDate);
+
+//     document.getElementById("reserveDecisionTitle").textContent = "Shorten Absence";
+
+//     document.getElementById("reserveDecisionSummary").textContent =
+//         `New return date: ${prettyNew}. Original reserve return: ${prettyOriginal}.`;
+
+//     document.getElementById("reserveDecisionImmediateLabel").textContent =
+//         `Move reserve back on ${prettyNew}`;
+
+//     document.getElementById("reserveDecisionDoubleLabel").textContent =
+//         `Keep reserve until ${prettyOriginal} (double coverage from ${prettyNew} to ${prettyOriginal})`;
+
+//     closeAbsenceActionModal();
+//     document.getElementById("reserveDecisionOverlay").classList.add("open");
+//     document.getElementById("reserveDecisionModal").classList.add("open");
+// }
+
+// function startEndAbsenceFlow() {
+//     currentActionMode = "end";
+
+//     const originalEndDate = currentAbsentEditVolunteer?.absence_end_date || "";
+
+//     document.getElementById("reserveDecisionTitle").textContent = "End Absence";
+
+//     document.getElementById("reserveDecisionSummary").textContent =
+//         `The reserve will otherwise move back on ${formatDatePretty(originalEndDate)}.`;
+
+//     document.getElementById("reserveDecisionImmediateLabel").textContent =
+//         "Move reserve back now";
+
+//     document.getElementById("reserveDecisionDoubleLabel").textContent =
+//         `Allow double coverage until ${formatDatePretty(originalEndDate)}`;
+
+//     closeAbsenceActionModal();
+//     document.getElementById("reserveDecisionOverlay").classList.add("open");
+//     document.getElementById("reserveDecisionModal").classList.add("open");
+// }
+
+// async function handleReserveDecision(choice) {
+//     if (!currentAbsentEditVolunteer) {
+//         alert("No absence selected.");
+//         return;
+//     }
+
+//     try {
+//         const payload = {
+//             volunteer_id: currentAbsentEditVolunteer.id,
+//             action: choice,
+//             mode: currentActionMode,
+//             new_end_date: pendingShortenDate
+//         };
+
+//         const response = await fetch("/admin/absence/update", {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/json"
+//             },
+//             body: JSON.stringify(payload)
+//         });
+
+//         let data;
+//         try {
+//             data = await response.json();
+//         } catch (e) {
+//             const text = await response.text();
+//             console.error("Server returned non-JSON:", text);
+//             alert("Server error — check console");
+//             return;
+//         }
+
+//         if (!response.ok) {
+//             throw new Error(data.error || "Update failed");
+//         }
+
+//         closeReserveDecisionModal();
+
+//         // reload board immediately
+//         loadStationBoard();
+
+//     } catch (err) {
+//         alert(err.message || "Something went wrong");
+//     }
+// }
+
+function renderStationBoard(stationData) {
+    currentStationData = stationData || {};
+
+    const grid = document.getElementById("scheduleGrid");
+    const grid2 = document.getElementByID("passing");
+    grid.innerHTML = "";
+    grid2.innerHTML = "";
+
+    const stationNames = Object.keys(stationData);
+    let totalVolunteers = 0;
+    let assignedVolunteers = 0;
+    let captainsCount = 0;
+    let reserveCount = 0;
+
+    let stationString = "";
+
+    const seenVolunteerKeys = new Set();
+    const seenCaptainKeys = new Set();
+
+    stationNames.forEach(stationName => {
+        if (stationName === "Other") return;
+
+        const station = stationData[stationName];
+        const volunteers = station.volunteers || [];
+
+        stationString += station.toString();
+        stationString += " ";
+
+        totalVolunteers += volunteers.length;
+
+        // Maybe remove this section
+        if (stationName === "Reserve") {
+            reserveCount = volunteers.length;
+        } else {
+            assignedVolunteers += volunteers.length;
+        }
+
+        const card = document.createElement("div");
+        const card2 = document.createElement("div");
+        const cssClass = stationClassMap[stationName];
+        if (!cssClass) return;
+
+        card.className = `card ${cssClass}`;
+
+        let volunteerHTML = "";
+        let stationsHTML = "";
+
+        if (volunteers.length > 0) {
+            volunteerHTML = `
+                <div class="volunteer-list">
+                    ${volunteers.map(volunteer => {
+                        const displayName = getVolunteerDisplayName(volunteer);
+                        const uniqueKey =
+                            typeof volunteer === "string"
+                                ? displayName
+                                : (volunteer.id ?? displayName);
+
+                        if (!seenVolunteerKeys.has(uniqueKey)) {
+                            seenVolunteerKeys.add(uniqueKey);
+                        }
+
+                        if (isCaptain(volunteer) && !seenCaptainKeys.has(uniqueKey)) {
+                            seenCaptainKeys.add(uniqueKey);
+                            captainsCount += 1;
+                        }
+
+                        const displayTime = volunteer.display_time ? ` (${volunteer.display_time})` : "";
+
+                        return `
+                            <button class="volunteer-pill" type="button" onclick='openVolunteerPanel(${JSON.stringify(JSON.stringify(volunteer))})'>
+                                ${displayName}${displayTime}
+                            </button>
+                        `;
+                    }).join("")}
+                </div>
+            `;
+        } else {
+            volunteerHTML = `<div class="empty-state">No volunteers assigned</div>`;
+        }
+        stationsHTML = `
+            <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
+                <h2>${stationString}</h2>
+            </div>
+        `;
+        // const absentEditButton = stationName === "Absent"
+        //     ? `
+        //         <button
+        //             // class="absent-edit-btn"
+        //             type="button"
+        //             // title="Edit Absences"
+        //             onclick="openAbsentEditPicker()"
+        //         >
+        //             ✏️
+        //         </button>
+        //     `
+        //     : "";
+        passing.innerHTML = `
+            <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
+                ${stationsHTML}
+            </div>
+        `;
+
+        card.innerHTML = `
+            <div class="card-top">
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                    <h3>${stationName}</h3>
+                </div>
+            </div>
+            ${volunteerHTML}
+        `;
+
+        // document.getElementById("passing").innerHTML = `
+        //     <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
+        //         ${stationsHTML}
+        //     </div>
+        // `;
+
+        grid.appendChild(card);
+    });
+
+    document.getElementById("totalVolunteersCount").textContent = totalVolunteers;
+    document.getElementById("assignedVolunteersCount").textContent = assignedVolunteers;
+    document.getElementById("captainsCount").textContent = captainsCount;
+    document.getElementById("reserveCount").textContent = reserveCount;
+}
+
+async function loadStationBoard() {
+    try {
+        const response = await fetch("/admin/debug-hourly-final");
+        const stationData = await response.json();
+
+        stationData.data
+
+        if (!response.ok || stationData.error) {
+            throw new Error(stationData.error || "Failed to load station board.");
+        }
+        
+        // document.getElementById("passing").innerHTML = `
+        //     <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
+        //         Passed initial checks.
+        //     </div>
+        // `;
+
+        renderStationBoard(stationData);
+    } catch (error) {
+        document.getElementById("scheduleGrid").innerHTML = `
+        <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
+            Failed to load station board.
+            </div>
+            `;
+        }
+        // document.getElementById("passing").innerHTML = `
+        //     <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
+        //         {}.
+        //     </div>
+        // `;
+}
+
+async function loadSchedule() {
+    const date = document.getElementById("datePicker").value;
+
+    if (!date) {
+        alert("Please select a date.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/schedule?date=${date}`);
+        const data = await response.json();
+
+        const converted = {};
+        data.forEach(station => {
+            converted[station.stationName] = {
+                volunteers: station.volunteers || []
+            };
+        });
+
+        renderStationBoard(converted);
+    } catch (error) {
+        alert("Could not load that schedule.");
+    }
+}
+
+// function enableEdit() {
+//     alert("Edit mode placeholder.");
+// }
+
+// function requestCoverage() {
+//     document.getElementById("coverageBox").style.display = "block";
+// }
+
+// function submitAbsent() {
+//     const selected = document.getElementById("absentSelect").value;
+//     alert(`Coverage flow placeholder for volunteer ID ${selected}`);
+// }
+
+function openVolunteerPanel(volunteerJson) {
+    const volunteer = JSON.parse(volunteerJson);
+    // document.getElementById("editName").style.display = "none";
+    // document.getElementById("editEmail").style.display = "none";
+    // document.getElementById("editPhone").style.display = "none";
+    
+    document.getElementById("detailName").style.display = "inline";
+    document.getElementById("detailEmail").style.display = "block";
+    document.getElementById("detailPhone").style.display = "block";
+
+    // document.getElementById("editBtn").style.display = "inline-block";
+    // document.getElementById("saveBtn").style.display = "none";
+
+    
+    currentVolunteer = volunteer;
+
+    document.getElementById("detailName").textContent = volunteer.name || "Volunteer";
+    document.getElementById("detailEmail").textContent = volunteer.email || "None listed";
+    document.getElementById("detailPhone").textContent = volunteer.phone || "None listed";
+    document.getElementById("detailCaptain").textContent = volunteer.captain_status || "Volunteer";
+    document.getElementById("detailShift").textContent = volunteer.typical_shift || "None listed";
+    document.getElementById("detailUnavailability").textContent = volunteer.unavailability || "None listed";
+    document.getElementById("detailRestrictions").textContent = volunteer.capability_restrictions || "None listed";
+
+    // const absenceCard = document.getElementById("detailAbsenceCard");
+    // const absenceText = document.getElementById("detailAbsence");
+    // const absenceMessageCard = document.getElementById("detailAbsenceMessageCard");
+    // const absenceMessage = document.getElementById("detailAbsenceMessage");
+
+    // if (volunteer.absence_id) {
+    //     let text = "";
+
+    //     if (volunteer.absence_is_partial) {
+    //         const start = formatHourPretty(volunteer.absence_partial_start_hour);
+    //         const end = formatHourPretty(volunteer.absence_partial_end_hour);
+    //         text = `Partial: ${start} – ${end}`;
+    //     } else {
+    //         const start = formatDatePretty(volunteer.absence_start_date);
+    //         const end = formatDatePretty(volunteer.absence_end_date);
+
+    //         if (start === end) {
+    //             text = start;
+    //         } else {
+    //             text = `${start} – ${end}`;
+    //         }
+    //     }
+
+    //     absenceText.textContent = text;
+    //     absenceCard.style.display = "block";
+
+    //     const notes = (volunteer.absence_notes || "").trim();
+    //     if (notes) {
+    //         absenceMessage.textContent = notes;
+    //         absenceMessageCard.style.display = "block";
+    //     } else {
+    //         absenceMessageCard.style.display = "none";
+    //     }
+    // } else {
+    //     absenceCard.style.display = "none";
+    //     absenceMessageCard.style.display = "none";
+    // }
+
+    document.getElementById("detailPanel").classList.add("open");
+    document.getElementById("detailOverlay").classList.add("open");
+    
+}
+
+function closeVolunteerPanel() {
+    document.getElementById("detailPanel").classList.remove("open");
+    document.getElementById("detailOverlay").classList.remove("open");
+
+    // document.getElementById("editName").style.display = "none";
+    // document.getElementById("editEmail").style.display = "none";
+    // document.getElementById("editPhone").style.display = "none";
+
+    document.getElementById("detailName").style.display = "inline";
+    document.getElementById("detailEmail").style.display = "block";
+    document.getElementById("detailPhone").style.display = "block";
+
+    // document.getElementById("editBtn").style.display = "inline-block";
+    // document.getElementById("saveBtn").style.display = "none";
+
+    // document.getElementById("editName").value = "";
+    // document.getElementById("editEmail").value = "";
+    // document.getElementById("editPhone").value = "";
+
+    currentVolunteer = null;
+    
+}
+
+// function editVolunteer() {
+//     if(!currentVolunteer) return;
+//     document.getElementById("detailName").style.display = "none";
+//     document.getElementById("detailEmail").style.display = "none";
+//     document.getElementById("detailPhone").style.display = "none";
+
+//     const nameInput = document.getElementById("editName");
+//     const emailInput = document.getElementById("editEmail");
+//     const phoneInput = document.getElementById("editPhone");
+
+//     nameInput.style.display = "block";
+//     emailInput.style.display = "block";
+//     phoneInput.style.display = "block";
+
+//     nameInput.value = currentVolunteer.name || "";
+//     emailInput.value = currentVolunteer.email || "";
+//     phoneInput.value = currentVolunteer.phone || "";
+
+//     document.getElementById("editBtn").style.display = "none";
+//     document.getElementById("saveBtn").style.display = "inline-block";
+    
+// }
+
+// function saveVolunteer() {
+//     const fullName = document.getElementById("editName").value.trim();
+//     const [firstName, ...rest] = fullName.split(" ");
+//     const lastName = rest.join(" ");
+//     const updatedData = {
+//         id: currentVolunteer.id,
+//         first_name: firstName,
+//         last_name: lastName,
+//         email: document.getElementById("editEmail").value,
+//         phone: document.getElementById("editPhone").value
+//     };
+
+//     fetch("/admin/edit-volunteer", {
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json"
+//         },
+//         body: JSON.stringify(updatedData)
+//     })
+//     .then(res => res.json())
+//     .then(data => {
+//         location.reload();
+//     })
+//     .catch(err => console.error(err));
+// }
+
+window.addEventListener("DOMContentLoaded", loadStationBoard);
+</script>
+
+<div id="detailOverlay" class="detail-overlay" onclick="closeVolunteerPanel()"></div>
+
+<div id="detailPanel" class="detail-panel">
+    <div class="detail-panel-header">
+        <div class="detail-panel-title">
+            <span id="detailName">Volunteer</span>
+            <!-- <input id="editName" style="display:none;"> -->
+        </div>
+        <div class="detail-panel-actions">
+            <button class="detail-btn back" type="button" onclick="closeVolunteerPanel()">Back</button>
+            <!-- <button class="detail-btn edit" type="button" id = "editBtn" onclick="editVolunteer()">Edit</button> -->
+            <!-- <button class="detail-btn save" type="button" id="saveBtn" onclick="saveVolunteer()" style="display:none;">Save changes</button> -->
+        </div>
+    </div>
+
+    <div class="detail-panel-body">
+        <div class="detail-card">
+            <div class="detail-label">Email</div>
+            <div class="detail-value">
+                <span id="detailEmail">—</span>
+                <!-- <input id = "editEmail" style="display:none;"> -->
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <div class="detail-label">Phone</div>
+            <div class="detail-value">
+                <span id="detailPhone">—</span>
+                <!-- <input id = "editPhone" style="display:none;"> -->
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <div class="detail-label">Captain Status</div>
+            <div class="detail-value" id="detailCaptain">—</div>
+        </div>
+
+        <div class="detail-card">
+            <div class="detail-label">Typical Shift</div>
+            <div class="detail-value" id="detailShift">—</div>
+        </div>
+
+        <div class="detail-card">
+            <div class="detail-label">Unavailability</div>
+            <div class="detail-value" id="detailUnavailability">—</div>
+        </div>
+
+        <div class="detail-card">
+            <div class="detail-label">Capability Restrictions</div>
+            <div class="detail-value" id="detailRestrictions">—</div>
+        </div>
+
+        <!-- <div class="detail-card" id="detailAbsenceCard" style="display:none;">
+            <div class="detail-label">Absence</div>
+            <div class="detail-value" id="detailAbsence">—</div>
+        </div> -->
+
+        <!-- <div class="detail-card" id="detailAbsenceMessageCard" style="display:none;">
+            <div class="detail-label">Reason for Absence</div>
+            <div class="detail-value" id="detailAbsenceMessage">—</div>
+        </div> -->
+    </div>
+</div>
+
+<!-- <div id="absentEditOverlay" class="detail-overlay" onclick="closeAbsentEditPicker()"></div> -->
+
+<!-- <div id="absentEditModal" class="detail-panel">
+    <div class="detail-panel-header">
+        <div class="detail-panel-title">Edit Absence</div>
+        <div class="detail-panel-actions">
+            <button class="detail-btn back" type="button" onclick="closeAbsentEditPicker()">Back</button>
+            <button class="detail-btn edit" type="button" onclick="startAbsentEdit()">Next</button>
+        </div>
+    </div>
+
+    <div class="detail-panel-body">
+        <div class="detail-card">
+            <div class="detail-label">Select Absent Volunteer</div>
+            <select id="absentVolunteerSelect" class="date-picker" style="width:100%;"></select>
+        </div>
+    </div>
+</div> -->
+
+<!-- <div id="absenceActionOverlay" class="detail-overlay" onclick="closeAbsenceActionModal()"></div> -->
+
+<!-- <div id="absenceActionModal" class="detail-panel">
+    <div class="detail-panel-header">
+        <div class="detail-panel-title">
+            Edit Absence: <span id="absenceActionVolunteerName">Volunteer</span>
+        </div>
+        <div class="detail-panel-actions">
+            <button class="detail-btn back" type="button" onclick="closeAbsenceActionModal()">Back</button>
+        </div>
+    </div>
+
+    <div class="detail-panel-body">
+
+        <div class="detail-card">
+            <div class="detail-label">Choose Action</div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="detail-btn edit" type="button" onclick="showAbsenceActionSection('extend')">Extend</button>
+                <button class="detail-btn edit" type="button" onclick="showAbsenceActionSection('shorten')">Shorten</button>
+                <button class="detail-btn edit" type="button" onclick="showAbsenceActionSection('end')">End Absence</button>
+            </div>
+        </div>
+
+        <div class="detail-card" id="extendAbsenceSection" style="display:none;">
+            <div class="detail-label">Extend Absence</div>
+            <input type="date" id="extendAbsenceNewEndDate" class="date-picker" style="width:100%;">
+            <button class="detail-btn edit" type="button" onclick="startExtendFlow()">Next</button>
+        </div>
+
+        <div class="detail-card" id="shortenAbsenceSection" style="display:none;">
+            <div class="detail-label">Shorten Absence</div>
+            <input type="date" id="shortenAbsenceNewEndDate" class="date-picker" style="width:100%;">
+            <button class="detail-btn edit" type="button" onclick="startShortenFlow()">Next</button>
+        </div>
+
+        <div class="detail-card" id="endAbsenceSection" style="display:none;">
+            <div class="detail-label">End Absence</div>
+            <div class="detail-value">End this absence now.</div>
+            <button class="detail-btn edit" type="button" onclick="startEndAbsenceFlow()">Next</button>
+        </div>
+
+    </div>
+</div> -->
+
+<!-- <div id="reserveDecisionOverlay" class="detail-overlay" onclick="closeReserveDecisionModal()"></div> -->
+
+<!-- <div id="reserveDecisionModal" class="detail-panel">
+    <div class="detail-panel-header">
+        <div class="detail-panel-title" id="reserveDecisionTitle">Reserve Decision</div>
+        <div class="detail-panel-actions">
+            <button class="detail-btn back" type="button" onclick="closeReserveDecisionModal()">Back</button>
+        </div>
+    </div>
+
+    <div class="detail-panel-body">
+        <div class="detail-card">
+            <div class="detail-label">Reserve Coverage</div>
+            <div class="detail-value" id="reserveDecisionSummary">—</div>
+        </div>
+
+        <div class="detail-card">
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="detail-btn edit" type="button" id="reserveDecisionImmediateLabel" onclick="handleReserveDecision('move_now')">
+                    Move reserve back now
+                </button>
+
+                <button class="detail-btn edit" type="button" id="reserveDecisionDoubleLabel" onclick="handleReserveDecision('double_coverage')">
+                    Allow double coverage
+                </button>
+            </div>
+        </div>
+    </div>
+</div> -->
+</body>
+</html>
