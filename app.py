@@ -327,7 +327,7 @@ def captain_page():
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
 @app.route("/captain/volunteer-hours-cap")
-def volunteer_hours():
+def volunteer_hours_captain():
     try:
         volunteers = Volunteer.query\
             .filter(Volunteer.deleted_at.is_(None))\
