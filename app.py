@@ -2264,7 +2264,7 @@ def sync_volunteers():
             station_name = str(row.get("Typical Station", "")).strip()
             if not first_name:
                 continue
-            station = Station.query.filter_by(station_name = station_name_).first()
+            station = Station.query.filter_by(station_name = station_name).first()
             if station:
                 station_id = station.station_id
             else: 
