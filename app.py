@@ -62,7 +62,7 @@ class Volunteer(db.Model, SoftDeleteMixin):
     typical_shift = Column(String(100))
     unavailability = Column(String(100))
     capability_restrictions = Column(String(500))
-    #station_id = Column(Integer, ForeignKey("station.station_id"))
+    station_id = Column(Integer, ForeignKey("station.station_id"))
     #station = relationship("Station")
 
 #for people signing up to volunteer that will be placed in inbox
@@ -2261,8 +2261,15 @@ def sync_volunteers():
             capability_restrictions = str(row.get("Capability Restrictions", "")).strip()
             unavailability = str(row.get("Unavailability", "")).strip()
             typical_shift = str(row.get("Typical Shift", "")).strip()
+            station_name = str(row.get("Typical Station", "")).strip()
             if not first_name:
                 continue
+            station = Station.query.filter_by(station_name = station_name_).first()
+            if station:
+                station_id = station.station_id
+            else: 
+                station_id = None
+
             
             volunteer = Volunteer.query.filter_by(first_name = first_name, email=email).first()
 
@@ -2274,7 +2281,8 @@ def sync_volunteers():
                     phone=phone,
                     capability_restrictions=capability_restrictions,
                     unavailability = unavailability,
-                    typical_shift = typical_shift
+                    typical_shift = typical_shift,
+                    station_id = station_id
                 )
                 db.session.add(volunteer)
             if not volunteer.phone and phone:
@@ -2287,6 +2295,8 @@ def sync_volunteers():
                 volunteer.typical_shift = typical_shift
             if not volunteer.unavailability and unavailability:
                 volunteer.unavailability = unavailability
+            if not volunteer.station_id and station_id:
+                volunteer.station_id = station_id
             
         db.session.commit()
 

@@ -480,11 +480,6 @@ body {
             <span class="label">Inbox</span>
         </button>
 
-        <button onclick="enableEdit()">
-            <span class="icon">✏️</span>
-            <span class="label">Edit</span>
-        </button>
-
 
         <button onclick="window.location.href='/admin/volunteer-hours'">
             <span class="icon">⏱️</span>
@@ -1010,29 +1005,6 @@ async function loadStationBoard() {
             </div>
         `;
     }
-}
-
-// TODO make this allow editing on admin page
-function enableEdit() {
-    //alert("Edit mode placeholder.")
-    // added for edit
-    isEditMode = !isEditMode;
-    isSelectionLocked = isEditMode;
-
-    const btn = document.querySelector(".header-actions button[onclick='enableEdit()']");
-
-    if (isEditMode) {
-        btn.innerHTML = `<span class="icon">❌</span><span class="label">Cancel</span>`;
-        document.body.classList.add("edit-mode");
-        document.body.classList.add("selection-locked");
-
-    } else {
-        btn.innerHTML = `<span class="icon">✏️</span><span class="label">Edit</span>`;
-        document.body.classList.remove("edit-mode");
-        document.body.classList.remove("selection-locked");
-    }
-
-    renderStationBoard(currentStationData);
 }
 
 function requestCoverage() {
