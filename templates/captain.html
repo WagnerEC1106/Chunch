@@ -501,7 +501,6 @@ body {
     </div>
 
     <div class="grid" id="scheduleGrid"></div>
-    <div class="grid" id="passing"></div>"
 </div>
 
 <script>
@@ -563,218 +562,20 @@ function formatHourPretty(h) {
     return `${h - 12} PM`;
 }
 
-// function openAbsentEditPicker() {
-//     const select = document.getElementById("absentVolunteerSelect");
-//     if (!select) return;
-
-//     select.innerHTML = "";
-
-//     const absentStation = currentStationData["Absent"] || { volunteers: [] };
-//     const absentVolunteers = absentStation.volunteers || [];
-
-//     if (absentVolunteers.length === 0) {
-//         const option = document.createElement("option");
-//         option.value = "";
-//         option.textContent = "No absent volunteers";
-//         select.appendChild(option);
-//     } else {
-//         absentVolunteers.forEach(volunteer => {
-//             const option = document.createElement("option");
-//             option.value = String(volunteer.id || "");
-//             option.textContent = volunteer.name || "Volunteer";
-//             select.appendChild(option);
-//         });
-//     }
-
-//     document.getElementById("absentEditOverlay").classList.add("open");
-//     document.getElementById("absentEditModal").classList.add("open");
-// }
-
-// function closeAbsentEditPicker() {
-//     document.getElementById("absentEditOverlay").classList.remove("open");
-//     document.getElementById("absentEditModal").classList.remove("open");
-// }
-
-// function closeAbsenceActionModal() {
-//     document.getElementById("absenceActionOverlay").classList.remove("open");
-//     document.getElementById("absenceActionModal").classList.remove("open");
-// }
-
-// function closeReserveDecisionModal() {
-//     document.getElementById("reserveDecisionOverlay").classList.remove("open");
-//     document.getElementById("reserveDecisionModal").classList.remove("open");
-// }
-
-// function showAbsenceActionSection(sectionName) {
-//     document.getElementById("extendAbsenceSection").style.display = "none";
-//     document.getElementById("shortenAbsenceSection").style.display = "none";
-//     document.getElementById("endAbsenceSection").style.display = "none";
-
-//     if (sectionName === "extend") {
-//         document.getElementById("extendAbsenceSection").style.display = "block";
-//     } else if (sectionName === "shorten") {
-//         document.getElementById("shortenAbsenceSection").style.display = "block";
-//     } else if (sectionName === "end") {
-//         document.getElementById("endAbsenceSection").style.display = "block";
-//     }
-// }
-
-// function startAbsentEdit() {
-//     const select = document.getElementById("absentVolunteerSelect");
-//     if (!select) return;
-
-//     const selectedId = Number(select.value);
-//     if (!selectedId) return;
-
-//     const absentStation = currentStationData["Absent"] || { volunteers: [] };
-//     const absentVolunteers = absentStation.volunteers || [];
-
-//     const volunteer = absentVolunteers.find(v => Number(v.id) === selectedId);
-//     if (!volunteer) return;
-
-//     currentAbsentEditVolunteer = volunteer;
-
-//     document.getElementById("absenceActionVolunteerName").textContent =
-//         volunteer.name || "Volunteer";
-
-//     document.getElementById("extendAbsenceNewEndDate").value =
-//         volunteer.absence_end_date || "";
-//     document.getElementById("shortenAbsenceNewEndDate").value =
-//         volunteer.absence_end_date || "";
-
-//     showAbsenceActionSection("extend");
-
-//     closeAbsentEditPicker();
-//     document.getElementById("absenceActionOverlay").classList.add("open");
-//     document.getElementById("absenceActionModal").classList.add("open");
-// }
-
-// function startExtendFlow() {
-//     const newEndDate = document.getElementById("extendAbsenceNewEndDate").value;
-//     if (!newEndDate) {
-//         alert("Please choose a new end date.");
-//         return;
-//     }
-
-//     alert("Extend flow connected. Save logic comes next.");
-// }
-
 let pendingShortenDate = null;
 let currentActionMode = null;
-
-// function startShortenFlow() {
-//     const newEndDate = document.getElementById("shortenAbsenceNewEndDate").value;
-//     if (!newEndDate) {
-//         alert("Please choose a new end date.");
-//         return;
-//     }
-
-//     pendingShortenDate = newEndDate;
-//     currentActionMode = "shorten";
-
-//     const originalEndDate = currentAbsentEditVolunteer?.absence_end_date || "";
-
-//     const prettyNew = formatDatePretty(newEndDate);
-//     const prettyOriginal = formatDatePretty(originalEndDate);
-
-//     document.getElementById("reserveDecisionTitle").textContent = "Shorten Absence";
-
-//     document.getElementById("reserveDecisionSummary").textContent =
-//         `New return date: ${prettyNew}. Original reserve return: ${prettyOriginal}.`;
-
-//     document.getElementById("reserveDecisionImmediateLabel").textContent =
-//         `Move reserve back on ${prettyNew}`;
-
-//     document.getElementById("reserveDecisionDoubleLabel").textContent =
-//         `Keep reserve until ${prettyOriginal} (double coverage from ${prettyNew} to ${prettyOriginal})`;
-
-//     closeAbsenceActionModal();
-//     document.getElementById("reserveDecisionOverlay").classList.add("open");
-//     document.getElementById("reserveDecisionModal").classList.add("open");
-// }
-
-// function startEndAbsenceFlow() {
-//     currentActionMode = "end";
-
-//     const originalEndDate = currentAbsentEditVolunteer?.absence_end_date || "";
-
-//     document.getElementById("reserveDecisionTitle").textContent = "End Absence";
-
-//     document.getElementById("reserveDecisionSummary").textContent =
-//         `The reserve will otherwise move back on ${formatDatePretty(originalEndDate)}.`;
-
-//     document.getElementById("reserveDecisionImmediateLabel").textContent =
-//         "Move reserve back now";
-
-//     document.getElementById("reserveDecisionDoubleLabel").textContent =
-//         `Allow double coverage until ${formatDatePretty(originalEndDate)}`;
-
-//     closeAbsenceActionModal();
-//     document.getElementById("reserveDecisionOverlay").classList.add("open");
-//     document.getElementById("reserveDecisionModal").classList.add("open");
-// }
-
-// async function handleReserveDecision(choice) {
-//     if (!currentAbsentEditVolunteer) {
-//         alert("No absence selected.");
-//         return;
-//     }
-
-//     try {
-//         const payload = {
-//             volunteer_id: currentAbsentEditVolunteer.id,
-//             action: choice,
-//             mode: currentActionMode,
-//             new_end_date: pendingShortenDate
-//         };
-
-//         const response = await fetch("/admin/absence/update", {
-//             method: "POST",
-//             headers: {
-//                 "Content-Type": "application/json"
-//             },
-//             body: JSON.stringify(payload)
-//         });
-
-//         let data;
-//         try {
-//             data = await response.json();
-//         } catch (e) {
-//             const text = await response.text();
-//             console.error("Server returned non-JSON:", text);
-//             alert("Server error — check console");
-//             return;
-//         }
-
-//         if (!response.ok) {
-//             throw new Error(data.error || "Update failed");
-//         }
-
-//         closeReserveDecisionModal();
-
-//         // reload board immediately
-//         loadStationBoard();
-
-//     } catch (err) {
-//         alert(err.message || "Something went wrong");
-//     }
-// }
 
 function renderStationBoard(stationData) {
     currentStationData = stationData || {};
 
     const grid = document.getElementById("scheduleGrid");
-    const grid2 = document.getElementByID("passing");
     grid.innerHTML = "";
-    grid2.innerHTML = "";
 
     const stationNames = Object.keys(stationData);
     let totalVolunteers = 0;
     let assignedVolunteers = 0;
     let captainsCount = 0;
     let reserveCount = 0;
-
-    let stationString = "";
 
     const seenVolunteerKeys = new Set();
     const seenCaptainKeys = new Set();
@@ -785,27 +586,15 @@ function renderStationBoard(stationData) {
         const station = stationData[stationName];
         const volunteers = station.volunteers || [];
 
-        stationString += station.toString();
-        stationString += " ";
-
         totalVolunteers += volunteers.length;
 
-        // Maybe remove this section
-        if (stationName === "Reserve") {
-            reserveCount = volunteers.length;
-        } else {
-            assignedVolunteers += volunteers.length;
-        }
-
         const card = document.createElement("div");
-        const card2 = document.createElement("div");
         const cssClass = stationClassMap[stationName];
         if (!cssClass) return;
 
         card.className = `card ${cssClass}`;
 
         let volunteerHTML = "";
-        let stationsHTML = "";
 
         if (volunteers.length > 0) {
             volunteerHTML = `
@@ -839,28 +628,6 @@ function renderStationBoard(stationData) {
         } else {
             volunteerHTML = `<div class="empty-state">No volunteers assigned</div>`;
         }
-        stationsHTML = `
-            <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
-                <h2>${stationString}</h2>
-            </div>
-        `;
-        // const absentEditButton = stationName === "Absent"
-        //     ? `
-        //         <button
-        //             // class="absent-edit-btn"
-        //             type="button"
-        //             // title="Edit Absences"
-        //             onclick="openAbsentEditPicker()"
-        //         >
-        //             ✏️
-        //         </button>
-        //     `
-        //     : "";
-        passing.innerHTML = `
-            <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
-                ${stationsHTML}
-            </div>
-        `;
 
         card.innerHTML = `
             <div class="card-top">
@@ -871,19 +638,8 @@ function renderStationBoard(stationData) {
             ${volunteerHTML}
         `;
 
-        // document.getElementById("passing").innerHTML = `
-        //     <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
-        //         ${stationsHTML}
-        //     </div>
-        // `;
-
         grid.appendChild(card);
     });
-
-    document.getElementById("totalVolunteersCount").textContent = totalVolunteers;
-    document.getElementById("assignedVolunteersCount").textContent = assignedVolunteers;
-    document.getElementById("captainsCount").textContent = captainsCount;
-    document.getElementById("reserveCount").textContent = reserveCount;
 }
 
 async function loadStationBoard() {
@@ -894,28 +650,17 @@ async function loadStationBoard() {
         stationData.data
 
         if (!response.ok || stationData.error) {
-            throw new Error(stationData.error || "Failed to load station board.");
+            throw new Error(stationData.error || "Failed to load station board response.");
         }
-        
-        // document.getElementById("passing").innerHTML = `
-        //     <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
-        //         Passed initial checks.
-        //     </div>
-        // `;
 
         renderStationBoard(stationData);
     } catch (error) {
         document.getElementById("scheduleGrid").innerHTML = `
         <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
-            Failed to load station board.
-            </div>
-            `;
-        }
-        // document.getElementById("passing").innerHTML = `
-        //     <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
-        //         {}.
-        //     </div>
-        // `;
+            Failed to load station board ${error}.
+        </div>
+        `;
+    }
 }
 
 async function loadSchedule() {
@@ -943,173 +688,51 @@ async function loadSchedule() {
     }
 }
 
-// function enableEdit() {
-//     alert("Edit mode placeholder.");
-// }
-
-// function requestCoverage() {
-//     document.getElementById("coverageBox").style.display = "block";
-// }
-
-// function submitAbsent() {
-//     const selected = document.getElementById("absentSelect").value;
-//     alert(`Coverage flow placeholder for volunteer ID ${selected}`);
-// }
-
-function openVolunteerPanel(volunteerJson) {
-    const volunteer = JSON.parse(volunteerJson);
-    // document.getElementById("editName").style.display = "none";
-    // document.getElementById("editEmail").style.display = "none";
-    // document.getElementById("editPhone").style.display = "none";
+// function openVolunteerPanel(volunteerJson) {
+//     const volunteer = JSON.parse(volunteerJson);
     
-    document.getElementById("detailName").style.display = "inline";
-    document.getElementById("detailEmail").style.display = "block";
-    document.getElementById("detailPhone").style.display = "block";
+//     document.getElementById("detailName").style.display = "inline";
+//     document.getElementById("detailEmail").style.display = "block";
+//     document.getElementById("detailPhone").style.display = "block";
 
-    // document.getElementById("editBtn").style.display = "inline-block";
-    // document.getElementById("saveBtn").style.display = "none";
+//     currentVolunteer = volunteer;
 
-    
-    currentVolunteer = volunteer;
+//     document.getElementById("detailName").textContent = volunteer.name || "Volunteer";
+//     document.getElementById("detailEmail").textContent = volunteer.email || "None listed";
+//     document.getElementById("detailPhone").textContent = volunteer.phone || "None listed";
+//     document.getElementById("detailCaptain").textContent = volunteer.captain_status || "Volunteer";
+//     document.getElementById("detailShift").textContent = volunteer.typical_shift || "None listed";
+//     document.getElementById("detailUnavailability").textContent = volunteer.unavailability || "None listed";
+//     document.getElementById("detailRestrictions").textContent = volunteer.capability_restrictions || "None listed";
 
-    document.getElementById("detailName").textContent = volunteer.name || "Volunteer";
-    document.getElementById("detailEmail").textContent = volunteer.email || "None listed";
-    document.getElementById("detailPhone").textContent = volunteer.phone || "None listed";
-    document.getElementById("detailCaptain").textContent = volunteer.captain_status || "Volunteer";
-    document.getElementById("detailShift").textContent = volunteer.typical_shift || "None listed";
-    document.getElementById("detailUnavailability").textContent = volunteer.unavailability || "None listed";
-    document.getElementById("detailRestrictions").textContent = volunteer.capability_restrictions || "None listed";
-
-    // const absenceCard = document.getElementById("detailAbsenceCard");
-    // const absenceText = document.getElementById("detailAbsence");
-    // const absenceMessageCard = document.getElementById("detailAbsenceMessageCard");
-    // const absenceMessage = document.getElementById("detailAbsenceMessage");
-
-    // if (volunteer.absence_id) {
-    //     let text = "";
-
-    //     if (volunteer.absence_is_partial) {
-    //         const start = formatHourPretty(volunteer.absence_partial_start_hour);
-    //         const end = formatHourPretty(volunteer.absence_partial_end_hour);
-    //         text = `Partial: ${start} – ${end}`;
-    //     } else {
-    //         const start = formatDatePretty(volunteer.absence_start_date);
-    //         const end = formatDatePretty(volunteer.absence_end_date);
-
-    //         if (start === end) {
-    //             text = start;
-    //         } else {
-    //             text = `${start} – ${end}`;
-    //         }
-    //     }
-
-    //     absenceText.textContent = text;
-    //     absenceCard.style.display = "block";
-
-    //     const notes = (volunteer.absence_notes || "").trim();
-    //     if (notes) {
-    //         absenceMessage.textContent = notes;
-    //         absenceMessageCard.style.display = "block";
-    //     } else {
-    //         absenceMessageCard.style.display = "none";
-    //     }
-    // } else {
-    //     absenceCard.style.display = "none";
-    //     absenceMessageCard.style.display = "none";
-    // }
-
-    document.getElementById("detailPanel").classList.add("open");
-    document.getElementById("detailOverlay").classList.add("open");
-    
-}
-
-function closeVolunteerPanel() {
-    document.getElementById("detailPanel").classList.remove("open");
-    document.getElementById("detailOverlay").classList.remove("open");
-
-    // document.getElementById("editName").style.display = "none";
-    // document.getElementById("editEmail").style.display = "none";
-    // document.getElementById("editPhone").style.display = "none";
-
-    document.getElementById("detailName").style.display = "inline";
-    document.getElementById("detailEmail").style.display = "block";
-    document.getElementById("detailPhone").style.display = "block";
-
-    // document.getElementById("editBtn").style.display = "inline-block";
-    // document.getElementById("saveBtn").style.display = "none";
-
-    // document.getElementById("editName").value = "";
-    // document.getElementById("editEmail").value = "";
-    // document.getElementById("editPhone").value = "";
-
-    currentVolunteer = null;
-    
-}
-
-// function editVolunteer() {
-//     if(!currentVolunteer) return;
-//     document.getElementById("detailName").style.display = "none";
-//     document.getElementById("detailEmail").style.display = "none";
-//     document.getElementById("detailPhone").style.display = "none";
-
-//     const nameInput = document.getElementById("editName");
-//     const emailInput = document.getElementById("editEmail");
-//     const phoneInput = document.getElementById("editPhone");
-
-//     nameInput.style.display = "block";
-//     emailInput.style.display = "block";
-//     phoneInput.style.display = "block";
-
-//     nameInput.value = currentVolunteer.name || "";
-//     emailInput.value = currentVolunteer.email || "";
-//     phoneInput.value = currentVolunteer.phone || "";
-
-//     document.getElementById("editBtn").style.display = "none";
-//     document.getElementById("saveBtn").style.display = "inline-block";
+//     document.getElementById("detailPanel").classList.add("open");
+//     document.getElementById("detailOverlay").classList.add("open");
     
 // }
 
-// function saveVolunteer() {
-//     const fullName = document.getElementById("editName").value.trim();
-//     const [firstName, ...rest] = fullName.split(" ");
-//     const lastName = rest.join(" ");
-//     const updatedData = {
-//         id: currentVolunteer.id,
-//         first_name: firstName,
-//         last_name: lastName,
-//         email: document.getElementById("editEmail").value,
-//         phone: document.getElementById("editPhone").value
-//     };
+// function closeVolunteerPanel() {
+//     document.getElementById("detailPanel").classList.remove("open");
+//     document.getElementById("detailOverlay").classList.remove("open");
 
-//     fetch("/admin/edit-volunteer", {
-//         method: "POST",
-//         headers: {
-//             "Content-Type": "application/json"
-//         },
-//         body: JSON.stringify(updatedData)
-//     })
-//     .then(res => res.json())
-//     .then(data => {
-//         location.reload();
-//     })
-//     .catch(err => console.error(err));
+//     document.getElementById("detailName").style.display = "inline";
+//     document.getElementById("detailEmail").style.display = "block";
+//     document.getElementById("detailPhone").style.display = "block";
+
+//     currentVolunteer = null;
 // }
 
 window.addEventListener("DOMContentLoaded", loadStationBoard);
 </script>
 
-<div id="detailOverlay" class="detail-overlay" onclick="closeVolunteerPanel()"></div>
+<!-- <div id="detailOverlay" class="detail-overlay" onclick="closeVolunteerPanel()"></div> -->
 
-<div id="detailPanel" class="detail-panel">
+<!-- <div id="detailPanel" class="detail-panel">
     <div class="detail-panel-header">
         <div class="detail-panel-title">
             <span id="detailName">Volunteer</span>
-            <!-- <input id="editName" style="display:none;"> -->
         </div>
         <div class="detail-panel-actions">
             <button class="detail-btn back" type="button" onclick="closeVolunteerPanel()">Back</button>
-            <!-- <button class="detail-btn edit" type="button" id = "editBtn" onclick="editVolunteer()">Edit</button> -->
-            <!-- <button class="detail-btn save" type="button" id="saveBtn" onclick="saveVolunteer()" style="display:none;">Save changes</button> -->
         </div>
     </div>
 
@@ -1118,7 +741,6 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
             <div class="detail-label">Email</div>
             <div class="detail-value">
                 <span id="detailEmail">—</span>
-                <!-- <input id = "editEmail" style="display:none;"> -->
             </div>
         </div>
 
@@ -1126,7 +748,6 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
             <div class="detail-label">Phone</div>
             <div class="detail-value">
                 <span id="detailPhone">—</span>
-                <!-- <input id = "editPhone" style="display:none;"> -->
             </div>
         </div>
 
@@ -1148,109 +769,6 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
         <div class="detail-card">
             <div class="detail-label">Capability Restrictions</div>
             <div class="detail-value" id="detailRestrictions">—</div>
-        </div>
-
-        <!-- <div class="detail-card" id="detailAbsenceCard" style="display:none;">
-            <div class="detail-label">Absence</div>
-            <div class="detail-value" id="detailAbsence">—</div>
-        </div> -->
-
-        <!-- <div class="detail-card" id="detailAbsenceMessageCard" style="display:none;">
-            <div class="detail-label">Reason for Absence</div>
-            <div class="detail-value" id="detailAbsenceMessage">—</div>
-        </div> -->
-    </div>
-</div>
-
-<!-- <div id="absentEditOverlay" class="detail-overlay" onclick="closeAbsentEditPicker()"></div> -->
-
-<!-- <div id="absentEditModal" class="detail-panel">
-    <div class="detail-panel-header">
-        <div class="detail-panel-title">Edit Absence</div>
-        <div class="detail-panel-actions">
-            <button class="detail-btn back" type="button" onclick="closeAbsentEditPicker()">Back</button>
-            <button class="detail-btn edit" type="button" onclick="startAbsentEdit()">Next</button>
-        </div>
-    </div>
-
-    <div class="detail-panel-body">
-        <div class="detail-card">
-            <div class="detail-label">Select Absent Volunteer</div>
-            <select id="absentVolunteerSelect" class="date-picker" style="width:100%;"></select>
-        </div>
-    </div>
-</div> -->
-
-<!-- <div id="absenceActionOverlay" class="detail-overlay" onclick="closeAbsenceActionModal()"></div> -->
-
-<!-- <div id="absenceActionModal" class="detail-panel">
-    <div class="detail-panel-header">
-        <div class="detail-panel-title">
-            Edit Absence: <span id="absenceActionVolunteerName">Volunteer</span>
-        </div>
-        <div class="detail-panel-actions">
-            <button class="detail-btn back" type="button" onclick="closeAbsenceActionModal()">Back</button>
-        </div>
-    </div>
-
-    <div class="detail-panel-body">
-
-        <div class="detail-card">
-            <div class="detail-label">Choose Action</div>
-            <div style="display:flex; flex-direction:column; gap:10px;">
-                <button class="detail-btn edit" type="button" onclick="showAbsenceActionSection('extend')">Extend</button>
-                <button class="detail-btn edit" type="button" onclick="showAbsenceActionSection('shorten')">Shorten</button>
-                <button class="detail-btn edit" type="button" onclick="showAbsenceActionSection('end')">End Absence</button>
-            </div>
-        </div>
-
-        <div class="detail-card" id="extendAbsenceSection" style="display:none;">
-            <div class="detail-label">Extend Absence</div>
-            <input type="date" id="extendAbsenceNewEndDate" class="date-picker" style="width:100%;">
-            <button class="detail-btn edit" type="button" onclick="startExtendFlow()">Next</button>
-        </div>
-
-        <div class="detail-card" id="shortenAbsenceSection" style="display:none;">
-            <div class="detail-label">Shorten Absence</div>
-            <input type="date" id="shortenAbsenceNewEndDate" class="date-picker" style="width:100%;">
-            <button class="detail-btn edit" type="button" onclick="startShortenFlow()">Next</button>
-        </div>
-
-        <div class="detail-card" id="endAbsenceSection" style="display:none;">
-            <div class="detail-label">End Absence</div>
-            <div class="detail-value">End this absence now.</div>
-            <button class="detail-btn edit" type="button" onclick="startEndAbsenceFlow()">Next</button>
-        </div>
-
-    </div>
-</div> -->
-
-<!-- <div id="reserveDecisionOverlay" class="detail-overlay" onclick="closeReserveDecisionModal()"></div> -->
-
-<!-- <div id="reserveDecisionModal" class="detail-panel">
-    <div class="detail-panel-header">
-        <div class="detail-panel-title" id="reserveDecisionTitle">Reserve Decision</div>
-        <div class="detail-panel-actions">
-            <button class="detail-btn back" type="button" onclick="closeReserveDecisionModal()">Back</button>
-        </div>
-    </div>
-
-    <div class="detail-panel-body">
-        <div class="detail-card">
-            <div class="detail-label">Reserve Coverage</div>
-            <div class="detail-value" id="reserveDecisionSummary">—</div>
-        </div>
-
-        <div class="detail-card">
-            <div style="display:flex; flex-direction:column; gap:10px;">
-                <button class="detail-btn edit" type="button" id="reserveDecisionImmediateLabel" onclick="handleReserveDecision('move_now')">
-                    Move reserve back now
-                </button>
-
-                <button class="detail-btn edit" type="button" id="reserveDecisionDoubleLabel" onclick="handleReserveDecision('double_coverage')">
-                    Allow double coverage
-                </button>
-            </div>
         </div>
     </div>
 </div> -->
