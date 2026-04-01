@@ -102,7 +102,7 @@ class UserAccount(db.Model):
             name="role_enum"
         ), nullable=False
     ) 
-    volunteer = relationship("Volunteer", backref="account")
+    volunteer = relationship("Volunteer", backref="account", uselist=False)
 
 # creating a stations table
 class Station(db.Model):
@@ -1184,7 +1184,7 @@ def debug_hourly_final():
                 "name": f"{v.first_name} {v.last_name}",
                 "email": v.email or "",
                 "phone": v.phone or "",
-                "role": v.account.role if v.account else "volunteer",
+                "role": account.role if account else "volunteer",
                 "typical_shift": v.typical_shift,
                 "display_time": "",
                 "unavailability": v.unavailability,
