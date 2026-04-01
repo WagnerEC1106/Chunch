@@ -1178,12 +1178,12 @@ def debug_hourly_final():
                     current_hour >= latest_absence.partial_end_hour
                 ):
                     latest_absence = None
+            account = v.account[0] if v.account else None
             volunteer_rows_by_id[v.id] = {
                 "id": v.id,
                 "name": f"{v.first_name} {v.last_name}",
                 "email": v.email or "",
                 "phone": v.phone or "",
-                account = v.account[0] if v.account else None
                 "role": v.account.role if v.account else "volunteer",
                 "typical_shift": v.typical_shift,
                 "display_time": "",
