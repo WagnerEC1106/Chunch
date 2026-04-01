@@ -141,7 +141,7 @@
 </div>
 
 <script>
-    const stationData = {{ station_data | tojson | safe }};
+    const stationData = "{{ station_data | tojson | safe }}";
     const stationNames = Object.keys(stationData);
     const stationSelect = document.getElementById('stationSelect');
     const stationHeading = document.getElementById('stationHeading');
