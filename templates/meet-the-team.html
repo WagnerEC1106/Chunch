@@ -19,6 +19,7 @@ body {
     color: #1f2937;
 }
 
+/* NAVBAR */
 .navbar {
     background: #0f172a;
     padding: 18px 40px;
@@ -41,12 +42,14 @@ body {
     background: #2563eb;
 }
 
+/* CONTAINER */
 .container {
     max-width: 1200px;
     margin: 80px auto;
     padding: 0 20px;
 }
 
+/* HEADER */
 .page-header {
     text-align: center;
     margin-bottom: 48px;
@@ -64,12 +67,14 @@ body {
     color: #6b7280;
 }
 
+/* MASONRY */
 .team-grid {
     column-count: 3;
     column-gap: 24px;
     margin-top: 20px;
 }
 
+/* CARDS */
 .team-card {
     display: inline-block;
     width: 100%;
@@ -91,6 +96,7 @@ body {
     box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
 }
 
+/* COLORS */
 .team-card:nth-child(6n+1) { background: #eff6ff; }
 .team-card:nth-child(6n+2) { background: #ecfeff; }
 .team-card:nth-child(6n+3) { background: #f5f3ff; }
@@ -98,6 +104,7 @@ body {
 .team-card:nth-child(6n+5) { background: #ecfccb; }
 .team-card:nth-child(6n+6) { background: #fce7f3; }
 
+/* TEXT */
 .member-name {
     font-size: 24px;
     font-weight: 800;
@@ -115,6 +122,7 @@ body {
     color: #374151;
 }
 
+/* EMPTY */
 .empty-state {
     text-align: center;
     color: #6b7280;
@@ -122,6 +130,7 @@ body {
     margin-top: 40px;
 }
 
+/* RESPONSIVE */
 @media (max-width: 1024px) {
     .team-grid {
         column-count: 2;
@@ -152,6 +161,7 @@ body {
 }
 </style>
 </head>
+
 <body>
 
 <nav class="navbar">
@@ -176,25 +186,33 @@ body {
 
                     {% if member.station %}
                         <div class="info-block">
-                            <div class="info-text">Find me at the {{ member.station }} station.</div>
+                            <div class="info-text">
+                                <strong>Find me at the</strong> {{ member.station }} station.
+                            </div>
                         </div>
                     {% endif %}
 
                     {% if member.hobbies %}
                         <div class="info-block">
-                            <div class="info-text">Some of my hobbies are {{ member.hobbies }}.</div>
+                            <div class="info-text">
+                                <strong>Some of my hobbies are...</strong> {{ member.hobbies }}
+                            </div>
                         </div>
                     {% endif %}
 
                     {% if member.highlight %}
                         <div class="info-block">
-                            <div class="info-text">The highlight of volunteering at Chunch is {{ member.highlight }}.</div>
+                            <div class="info-text">
+                                <strong>The highlight of volunteering at Chunch is...</strong> {{ member.highlight }}
+                            </div>
                         </div>
                     {% endif %}
 
                     {% if member.advice %}
                         <div class="info-block">
-                            <div class="info-text">If I could give the students one piece of advice, it would be {{ member.advice }}.</div>
+                            <div class="info-text">
+                                <strong>If I could give the students one piece of advice, it would be...</strong> {{ member.advice }}
+                            </div>
                         </div>
                     {% endif %}
                 </div>
