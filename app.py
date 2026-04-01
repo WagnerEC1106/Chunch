@@ -57,8 +57,11 @@ class Volunteer(db.Model, SoftDeleteMixin):
     first_name = Column(String(50))
     last_name = Column(String(50))
 
-    email = Column(String(100), unique=True)
-    phone = Column(String(100), unique=True)
+    email = Column(String(100))
+    phone = Column(String(100))
+    typical_shift = Column(String(100))
+    unavailability = Column(String(100))
+    capability_restrictions = Column(String(500))
     #station_id = Column(Integer, ForeignKey("station.station_id"))
     #station = relationship("Station")
 
