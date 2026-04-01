@@ -35,11 +35,19 @@
             font-size: 15px;
         }
 
-        .top-actions {
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .top-bar-actions {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
-            margin-bottom: 16px;
         }
 
         .section {
@@ -236,12 +244,11 @@
             <p>Review, approve, or manage application decisions.</p>
         </div>
         
-        <div class="top-actions">
-            <button class="secondary" onclick="window.location.href='/admin'">Back</button>
-        </div>
-
-        <div class="top-actions">
-            <button class="secondary" onclick="window.location.href='/admin/sync-applicants'">Update Volunteers</button>
+        <div class="top-bar">
+            <div class="top-bar-actions">
+                <button class="secondary" onclick="window.location.href='/admin'">Back</button>
+                <button class="secondary" onclick="window.location.href='/admin/sync-applicants'">Update Volunteers</button>
+            </div>
         </div>
 
         <div class="section">
