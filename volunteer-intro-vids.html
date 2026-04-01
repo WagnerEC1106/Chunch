@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Volunteer Intro</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<title>Meet the Team</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 * {
@@ -19,7 +19,6 @@ body {
     color: #1f2937;
 }
 
-/* Navbar */
 .navbar {
     background: #0f172a;
     padding: 18px 40px;
@@ -28,6 +27,7 @@ body {
     gap: 25px;
     flex-wrap: wrap;
 }
+
 .navbar a {
     text-decoration: none;
     color: white;
@@ -36,142 +36,176 @@ body {
     border-radius: 8px;
     transition: 0.3s ease;
 }
+
 .navbar a:hover {
     background: #2563eb;
 }
 
-/* Layout */
 .container {
-    display: flex;
-    padding: 60px;
-    gap: 60px;
-}
-.info-section {
-    width: 35%;
-    background: white;
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
-}
-.info-section h2 {
-    margin-bottom: 20px;
-}
-.info-section p {
-    margin-bottom: 15px;
-    line-height: 1.6;
+    max-width: 1200px;
+    margin: 80px auto;
+    padding: 0 20px;
 }
 
-.video-section {
-    width: 65%;
+.page-header {
     text-align: center;
+    margin-bottom: 48px;
 }
 
-/* Video styling */
-#volunteerInfo {
-    width: 100%;
-    max-width: 700px;
-    height: auto;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+.page-header h1 {
+    font-size: 48px;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 14px;
 }
 
-/* Next button */
-.next-btn {
-    margin-top: 30px;
-    padding: 16px 40px;
+.page-header p {
     font-size: 18px;
-    font-weight: 600;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    background: linear-gradient(135deg, #28a745, #218838);
-    color: white;
-    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
-    display: none;
+    color: #6b7280;
 }
 
-/* Help button */
-.help-btn {
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
-    background: #e5e7eb;
-    border: none;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-}
-.help-btn:hover {
-    background: #d1d5db;
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
 }
 
-/* Mobile view */
+.team-card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.team-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+}
+
+.team-card:nth-child(5n+1) { background: #eff6ff; }
+.team-card:nth-child(5n+2) { background: #ecfeff; }
+.team-card:nth-child(5n+3) { background: #f5f3ff; }
+.team-card:nth-child(5n+4) { background: #ecfccb; }
+.team-card:nth-child(5n+5) { background: #fef3c7; }
+
+.member-name {
+    font-size: 24px;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.member-station {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #2563eb;
+    background: rgba(255,255,255,0.75);
+    border-radius: 999px;
+    padding: 6px 12px;
+    margin-bottom: 18px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.info-block {
+    margin-bottom: 16px;
+}
+
+.info-label {
+    font-size: 12px;
+    font-weight: 800;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+}
+
+.info-text {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #374151;
+}
+
+.empty-state {
+    text-align: center;
+    color: #6b7280;
+    font-size: 18px;
+    margin-top: 40px;
+}
+
 @media (max-width: 768px) {
-    .container {
-        flex-direction: column;
-        padding: 30px;
+    .navbar {
+        gap: 12px;
+        padding: 15px 20px;
     }
-    .info-section,
-    .video-section {
-        width: 100%;
+
+    .container {
+        margin: 60px auto;
+    }
+
+    .page-header h1 {
+        font-size: 34px;
+    }
+
+    .page-header p {
+        font-size: 16px;
     }
 }
 </style>
 </head>
 <body>
 
-<!-- Navbar -->
 <nav class="navbar">
     <a href="index.html">HOME</a>
-    <a href="contribute.html">CONTRIBUTE</a>
     <a href="/meet-the-team">MEET THE TEAM</a>
+    <a href="contribute.html">CONTRIBUTE</a>
     <a href="volunteer-intro-vids.html">VOLUNTEER</a>
-    <a href="student-spotlight">STUDENTS</a>
+    <a href="/student-spotlight">STUDENTS</a>
 </nav>
 
-<!-- Main layout -->
 <div class="container">
-
-    <!-- Left info -->
-    <div class="info-section">
-        <h2>Volunteer Expectations</h2>
-        <p>Three Pillars of Chunch:</p>
-        <p>Accept the students where they are in life</p>
-        <p>Show and feel love unconditionally</p>
-        <p>Serve them well (with a home cooked meal, of course!)</p>
+    <div class="page-header">
+        <h1>Meet the Team</h1>
+        <p>Get to know the people who help make Chunch happen.</p>
     </div>
 
-    <!-- Right video -->
-    <div class="video-section">
-        <video id="volunteerInfo" controls>
-            <source src="/src/assets/videos/volunteer-info.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        <button class="next-btn" id="nextButton" onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSdtGQnJA_nq1lhP6xkpLDxxXegEY-QkyDjpbx38Iwdk2W_EvA/viewform?usp=header')">Next</button>
-    </div>
+    {% if team_members %}
+        <div class="team-grid">
+            {% for member in team_members %}
+                <div class="team-card">
+                    <div class="member-name">{{ member.name }}</div>
+                    <div class="member-station">{{ member.station or "Volunteer" }}</div>
 
+                    {% if member.highlight %}
+                        <div class="info-block">
+                            <div class="info-label">Highlight</div>
+                            <div class="info-text">{{ member.highlight }}</div>
+                        </div>
+                    {% endif %}
+
+                    {% if member.hobbies %}
+                        <div class="info-block">
+                            <div class="info-label">Hobbies</div>
+                            <div class="info-text">{{ member.hobbies }}</div>
+                        </div>
+                    {% endif %}
+
+                    {% if member.advice %}
+                        <div class="info-block">
+                            <div class="info-label">Advice</div>
+                            <div class="info-text">{{ member.advice }}</div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">No team members available yet.</div>
+    {% endif %}
 </div>
-
-<!-- Help button -->
-<button class="help-btn" onclick="showHelp()">?</button>
-
-<script>
-// Show Next button after video ends
-const video = document.getElementById("volunteerInfo");
-const nextButton = document.getElementById("nextButton");
-
-video.addEventListener("ended", () => {
-    nextButton.style.display = "inline-block";
-});
-
-// Help button
-function showHelp() {
-    alert("Having issues? Contact Bryan Scott at: (123)456-7890.");
-}
-</script>
 
 </body>
 </html>
