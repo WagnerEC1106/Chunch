@@ -776,6 +776,8 @@ def meet_the_team():
                 "advice": advice
             })
 
+        random.shuffle(team_members)
+
         return render_template("meet-the-team.html", team_members=team_members)
 
     except Exception as e:
