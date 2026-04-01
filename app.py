@@ -1056,6 +1056,8 @@ def save_need_coverage():
 @app.route("/admin/debug-hourly-final")
 def debug_hourly_final():
     try:
+        from datetime import datetime
+
         volunteers = Volunteer.query\
             .filter(Volunteer.deleted_at.is_(None))\
             .order_by(Volunteer.last_name, Volunteer.first_name)\
@@ -1094,6 +1096,7 @@ def debug_hourly_final():
 
         volunteer_rows_by_id = {}
         today = date.today()
+        current_hour = datetime.now().hour
 
         for v in volunteers:
             captain_status = "Volunteer"
@@ -1111,6 +1114,13 @@ def debug_hourly_final():
                 )\
                 .order_by(Absence.absence_id.desc())\
                 .first()
+
+            if latest_absence and latest_absence.is_partial:
+                if (
+                    latest_absence.partial_end_hour is not None and
+                    current_hour >= latest_absence.partial_end_hour
+                ):
+                    latest_absence = None
 
             volunteer_rows_by_id[v.id] = {
                 "id": v.id,
@@ -1188,9 +1198,28 @@ def debug_hourly_final():
         for assignment in assignments:
             if assignment.is_covering and assignment.absence_id:
                 absence = Absence.query.get(assignment.absence_id)
-                if absence and absence.end_date < today:
-                    if assignment.original_station_id is not None:
-                        assignment.station_id = assignment.original_station_id
+
+                should_reset = False
+
+                if not absence:
+                    should_reset = True
+                elif absence.is_partial:
+                    if (
+                        absence.start_date <= today <= absence.end_date and
+                        absence.partial_end_hour is not None and
+                        current_hour >= absence.partial_end_hour
+                    ):
+                        should_reset = True
+                    elif today > absence.end_date:
+                        should_reset = True
+                else:
+                    if today > absence.end_date:
+                        should_reset = True
+
+                if should_reset:
+                    reserve_station = Station.query.filter_by(station_name="Reserve").first()
+                    if reserve_station:
+                        assignment.station_id = reserve_station.station_id
 
                     assignment.is_covering = False
                     assignment.covering_for_volunteer_id = None
@@ -1201,7 +1230,7 @@ def debug_hourly_final():
 
                     covered = Assignment.query.filter_by(
                         volunteer_id=absence.volunteer_id
-                    ).first()
+                    ).first() if absence else None
 
                     if covered:
                         covered.is_absent = False
