@@ -2269,7 +2269,7 @@ def sync_volunteers():
                     first_name=row["First Name"],
                     last_name=row["Last Name"],
                     email=email,
-                    phone=phone
+                    phone=phone,
                     capability_restrictions=capability_restrictions,
                     unavailability = unavailability,
                     typical_shift = typical_shift
