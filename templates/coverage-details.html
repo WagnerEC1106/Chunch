@@ -524,21 +524,32 @@ function closeAssignPopup() {
 }
 
 function submitAssignWithEmail(sendEmail) {
-    if (sendEmail === "yes") {
-        const subject = document.getElementById("assignEmailSubject").innerText;
-        const body = document.getElementById("assignEmailBody").innerText;
-
-        const form = document.querySelector(".assign-form"); // current form
-        const email = form.querySelector('input[name="reserve_volunteer_id"]').dataset.email;
-
-        const mailtoLink =
-            `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-        window.location.href = mailtoLink;
+    if (!activeAssignForm) {
+        alert("No reserve assignment selected.");
+        return;
     }
 
-    // THEN submit form normally
-    document.querySelector(".assign-form").submit();
+    activeAssignForm.querySelector('input[name="send_email"]').value = sendEmail;
+
+    if (sendEmail === "yes") {
+        const reserveEmail =
+            activeAssignForm.querySelector(".reserve-email")?.value || "";
+
+        const subject =
+            document.getElementById("assignEmailSubject").innerText;
+
+        const body =
+            document.getElementById("assignEmailBody").innerText;
+
+        if (reserveEmail) {
+            const mailtoLink =
+                `mailto:${reserveEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(mailtoLink, "_blank");
+        }
+    }
+
+    closeAssignPopup();
+    activeAssignForm.submit();
 }
 
 </script>
