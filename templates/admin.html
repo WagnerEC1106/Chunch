@@ -768,20 +768,30 @@ function startShortenFlow() {
     currentActionMode = "shorten";
 
     const originalEndDate = currentAbsentEditVolunteer?.absence_end_date || "";
-
     const prettyNew = formatDatePretty(newEndDate);
-    const prettyOriginal = formatDatePretty(originalEndDate);
+    const prettyOriginal = originalEndDate ? formatDatePretty(originalEndDate) : "";
 
     document.getElementById("reserveDecisionTitle").textContent = "Shorten Absence";
 
-    document.getElementById("reserveDecisionSummary").textContent =
-        `The volunteer will return on ${prettyNew}. The reserve is currently scheduled through ${prettyOriginal}. What should happen to the reserve?`;
+    if (prettyOriginal) {
+        document.getElementById("reserveDecisionSummary").textContent =
+            `The volunteer will return on ${prettyNew}. The reserve is currently scheduled through ${prettyOriginal}. What should happen to the reserve?`;
 
-    document.getElementById("reserveDecisionImmediateLabel").textContent =
-        `Move reserve back on ${prettyNew}`;
+        document.getElementById("reserveDecisionImmediateLabel").textContent =
+            `Move reserve back on ${prettyNew}`;
 
-    document.getElementById("reserveDecisionDoubleLabel").textContent =
-        `Keep reserve through ${prettyOriginal}`;
+        document.getElementById("reserveDecisionDoubleLabel").textContent =
+            `Keep reserve through ${prettyOriginal}`;
+    } else {
+        document.getElementById("reserveDecisionSummary").textContent =
+            `The volunteer will return on ${prettyNew}. What should happen to the reserve?`;
+
+        document.getElementById("reserveDecisionImmediateLabel").textContent =
+            `Move reserve back on ${prettyNew}`;
+
+        document.getElementById("reserveDecisionDoubleLabel").textContent =
+            "Keep current reserve coverage";
+    }
 
     document.getElementById("reserveDecisionImmediateLabel").onclick = function() {
         handleReserveDecision("move_now");
@@ -792,24 +802,35 @@ function startShortenFlow() {
     };
 
     closeAbsenceActionModal();
-    document.getElementById("reserveDecisionOverlay").classList.add("open");
-    document.getElementById("reserveDecisionModal").classList.add("open");
-}
+    document.get
+
 function startEndAbsenceFlow() {
     currentActionMode = "end";
 
     const originalEndDate = currentAbsentEditVolunteer?.absence_end_date || "";
+    const prettyOriginal = originalEndDate ? formatDatePretty(originalEndDate) : "";
 
     document.getElementById("reserveDecisionTitle").textContent = "End Absence";
 
-    document.getElementById("reserveDecisionSummary").textContent =
-        `The reserve is currently scheduled through ${formatDatePretty(originalEndDate)}. What should happen now?`;
+    if (prettyOriginal) {
+        document.getElementById("reserveDecisionSummary").textContent =
+            `The reserve is currently scheduled through ${prettyOriginal}. What should happen to the reserve?`;
 
-    document.getElementById("reserveDecisionImmediateLabel").textContent =
-        "Move reserve back now";
+        document.getElementById("reserveDecisionImmediateLabel").textContent =
+            "Move reserve back now";
 
-    document.getElementById("reserveDecisionDoubleLabel").textContent =
-        `Keep reserve through ${formatDatePretty(originalEndDate)}`;
+        document.getElementById("reserveDecisionDoubleLabel").textContent =
+            `Keep reserve through ${prettyOriginal}`;
+    } else {
+        document.getElementById("reserveDecisionSummary").textContent =
+            "What should happen to the reserve?";
+
+        document.getElementById("reserveDecisionImmediateLabel").textContent =
+            "Move reserve back now";
+
+        document.getElementById("reserveDecisionDoubleLabel").textContent =
+            "Keep current reserve coverage";
+    }
 
     document.getElementById("reserveDecisionImmediateLabel").onclick = function() {
         handleReserveDecision("move_now");
@@ -823,7 +844,6 @@ function startEndAbsenceFlow() {
     document.getElementById("reserveDecisionOverlay").classList.add("open");
     document.getElementById("reserveDecisionModal").classList.add("open");
 }
-
 async function handleReserveDecision(choice) {
     if (!currentAbsentEditVolunteer) {
         alert("No absence selected.");
