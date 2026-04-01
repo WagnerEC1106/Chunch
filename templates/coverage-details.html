@@ -140,28 +140,25 @@
                         {% endif %}
 
                         <form method="POST" action="/admin/coverage/assign" class="assign-form" style="margin-top: 10px;">
-                            <input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}">
-                            <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
-                            <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
-                            <input type="hidden" name="send_email" value="no">
+    <input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}">
+    <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
+    <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
+    <input type="hidden" name="send_email" value="no">
+    <input type="hidden" name="cover_start_hour" class="cover-start-hour">
+    <input type="hidden" name="cover_end_hour" class="cover-end-hour">
+    <input type="hidden" class="reserve-email" value="{{ r.email or '' }}">
 
-                            <!-- coverage hours -->
-                            <input type="hidden" name="cover_start_hour" class="cover-start-hour">
-                            <input type="hidden" name="cover_end_hour" class="cover-end-hour">
-
-                            <input type="hidden" class="reserve-email" value="{{ r.email or '' }}">
-
-                            <button
-                                type="button"
-                                    onclick="openCoverageHourModal(
-                                        this.form,
-                                        '{{ r.name|escape }}',
-                                        '{{ absent_volunteer.station_name|default('Assigned Station', true)|escape }}',
-                                        '{{ absent_volunteer.typical_shift|default('', true)|escape }}'
-                                    )">
-                                    Assign This Reserve
-                            </button>
-                        </form>
+    <button
+        type="button"
+        onclick="openCoverageHourModal(
+            this.form,
+            '{{ r.name|escape }}',
+            '{{ absent_volunteer.station_name|default('Assigned Station', true)|escape }}',
+            '{{ absent_volunteer.typical_shift|default('', true)|escape }}'
+        )">
+        Assign This Reserve
+    </button>
+</form>
                     </div>
                 {% endfor %}
             {% else %}
@@ -184,20 +181,26 @@
                             <div class="warning">⚠ {{ r.special_notes }}</div>
                         {% endif %}
 
-                        <form method="POST" action="/admin/coverage/assign" style="margin-top: 10px;" class="assign-form">
-                            <input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}">
-                            <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
-                            <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
-                            <input type="hidden" name="send_email" value="no">
-                            <input type="hidden" name="cover_start_hour" class="cover-start-hour">
-                            <input type="hidden" name="cover_end_hour" class="cover-end-hour">
+                        <form method="POST" action="/admin/coverage/assign" class="assign-form" style="margin-top: 10px;">
+    <input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}">
+    <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
+    <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
+    <input type="hidden" name="send_email" value="no">
+    <input type="hidden" name="cover_start_hour" class="cover-start-hour">
+    <input type="hidden" name="cover_end_hour" class="cover-end-hour">
+    <input type="hidden" class="reserve-email" value="{{ r.email or '' }}">
 
-                            <button
-                                type="button"
-                                onclick="openCoverageHourModal(this.form, '{{ r.name|escape }}', '{{ absent_volunteer.station_name|default('Assigned Station', true)|escape }}', '{{ absent_volunteer.typical_shift|default('', true)|escape }}')">
-                                Assign This Reserve
-                            </button>
-                        </form>
+    <button
+        type="button"
+        onclick="openCoverageHourModal(
+            this.form,
+            '{{ r.name|escape }}',
+            '{{ absent_volunteer.station_name|default('Assigned Station', true)|escape }}',
+            '{{ absent_volunteer.typical_shift|default('', true)|escape }}'
+        )">
+        Assign This Reserve
+    </button>
+</form>
                     </div>
                 {% endfor %}
             {% else %}
@@ -274,290 +277,262 @@
     </div>
 </div>
 <script>
-let modalDefaultStart = null;
-let modalDefaultEnd = null;
-let activeAssignForm = null;
-let activeReserveName = "";
-let activeStationName = "";
-let addAnotherAfterSubmit = false;
-let parsedShiftHours = [];
-let selectedCoverageStart = null;
-let selectedCoverageEnd = null;
-let fullShiftStart = null;
-let fullShiftEnd = null;
-let remainingCoverageStart = null;
-let remainingCoverageEnd = null;
-let coverageSelections = [];
+    let activeAssignForm = null;
+    let activeReserveName = "";
+    let activeStationName = "";
+    let parsedShiftHours = [];
+    let selectedCoverageStart = null;
+    let selectedCoverageEnd = null;
+    let pendingAddMoreChoice = false;
+    let modalDefaultStart = null;
+    let modalDefaultEnd = null;
 
-function parseTimeToHour(timeStr) {
-    timeStr = String(timeStr).trim().toUpperCase().replace(/\s+/g, "");
-
-    if (!timeStr) return null;
-
-    if (timeStr.endsWith("AM")) {
-        let raw = timeStr.slice(0, -2);
-        if (raw.includes(":")) raw = raw.split(":")[0];
-        if (!/^\d+$/.test(raw)) return null;
-        const hour = parseInt(raw, 10);
-        return hour === 12 ? 0 : hour;
+    function formatHour(hour) {
+        if (hour === 0) return "12AM";
+        if (hour < 12) return `${hour}AM`;
+        if (hour === 12) return "12PM";
+        return `${hour - 12}PM`;
     }
 
-    if (timeStr.endsWith("PM")) {
-        let raw = timeStr.slice(0, -2);
-        if (raw.includes(":")) raw = raw.split(":")[0];
-        if (!/^\d+$/.test(raw)) return null;
-        const hour = parseInt(raw, 10);
-        return hour === 12 ? 12 : hour + 12;
+    function formatRange(start, end) {
+        return `${formatHour(start)} - ${formatHour(end)}`;
     }
 
-    return null;
-}
+    function parseTimeToHour(timeStr) {
+        timeStr = String(timeStr).trim().toUpperCase().replace(/\s+/g, "");
 
-function parseHourList(text) {
-    text = String(text || "").trim();
-    if (!text) return [];
+        if (!timeStr) return null;
 
-    const normalized = text.replace(/–/g, "-").replace(/—/g, "-");
-    const parts = normalized.split(",").map(p => p.trim()).filter(Boolean);
-    const hours = new Set();
+        if (timeStr.endsWith("AM")) {
+            let raw = timeStr.slice(0, -2);
+            if (raw.includes(":")) raw = raw.split(":")[0];
+            if (!/^\d+$/.test(raw)) return null;
+            const hour = parseInt(raw, 10);
+            return hour === 12 ? 0 : hour;
+        }
 
-    parts.forEach(part => {
-        if (part.includes("-")) {
-            const [startStr, endStr] = part.split("-", 2);
-            const startHour = parseTimeToHour(startStr);
-            const endHour = parseTimeToHour(endStr);
+        if (timeStr.endsWith("PM")) {
+            let raw = timeStr.slice(0, -2);
+            if (raw.includes(":")) raw = raw.split(":")[0];
+            if (!/^\d+$/.test(raw)) return null;
+            const hour = parseInt(raw, 10);
+            return hour === 12 ? 12 : hour + 12;
+        }
 
-            if (startHour === null || endHour === null) return;
-            if (startHour > endHour) return;
+        return null;
+    }
 
-            for (let h = startHour; h <= endHour; h++) {
-                hours.add(h);
+    function parseHourList(text) {
+        text = String(text || "").trim();
+        if (!text) return [];
+
+        const normalized = text.replace(/–|—/g, "-");
+        const parts = normalized.split(",").map(p => p.trim()).filter(Boolean);
+
+        const hours = new Set();
+
+        for (const part of parts) {
+            if (part.includes("-")) {
+                const [startStr, endStr] = part.split("-", 2);
+                const startHour = parseTimeToHour(startStr);
+                const endHour = parseTimeToHour(endStr);
+
+                if (startHour === null || endHour === null) continue;
+                if (startHour > endHour) continue;
+
+                for (let h = startHour; h <= endHour; h++) {
+                    hours.add(h);
+                }
+            } else {
+                const single = parseTimeToHour(part);
+                if (single !== null) hours.add(single);
             }
-        } else {
-            const hour = parseTimeToHour(part);
-            if (hour !== null) hours.add(hour);
         }
-    });
 
-    return Array.from(hours).sort((a, b) => a - b);
-}
-
-function formatHour(hour) {
-    if (hour === 0) return "12AM";
-    if (hour < 12) return `${hour}AM`;
-    if (hour === 12) return "12PM";
-    return `${hour - 12}PM`;
-}
-
-function formatRange(startHour, endHour) {
-    return `${formatHour(startHour)} - ${formatHour(endHour)}`;
-}
-
-function fillHourSelect(selectEl, startHour, endHour) {
-    selectEl.innerHTML = "";
-
-    for (let hour = startHour; hour <= endHour; hour++) {
-        const option = document.createElement("option");
-        option.value = hour;
-        option.textContent = formatHour(hour);
-        selectEl.appendChild(option);
-    }
-}
-
-function openCoverageHourModal(form, reserveName, stationName, shiftText) {
-    activeAssignForm = form;
-    activeReserveName = reserveName;
-    activeStationName = stationName;
-
-    parsedShiftHours = parseHourList(shiftText);
-
-    if (!parsedShiftHours.length) {
-        alert("Could not determine shift hours.");
-        return;
+        return Array.from(hours).sort((a, b) => a - b);
     }
 
-    const shiftStart = Math.min(...parsedShiftHours);
-    const shiftEnd = Math.max(...parsedShiftHours);
-
-    fullShiftStart = shiftStart;
-    fullShiftEnd = shiftEnd;
-
-    const coveredStart = {{ absent_volunteer.covered_start|tojson }};
-    const coveredEnd = {{ absent_volunteer.covered_end|tojson }};
-
-    let defaultStart = shiftStart;
-    let defaultEnd = shiftEnd;
-
-    if (coveredStart !== null && coveredEnd !== null) {
-        if (coveredStart <= shiftStart && coveredEnd < shiftEnd) {
-            defaultStart = coveredEnd;
-            defaultEnd = shiftEnd;
-        } else if (coveredStart > shiftStart && coveredEnd >= shiftEnd) {
-            defaultStart = shiftStart;
-            defaultEnd = coveredStart;
+    function fillHourSelect(select, start, end) {
+        select.innerHTML = "";
+        for (let h = start; h <= end; h++) {
+            const option = document.createElement("option");
+            option.value = h;
+            option.textContent = formatHour(h);
+            select.appendChild(option);
         }
     }
 
-    modalDefaultStart = defaultStart;
-    modalDefaultEnd = defaultEnd;
+    function openCoverageHourModal(form, reserveName, stationName, shiftText) {
+        activeAssignForm = form;
+        activeReserveName = reserveName;
+        activeStationName = stationName;
+        pendingAddMoreChoice = false;
 
-    document.getElementById("coverageHourSummary").textContent =
-        `Set the coverage hours for ${reserveName} at ${stationName}.`;
+        parsedShiftHours = parseHourList(shiftText);
 
-    document.getElementById("coverageHourFullShiftLabel").textContent =
-        `Usual shift: ${formatRange(shiftStart, shiftEnd)}`;
-
-    document.getElementById("coverFullShiftText").textContent =
-        `Cover full remaining shift (${formatRange(defaultStart, defaultEnd)})`;
-
-    const startSelect = document.getElementById("coverStartHour");
-    const endSelect = document.getElementById("coverEndHour");
-
-    fillHourSelect(startSelect, 5, 16);
-    fillHourSelect(endSelect, 5, 16);
-
-    startSelect.value = defaultStart;
-    endSelect.value = defaultEnd;
-
-    document.getElementById("coverFullShiftCheckbox").checked = true;
-    document.getElementById("customHourFields").style.display = "none";
-
-    document.getElementById("coverageHourOverlay").style.display = "block";
-    document.getElementById("coverageHourModal").style.display = "block";
-}
-
-function closeCoverageHourModal() {
-    document.getElementById("coverageHourOverlay").style.display = "none";
-    document.getElementById("coverageHourModal").style.display = "none";
-}
-
-document.getElementById("coverFullShiftCheckbox").addEventListener("change", function () {
-    document.getElementById("customHourFields").style.display =
-        this.checked ? "none" : "block";
-});
-
-function goToEmailPopup() {
-    if (!activeAssignForm) return;
-
-    let startHour = modalDefaultStart;
-    let endHour = modalDefaultEnd;
-
-    const fullShift = document.getElementById("coverFullShiftCheckbox").checked;
-
-    if (!fullShift) {
-        startHour = parseInt(document.getElementById("coverStartHour").value, 10);
-        endHour = parseInt(document.getElementById("coverEndHour").value, 10);
-
-        if (startHour > endHour) {
-            alert("Start hour cannot be after end hour.");
+        if (!parsedShiftHours.length) {
+            alert("Could not determine shift hours.");
             return;
         }
-    }
 
-    selectedCoverageStart = startHour;
-    selectedCoverageEnd = endHour;
+        const shiftStart = Math.min(...parsedShiftHours);
+        const shiftEnd = Math.max(...parsedShiftHours);
 
-    activeAssignForm.querySelector(".cover-start-hour").value = startHour;
-    activeAssignForm.querySelector(".cover-end-hour").value = endHour;
+        const coveredStart = {{ absent_volunteer.covered_start|tojson }};
+        const coveredEnd = {{ absent_volunteer.covered_end|tojson }};
 
-    closeCoverageHourModal();
-    openMoreCoveragePopup();
-}
+        let defaultStart = shiftStart;
+        let defaultEnd = shiftEnd;
 
-function openMoreCoveragePopup() {
-    const shiftStart = Math.min(...parsedShiftHours);
-    const shiftEnd = Math.max(...parsedShiftHours);
-
-    const usualLength = shiftEnd - shiftStart + 1;
-    const selectedLength = selectedCoverageEnd - selectedCoverageStart + 1;
-
-    let message = "";
-
-    if (selectedLength < usualLength) {
-        message =
-            `This assignment covers less than the volunteer's usual shift (${formatRange(shiftStart, shiftEnd)}). ` +
-            `Selected coverage: ${formatRange(selectedCoverageStart, selectedCoverageEnd)}. ` +
-            `Would you like to add another reserve to help cover the remaining time, or keep this coverage as-is?`;
-    } else {
-        message =
-            `Selected coverage: ${formatRange(selectedCoverageStart, selectedCoverageEnd)}. ` +
-            `Would you like to add another reserve as well, or keep this single coverage assignment?`;
-    }
-
-    document.getElementById("moreCoverageMessage").textContent = message;
-    document.getElementById("moreCoveragePopup").style.display = "block";
-}
-
-function closeMoreCoveragePopup() {
-    document.getElementById("moreCoveragePopup").style.display = "none";
-}
-
-function chooseMoreCoverage(choice) {
-    if (!activeAssignForm) return;
-
-    activeAssignForm.querySelector(".cover-start-hour").value = selectedCoverageStart;
-    activeAssignForm.querySelector(".cover-end-hour").value = selectedCoverageEnd;
-
-    addAnotherAfterSubmit = (choice === "add");
-
-    closeMoreCoveragePopup();
-    openAssignPopup();
-}
-
-function openAssignPopup() {
-    const subject = "Coverage Assignment for " + activeStationName;
-    const body =
-        "Hi " + activeReserveName + ",\n\n" +
-        "You have been assigned to help cover " + activeStationName + " at Chunch.\n\n" +
-        "Please review the training materials and station-specific videos before your shift.\n\n" +
-        "These can be found at this link: https://drive.google.com/drive/folders/1IwmKyFWKEvAB86WKg9I7C9N1BBvrSzD-\n\n" +
-        "Thank you.\n\n" +
-        "- Bryan & Cheryl";
-
-    document.getElementById("assignEmailSubject").textContent = subject;
-    document.getElementById("assignEmailBody").textContent = body;
-    document.getElementById("assignPopup").style.display = "block";
-}
-
-function closeAssignPopup() {
-    activeAssignForm = null;
-    activeReserveName = "";
-    activeStationName = "";
-    parsedShiftHours = [];
-    selectedCoverageStart = null;
-    selectedCoverageEnd = null;
-    document.getElementById("assignPopup").style.display = "none";
-}
-
-function submitAssignWithEmail(sendEmail) {
-    if (!activeAssignForm) {
-        alert("No reserve assignment selected.");
-        return;
-    }
-
-    activeAssignForm.querySelector('input[name="send_email"]').value = sendEmail;
-
-    if (sendEmail === "yes") {
-        const reserveEmail =
-            activeAssignForm.querySelector(".reserve-email")?.value || "";
-
-        const subject =
-            document.getElementById("assignEmailSubject").innerText;
-
-        const body =
-            document.getElementById("assignEmailBody").innerText;
-
-        if (reserveEmail) {
-            const mailtoLink =
-                `mailto:${reserveEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            window.open(mailtoLink, "_blank");
+        if (coveredStart !== null && coveredEnd !== null) {
+            if (coveredStart <= shiftStart && coveredEnd < shiftEnd) {
+                defaultStart = coveredEnd;
+                defaultEnd = shiftEnd;
+            } else if (coveredStart > shiftStart && coveredEnd >= shiftEnd) {
+                defaultStart = shiftStart;
+                defaultEnd = coveredStart;
+            }
         }
+
+        modalDefaultStart = defaultStart;
+        modalDefaultEnd = defaultEnd;
+
+        document.getElementById("coverageHourSummary").textContent =
+            `Set the coverage hours for ${reserveName} at ${stationName}.`;
+
+        document.getElementById("coverageHourFullShiftLabel").textContent =
+            `Usual shift: ${formatRange(shiftStart, shiftEnd)}`;
+
+        document.getElementById("coverFullShiftText").textContent =
+            `Cover full remaining shift (${formatRange(defaultStart, defaultEnd)})`;
+
+        const startSelect = document.getElementById("coverStartHour");
+        const endSelect = document.getElementById("coverEndHour");
+
+        fillHourSelect(startSelect, 5, 16);
+        fillHourSelect(endSelect, 5, 16);
+
+        startSelect.value = defaultStart;
+        endSelect.value = defaultEnd;
+
+        document.getElementById("coverFullShiftCheckbox").checked = true;
+        document.getElementById("customHourFields").style.display = "none";
+
+        document.getElementById("coverageHourOverlay").style.display = "block";
+        document.getElementById("coverageHourModal").style.display = "block";
     }
 
-    closeAssignPopup();
-    activeAssignForm.submit();
-}t
+    function closeCoverageHourModal() {
+        document.getElementById("coverageHourOverlay").style.display = "none";
+        document.getElementById("coverageHourModal").style.display = "none";
+    }
 
+    function openAssignPopup() {
+        const subject = `Coverage Assignment for ${activeStationName}`;
+        const body =
+`Hi ${activeReserveName},
+
+You have been assigned to help cover ${activeStationName} at Chunch.
+
+Please review the training materials and station-specific videos before your shift.
+
+These can be found at this link: https://drive.google.com/drive/folders/1IwmKyFWKEvAB86WKg9I7C9N1BBvrSzD-
+
+Thank you.
+
+- Bryan & Cheryl`;
+
+        document.getElementById("assignEmailSubject").innerText = subject;
+        document.getElementById("assignEmailBody").innerText = body;
+        document.getElementById("assignPopup").style.display = "block";
+    }
+
+    function closeAssignPopup() {
+        document.getElementById("assignPopup").style.display = "none";
+    }
+
+    function openMoreCoveragePopup() {
+        document.getElementById("selectedCoverageText").innerText =
+            `Selected coverage: ${formatRange(selectedCoverageStart, selectedCoverageEnd)}`;
+        document.getElementById("moreCoveragePopup").style.display = "block";
+    }
+
+    function closeMoreCoveragePopup() {
+        document.getElementById("moreCoveragePopup").style.display = "none";
+    }
+
+    function goToEmailPopup() {
+        if (!activeAssignForm) return;
+
+        let startHour = modalDefaultStart;
+        let endHour = modalDefaultEnd;
+
+        const fullShift = document.getElementById("coverFullShiftCheckbox").checked;
+
+        if (!fullShift) {
+            startHour = parseInt(document.getElementById("coverStartHour").value, 10);
+            endHour = parseInt(document.getElementById("coverEndHour").value, 10);
+
+            if (startHour > endHour) {
+                alert("Start hour cannot be after end hour.");
+                return;
+            }
+        }
+
+        selectedCoverageStart = startHour;
+        selectedCoverageEnd = endHour;
+
+        activeAssignForm.querySelector(".cover-start-hour").value = startHour;
+        activeAssignForm.querySelector(".cover-end-hour").value = endHour;
+
+        closeCoverageHourModal();
+        openMoreCoveragePopup();
+    }
+
+    function chooseMoreCoverage(addMore) {
+        pendingAddMoreChoice = addMore;
+        closeMoreCoveragePopup();
+        openAssignPopup();
+    }
+
+    function submitAssignWithEmail(sendEmail) {
+        if (!activeAssignForm) {
+            alert("No reserve assignment selected.");
+            return;
+        }
+
+        activeAssignForm.querySelector('input[name="send_email"]').value = sendEmail;
+
+        const absentVolunteerId = {{ absent_volunteer.id|tojson }};
+
+        if (pendingAddMoreChoice) {
+            activeAssignForm.action =
+                `/admin/coverage/assign?add_more=1&volunteer_id=${encodeURIComponent(absentVolunteerId)}`;
+        } else {
+            activeAssignForm.action = "/admin/coverage/assign";
+        }
+
+        if (sendEmail === "yes") {
+            const reserveEmail =
+                activeAssignForm.querySelector(".reserve-email")?.value || "";
+
+            const subject = document.getElementById("assignEmailSubject").innerText;
+            const body = document.getElementById("assignEmailBody").innerText;
+
+            if (reserveEmail) {
+                const mailtoLink =
+                    `mailto:${reserveEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.open(mailtoLink, "_blank");
+            }
+        }
+
+        closeAssignPopup();
+        activeAssignForm.submit();
+    }
+
+    document.getElementById("coverFullShiftCheckbox").addEventListener("change", function() {
+        document.getElementById("customHourFields").style.display = this.checked ? "none" : "block";
+    });
 </script>
 
 </body>
