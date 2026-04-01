@@ -1183,7 +1183,7 @@ def debug_hourly_final():
                 "email": v.email or "",
                 "phone": v.phone or "",
                 "captain_status": captain_status,
-                "typical_shift": str(sheet_row.get("Typical Shift", "")).strip(),
+                "typical_shift": v.typical_shift,
                 "display_time": "",
                 "unavailability": v.unavailability,
                 "capability_restrictions": v.capability_restrictions,
