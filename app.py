@@ -2281,7 +2281,7 @@ def sync_volunteers():
                     phone=phone,
                     capability_restrictions=capability_restrictions,
                     unavailability = unavailability,
-                    typical_shift = typical_shift
+                    typical_shift = typical_shift,
                     station_id = station_id
                 )
                 db.session.add(volunteer)
