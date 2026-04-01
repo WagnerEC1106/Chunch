@@ -2256,6 +2256,9 @@ def sync_volunteers():
             email = str(row.get("Email", "")).strip().lower()
             phone = str(row.get("Phone Number", "")).strip()
             first_name = str(row.get("First Name", "")).strip()
+            capability_restrictions = str(row.get("Capability Restrictions", "")).strip()
+            unavailability = str(row.get("Unavailability", "")).strip()
+            typical_shift = str(row.get("Typical Shift", "")).strip()
             if not first_name:
                 continue
             
@@ -2267,12 +2270,21 @@ def sync_volunteers():
                     last_name=row["Last Name"],
                     email=email,
                     phone=phone
+                    capability_restrictions=capability_restrictions,
+                    unavailability = unavailability,
+                    typical_shift = typical_shift
                 )
                 db.session.add(volunteer)
             if not volunteer.phone and phone:
                 volunteer.phone = phone
             if not volunteer.email and email:
                 volunteer.email = email
+            if not volunteer.capability_restrictions and capability_restrictions:
+                volunteer.capability_restrictions = capability_restrictions
+            if not volunteer.typical_shift and typical_shift:
+                volunteer.typical_shift = typical_shift
+            if not volunteer.unavailability and unavailability:
+                volunteer.unavailability = unavailability
             
         db.session.commit()
 
