@@ -717,7 +717,33 @@ function startExtendFlow() {
         return;
     }
 
-    alert("Extend flow connected. Save logic comes next.");
+    pendingShortenDate = newEndDate;
+    currentActionMode = "extend";
+
+    const prettyNew = formatDatePretty(newEndDate);
+
+    document.getElementById("reserveDecisionTitle").textContent = "Extend Absence";
+
+    document.getElementById("reserveDecisionSummary").textContent =
+        `This absence will now continue through ${prettyNew}. Any reserve coverage already assigned will stay in place.`;
+
+    document.getElementById("reserveDecisionImmediateLabel").textContent =
+        `Save new end date (${prettyNew})`;
+
+    document.getElementById("reserveDecisionDoubleLabel").textContent =
+        "Cancel";
+
+    document.getElementById("reserveDecisionImmediateLabel").onclick = function() {
+        handleReserveDecision("move_now");
+    };
+
+    document.getElementById("reserveDecisionDoubleLabel").onclick = function() {
+        closeReserveDecisionModal();
+    };
+
+    closeAbsenceActionModal();
+    document.getElementById("reserveDecisionOverlay").classList.add("open");
+    document.getElementById("reserveDecisionModal").classList.add("open");
 }
 
 let pendingShortenDate = null;
