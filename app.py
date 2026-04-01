@@ -2152,6 +2152,7 @@ def applicant_detail(applicant_id):
     applicant = Applicant.query.get_or_404(applicant_id)
     return render_template("applicant-detail.html", applicant=applicant)
 
+# Need to make this into a button in the inbox
 @app.route("/admin/sync-applicants", methods=["GET", "POST"])
 def sync_applicants():
     if "user_id" not in session:
