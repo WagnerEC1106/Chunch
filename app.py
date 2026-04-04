@@ -301,8 +301,22 @@ def edit_volunteer():
     volunteer.typical_shift = data.get("typical_shift")
     volunteer.unavailability = data.get("unavailability")
     volunteer.capability_restrictions = data.get("capability_restrictions")
-    if "role" in data and volunteer.account: 
-        volunteer.account.role = data["role"]
+    if "role" in data:
+        new_role = data["role"]
+
+        if new_role not in {"admin", "captain", "volunteer", "other"}:
+            return {"error": "Invalid role"}, 400
+
+        if volunteer.account:
+            volunteer.account.role = new_role
+
+        elif new_role in {"admin", "captain"}:
+            new_account = UserAccount(
+                volunteer_id=volunteer.id,
+                password="TEMP_PASSWORD",  # need to create hashed passwords at some point
+                role=new_role
+            )
+            db.session.add(new_account)
     
     db.session.commit()
 
@@ -1386,8 +1400,8 @@ def debug_hourly_final():
         for v in volunteers:
             key = (
                 (v.first_name or "").strip().lower(),
-                (v.last_name or "").strip().lower(),
-                (v.email or "").strip().lower()
+                (v.last_name or "").strip().lower()#,
+                #(v.email or "").strip().lower()
             )
             volunteer_lookup[key] = v.id
 
