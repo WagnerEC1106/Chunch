@@ -65,6 +65,7 @@ class Volunteer(db.Model, SoftDeleteMixin):
     unavailability = Column(String(100))
     capability_restrictions = Column(String(500))
     station_id = Column(Integer, ForeignKey("station.station_id"))
+    account = relationship("UserAccount", back_populates="volunteer", uselist=False)
     #station = relationship("Station")
 
 #for people signing up to volunteer that will be placed in inbox
@@ -104,8 +105,7 @@ class UserAccount(db.Model):
             name="role_enum"
         ), nullable=False
     ) 
-    volunteer = relationship("Volunteer", backref="account", uselist=False)
-
+    volunteer = relationship("Volunteer", back_populates="account")
 # creating a stations table
 class Station(db.Model):
     __tablename__ = "station"
