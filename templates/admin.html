@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Administrator Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+    <!-- onload="this.onload=function(){};handleClientLoad()" 
+    onreadystatechange="if (this.readyState === 'complete') this.onload()"
+    async defer
+></script> -->
+<meta name="google-signin-client_id" content="483439290581-t6qm63e9rcuvm62l6j3cghvj71eo5h1k.apps.googleusercontent.com">
 
 <style>
 * {
@@ -49,10 +55,10 @@ body {
     gap: 10px;
     flex-wrap: wrap;
 }
-.header-top.button {
+.header-top button {
     background: rgb(178, 59, 59);
 }
-.header-top.button.hover { background: rgb(107, 29, 29); }
+.header-top button.hover { background: rgb(107, 29, 29); }
 
 .date-picker {
     padding: 10px 12px;
@@ -474,7 +480,7 @@ body {
         <div class="header-copy">
             <h1>Admin Dashboard</h1>
         </div>
-        <button onclick="signOut();">
+        <button onclick="logOut();">
             <span class="icon">🚪</span>
             <span class="label">Sign Out</span>
         </button>
@@ -554,6 +560,7 @@ body {
 </div>
 
 <script>
+
 
 let isEditMode = false;
 let isSelectionLocked = false;    
@@ -1247,12 +1254,40 @@ document.addEventListener("click", function (e) {
     e.preventDefault();
 }, true);
 
-function signOut() {
-    var auth2 = gapi.auth2.getAuthInstance();
-    auth2.signOut().then(function () {
-        console.log('User signed out.');
+
+// function handleAuthClick(event) {
+//     gapi.auth2.getAuthInstance().signIn();
+// }
+
+// function handleSignoutClick(event) {
+//     gapi.auth2.getAuthInstance().signOut();
+// }
+
+function logOut() {
+    fetch("/api/google-logout", {method: "POST"})
+    .then(() => {
+        var auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut().then(function () {
+            console.log('User signed out.');
+            window.location.href = "/"; // redirect to home page after logout
+        });
     });
 }
+// let loggedIn = true;
+// async function signOut() {
+//     const response = await fetch("/api/google-logout", {
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json"
+//         },
+//         body: JSON.stringify({})
+//     });
+
+//     var auth2 = gapi.auth2.getAuthInstance();
+//     auth2.signOut().then(function () {
+//         console.log('User signed out.');
+//     });
+// }
 
 // initial load
 loadStationBoard();
