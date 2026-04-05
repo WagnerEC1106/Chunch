@@ -305,17 +305,20 @@ def edit_volunteer():
     
     if "role" in data:
         new_role = data["role"]
-
+        
         if new_role not in {"admin", "captain", "volunteer", "other"}:
             return {"error": "Invalid role"}, 400
-
+        
         if volunteer.account:
-            volunteer.account.role = new_role
-
+            if new_role in {"admin", "captain"}:
+                volunteer.account.role = new_role
+            else:
+                db.session.delete(volunteer.account)
+        
         elif new_role in {"admin", "captain"}:
             new_account = UserAccount(
                 volunteer_id=volunteer.id,
-                password="TEMP_PASSWORD",  # need to create hashed passwords at some point
+                password="TEMP_PASSWORD",  # replace later with hashed
                 role=new_role
             )
             db.session.add(new_account)
@@ -1457,7 +1460,7 @@ def debug_hourly_final():
                 "name": f"{v.first_name} {v.last_name}",
                 "email": v.email or "",
                 "phone": v.phone or "",
-                "role": role_by_volunteer_id.get(v.id, "volunteer"),
+                "role": v.account.role if v.account else "volunteer",
                 "typical_shift": v.typical_shift or str(sheet_row.get("Typical Shift", "")).strip(),
                 "display_time": "",
                 "unavailability": v.unavailability or str(sheet_row.get("Unavailability", "")).strip(),
