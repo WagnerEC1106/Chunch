@@ -266,6 +266,7 @@
         </div>
 
         <script>
+        // Modal UI functionality
         const modal = document.getElementById("loginModal");
 
         function openModal() {
@@ -290,6 +291,7 @@
             }
         });
 
+        // Google Sign-In
         async function handleCredentialResponse(response) {
         const res = await fetch("/api/google-login", {
             method: "POST", 
