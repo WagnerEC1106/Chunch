@@ -301,6 +301,8 @@ def edit_volunteer():
     volunteer.typical_shift = data.get("typical_shift")
     volunteer.unavailability = data.get("unavailability")
     volunteer.capability_restrictions = data.get("capability_restrictions")
+    volunteer.station_id = data.get("station_id")
+    
     if "role" in data:
         new_role = data["role"]
 
