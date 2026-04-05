@@ -1501,7 +1501,7 @@ def debug_hourly_final():
             last_name = str(row.get("Last Name", "")).strip().lower()
             email = str(row.get("Email", "")).strip().lower()
             typical_station = str(row.get("Typical Station", "")).strip().lower()
-            key = (first_name, last_name, email)
+            key = (first_name, last_name)
             volunteer_id = volunteer_lookup.get(key)
 
             if not email or not typical_station or typical_station == "other":
