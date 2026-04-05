@@ -195,6 +195,11 @@ body {
     gap: 10px;
     flex-wrap: wrap;
 }
+.logout-btn {
+    align-items: right;
+    background: rgb(178,59,59);
+}
+.logout-btn.hover { background: rgb(107, 29, 29); }
 
 .icon {
     font-size: 18px;
@@ -322,6 +327,7 @@ body {
 .greeters { background: linear-gradient(135deg,#14b8a6,#0d9488); }
 .potato { background: linear-gradient(135deg,#a16207,#854d0e); }
 .salad { background: linear-gradient(135deg,#65a30d,#4d7c0f); }
+.vegan{ background: linear-gradient(135deg, #00ff91, #00ac62); }
 .absent { background: linear-gradient(135deg,#dc2626,#7f1d1d); }
 .other { background: linear-gradient(135deg,#64748b,#475569); }
 
@@ -357,15 +363,14 @@ body {
         </div>
     </div>
 
-    <!-- <div class="header-actions">
-        <button onclick="window.print()">
-            <span class="icon">🖨️</span>
-            <span class="label">Print</span>
-        </button> -->
-
+    <div class="header-actions">
         <button onclick="window.location.href='/captain/volunteer-hours-cap'">
             <span class="icon">⏱️</span>
             <span class="label">Hourly View</span>
+        </button>
+        <button class="logout-btn" onclick="signOut();">
+            <span class="icon">🚪</span>
+            <span class="label">Sign Out</span>
         </button>
     </div>
 </div>
@@ -576,7 +581,6 @@ function openVolunteerPanel(volunteerJson) {
 
     document.getElementById("detailPanel").classList.add("open");
     document.getElementById("detailOverlay").classList.add("open");
-    
 }
 
 function closeVolunteerPanel() {
@@ -588,6 +592,13 @@ function closeVolunteerPanel() {
     document.getElementById("detailPhone").style.display = "block";
 
     currentVolunteer = null;
+}
+
+function signOut() {
+    var auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut().then(function () {
+        console.log('User signed out.');
+    });
 }
 
 window.addEventListener("DOMContentLoaded", loadStationBoard);

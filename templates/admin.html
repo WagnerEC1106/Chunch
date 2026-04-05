@@ -50,6 +50,12 @@ body {
     flex-wrap: wrap;
 }
 
+.logout-btn {
+    align-items: right;
+    background: rgb(178,59,59);
+}
+.logout-btn.hover { background: rgb(107, 29, 29); }
+
 .date-picker {
     padding: 10px 12px;
     border-radius: 10px;
@@ -435,6 +441,7 @@ body {
 .greeters { background: linear-gradient(135deg,#14b8a6,#0d9488); }
 .potato { background: linear-gradient(135deg,#a16207,#854d0e); }
 .salad { background: linear-gradient(135deg,#65a30d,#4d7c0f); }
+.vegan{ background: linear-gradient(135deg, #00ff91, #00ac62); }
 .absent { background: linear-gradient(135deg,#dc2626,#7f1d1d); }
 .other { background: linear-gradient(135deg,#64748b,#475569); }
 
@@ -469,9 +476,6 @@ body {
         <div class="header-copy">
             <h1>Admin Dashboard</h1>
         </div>
-
-        <div class="header-tools">
-        </div>
     </div>
 
     <div class="header-actions">
@@ -479,8 +483,6 @@ body {
             <span class="icon">📬</span>
             <span class="label">Inbox</span>
         </button>
-
-
         <button onclick="window.location.href='/admin/volunteer-hours'">
             <span class="icon">⏱️</span>
             <span class="label">Hourly View</span>
@@ -496,9 +498,16 @@ body {
             <span class="label">Volunteer Master List</span>
         </button>
 
-        <button onclick="window.location.href='/captain'">
+        <!-- <button onclick="window.location.href='/captain'">
             <span class="label">Captain View</span>
-        </button>
+        </button> -->
+
+        <div class="logout-btn">
+            <button onclick="signOut();">
+                <span class="icon">🚪</span>
+                <span class="label">Sign Out</span>
+            </button>
+        </div>
     </div>
 </div>
 
@@ -1241,6 +1250,12 @@ document.addEventListener("click", function (e) {
     e.preventDefault();
 }, true);
 
+function signOut() {
+    var auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut().then(function () {
+        console.log('User signed out.');
+    });
+}
 
 // initial load
 loadStationBoard();

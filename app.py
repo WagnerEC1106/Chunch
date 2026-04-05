@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, redirect
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import Column, Integer, String
@@ -125,6 +125,7 @@ class Station(db.Model):
             "Greeters",
             "Baked Potato Bar",
             "Salad Bar",
+            "Vegan Station",
             "Absent",
             "Other",
             name="station_enum"
@@ -325,6 +326,12 @@ def captain_page():
 
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
+
+# Sign out of admin/captain
+@app.route("/google-logout")
+def google_logout():
+    session.clear()
+    return redirect(".", "index.html")
 
 @app.route("/captain/volunteer-hours-cap")
 def volunteer_hours_captain():
