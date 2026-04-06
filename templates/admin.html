@@ -1194,15 +1194,31 @@ function editVolunteer() {
     
     stationSelect.innerHTML = "";
 
-    const stations = ["Setup Team", "Teardown Team", "Line Servers", "Kitchen", "Drink Station", "Desserts", "Busboys/sanitation",
-                "Dishwashers", "Reserve", "General Manager","Greeters", "Baked Potato Bar", "Salad Bar", "Vegan Station", "Absent", "Other"];
+    const stations = [
+        { id: 1, name: "Setup Team" },
+        { id: 2, name: "Teardown Team" },
+        { id: 3, name: "Line Servers" },
+        { id: 4, name: "Kitchen" },
+        { id: 5, name: "Drink Station" },
+        { id: 6, name: "Desserts" },
+        { id: 7, name: "Busboys/sanitation" },
+        { id: 8, name: "Dishwashers" },
+        { id: 9, name: "Reserve" },
+        { id: 10, name: "General Manager" },
+        { id: 11, name: "Greeters" },
+        { id: 12, name: "Baked Potato Bar" },
+        { id: 13, name: "Salad Bar" },
+        { id: 14, name: "Vegan Station" },
+        { id: 15, name: "Absent" },
+        { id: 16, name: "Other" }
+    ];
 
     stations.forEach(station => {
         const option = document.createElement("option");
-        option.value = station;
-        option.textContent = station;
+        option.value = station.id;      // numeric ID
+        option.textContent = station.name;
 
-        if (station.name === currentVolunteer.station) {
+        if (station.id === currentVolunteer.station_id) { // use numeric comparison
             option.selected = true;
         }
 
