@@ -334,17 +334,15 @@
                         <td class="muted">{{ r.phone }}</td>
                         <td colspan="2">
                             <div class="actions">
-                                <form method="POST" action="/admin/inbox/accept-with-assignment">
-                                    <button type="button" class="btn-accept"
-                                        onclick='openAssignmentModal(
-                                            {{ r.id }},
-                                            {{ (r.first_name + " " + r.last_name) | tojson }},
-                                            {{ r.phone | tojson }},
-                                            {{ r.availability | tojson }}
-                                        )'>
-                                        Accept
-                                    </button>
-                                </form>
+                                <button type="button" class="btn-accept"
+                                    onclick='openAssignmentModal(
+                                        {{ r.id }},
+                                        {{ (r.first_name + " " + r.last_name) | tojson }},
+                                        {{ r.phone | tojson }},
+                                        {{ r.availability | tojson }}
+                                    )'>
+                                    Accept
+                                </button>
 
                                 <form method="POST" action="/admin/inbox/pending/{{ r.id }}">
                                     <button class="btn-undo" type="submit" onclick="return confirm('Undo this rejection?')">
@@ -373,7 +371,7 @@
 
           <label>Station:</label>
           <select name="station_id" required>
-              <option value="" disabled>Select a station</option>
+              <option value="" disabled selected>Select a station</option>
             {% for station in stations %}
               <option value="{{ station.id }}">{{ station.station_name }}</option>
             {% endfor %}
