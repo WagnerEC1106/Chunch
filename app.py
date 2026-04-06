@@ -380,7 +380,7 @@ def volunteer_hours_captain():
             "General Manager",
             "Greeters",
             "Baked Potato Bar",
-            "Salad Bar"
+            "Salad Bar",
             "Vegan Station"
         ]
 
@@ -2059,7 +2059,8 @@ def volunteer_hours():
             "General Manager",
             "Greeters",
             "Baked Potato Bar",
-            "Salad Bar"
+            "Salad Bar",
+            "Vegan Station"
         ]
 
         existing_station_names = {
