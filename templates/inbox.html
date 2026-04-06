@@ -334,8 +334,14 @@
                         <td class="muted">{{ r.phone }}</td>
                         <td colspan="2">
                             <div class="actions">
-                                <form method="POST" action="/admin/inbox/accept/{{ r.id }}">
-                                    <button class="btn-accept" type="submit" onclick="return confirm('Accept this applicant?')">
+                                <form method="POST" action="/admin/inbox/accept-with-assignment">
+                                    <button type="button" class="btn-accept"
+                                        onclick='openAssignmentModal(
+                                            {{ r.id }},
+                                            {{ (r.first_name + " " + r.last_name) | tojson }},
+                                            {{ r.phone | tojson }},
+                                            {{ r.availability | tojson }}
+                                        )'>
                                         Accept
                                     </button>
                                 </form>
