@@ -1067,7 +1067,7 @@ function openVolunteerPanel(volunteerJson) {
 
     // added for station
     document.getElementById("detailStation").textContent = volunteer.station || "Unassigned";
-
+    document.getElementById("editStation").value = volunteer.station || "Other";
 
     const absenceCard = document.getElementById("detailAbsenceCard");
     const absenceText = document.getElementById("detailAbsence");
@@ -1145,6 +1145,9 @@ function closeVolunteerPanel() {
     document.getElementById("editRestrictions").value = "";
     document.getElementById("editRole").value = "volunteer";
 
+    // added for station
+    document.getElementById("detailStation").style.display = "block";
+    document.getElementById("editStation").style.display = "none";
     currentVolunteer = null;
     
 }
@@ -1161,7 +1164,6 @@ function editVolunteer() {
     document.getElementById("detailUnavailability").style.display = "none";
     document.getElementById("detailRestrictions").style.display = "none";
 
-
     const nameInput = document.getElementById("editName");
     const emailInput = document.getElementById("editEmail");
     const phoneInput = document.getElementById("editPhone");
@@ -1169,6 +1171,9 @@ function editVolunteer() {
     const unavailabilityInput = document.getElementById("editUnavailability");
     const restrictionsInput = document.getElementById("editRestrictions");
     const captainInput = document.getElementById("editRole");
+
+    // added for station
+    const stationSelect = document.getElementById("editStation");
     
     nameInput.style.display = "block";
     emailInput.style.display = "block";
@@ -1177,6 +1182,7 @@ function editVolunteer() {
     unavailabilityInput.style.display = "block";
     restrictionsInput.style.display = "block";
     captainInput.style.display = "block";
+    stationSelect.style.display = "block";
     
     nameInput.value = currentVolunteer.name || "";
     emailInput.value = currentVolunteer.email || "";
@@ -1186,6 +1192,23 @@ function editVolunteer() {
     restrictionsInput.value = currentVolunteer.capability_restrictions || "";
     captainInput.value = currentVolunteer.role || "";
     
+    stationSelect.innerHTML = "";
+
+    const stations = ["Setup Team", "Teardown Team", "Line Servers", "Kitchen", "Drink Station", "Desserts", "Busboys/sanitation",
+                "Dishwashers", "Reserve", "General Manager","Greeters", "Baked Potato Bar", "Salad Bar", "Vegan Station", "Absent", "Other"];
+
+    stations.forEach(station => {
+        const option = document.createElement("option");
+        option.value = station;
+        option.textContent = station;
+
+        if (station.name === currentVolunteer.station) {
+            option.selected = true;
+        }
+
+        stationSelect.appendChild(option);
+    });
+
     document.getElementById("editBtn").style.display = "none";
     document.getElementById("saveBtn").style.display = "inline-block";
     
@@ -1357,7 +1380,27 @@ loadStationBoard();
         <!-- added for station-->
         <div class="detail-card">
             <div class="detail-label">Station</div>
+            <!-- View Mode-->
             <div id="detailStation" class="detail-value"></div>
+            <!-- Edit mode -->
+            <select id="editStation" class="date-picker" style="display:none;">
+                <option>Setup Team</option>
+                <option>Teardown Team</option>
+                <option>Line Servers</option>
+                <option>Kitchen</option>
+                <option>Drink Station</option>
+                <option>Desserts</option>
+                <option>Busboys/sanitation</option>
+                <option>Dishwashers</option>
+                <option>Reserve</option>
+                <option>General Manager</option>
+                <option>Greeters</option>
+                <option>Baked Potato Bar</option>
+                <option>Salad Bar</option>
+                <option>Vegan Station</option>
+                <option>Absent</option>
+                <option>Other</option>
+            </select>
         </div>
     </div>
 </div>
