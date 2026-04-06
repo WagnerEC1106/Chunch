@@ -1124,6 +1124,9 @@ function closeVolunteerPanel() {
     document.getElementById("editUnavailability").style.display = "none";
     document.getElementById("editRestrictions").style.display = "none";
     document.getElementById("editRole").style.display = "none";
+    // added for station
+    document.getElementById("editStation").style.display = "none";
+
 
     document.getElementById("detailName").style.display = "inline";
     document.getElementById("detailEmail").style.display = "block";
@@ -1132,6 +1135,8 @@ function closeVolunteerPanel() {
     document.getElementById("detailUnavailability").style.display = "block";
     document.getElementById("detailRestrictions").style.display = "block";
     document.getElementById("detailCaptain").style.display = "block";
+    // added for station
+    document.getElementById("detailStation").style.display = "block";
 
 
     document.getElementById("editBtn").style.display = "inline-block";
@@ -1144,11 +1149,8 @@ function closeVolunteerPanel() {
     document.getElementById("editUnavailability").value = "";
     document.getElementById("editRestrictions").value = "";
     document.getElementById("editRole").value = "volunteer";
-
-    // added for station
-    document.getElementById("detailStation").style.display = "block";
-    document.getElementById("editStation").style.display = "none";
     document.getElementById("editStation").value = "";
+
     currentVolunteer = null;
     
 }
@@ -1164,6 +1166,7 @@ function editVolunteer() {
     document.getElementById("detailCaptain").style.display = "none";
     document.getElementById("detailUnavailability").style.display = "none";
     document.getElementById("detailRestrictions").style.display = "none";
+    document.getElementById("detailStation").style.display = "none";
 
     const nameInput = document.getElementById("editName");
     const emailInput = document.getElementById("editEmail");
@@ -1175,7 +1178,6 @@ function editVolunteer() {
 
     // added for station
     const stationSelect = document.getElementById("editStation");
-    document.getElementById("detailStation").style.display = "none";
     
     nameInput.style.display = "block";
     emailInput.style.display = "block";
