@@ -1297,16 +1297,40 @@ document.addEventListener("click", function (e) {
 //     gapi.auth2.getAuthInstance().signOut();
 // }
 
-function logOut() {
-    fetch("/api/google-logout", {method: "POST"})
-    .then(() => {
+async function logOut() {
+    const res = await fetch("/api/google-logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            message: "User logged out"
+        })
+    });
+
+    const data = await res.json();
+
+    if(!res.ok || data.error) {
+        alert(data.error || "Logout failed");
+        return;
+    } else {
+        alert("Successfully logged out");
+    }
         var auth2 = gapi.auth2.getAuthInstance();
         auth2.signOut().then(function () {
-            console.log('User signed out.');
+            alert("User signed out.");
             window.location.href = "/"; // redirect to home page after logout
         });
-    });
 }
+
+// function logOut() {
+//     fetch("/api/google-logout", {method: "POST"})
+//     .then(() => {
+//         var auth2 = gapi.auth2.getAuthInstance();
+//         auth2.signOut().then(function () {
+//             console.log('User signed out.');
+//             window.location.href = "/"; // redirect to home page after logout
+//         });
+//     });
+// }
 // let loggedIn = true;
 // async function signOut() {
 //     const response = await fetch("/api/google-logout", {
