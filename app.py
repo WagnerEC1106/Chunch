@@ -127,8 +127,8 @@ class Station(db.Model):
             "Greeters",
             "Baked Potato Bar",
             "Salad Bar",
-            "Vegan Station",
             "Absent",
+            "Vegan Station",
             "Other",
             name="station_enum"
         )
@@ -1632,15 +1632,19 @@ def debug_hourly_final():
                     if covered:
                         covered.is_absent = False
 
-        # added for station
-        # Fix volunteers whose assignment.station_id doesn't match computed station
-        for station_id, volunteer_ids in station_to_volunteer_ids.items():
-            for vid in volunteer_ids:
-                assignment = latest_assignment_by_volunteer.get(vid)
-                if assignment and assignment.station_id != station_id:
-                    #print(f"Updating volunteer {vid} station from {assignment.station_id} to {station_id}")
-                    assignment.station_id = station_id
+        for vid, assignment in latest_assignment_by_volunteer.items():
+            volunteer = next((v for v in volunteers if v.id == vid), None)
+            
+            if not volunteer:
+                continue
 
+            # Skip special cases (important)
+            if assignment.is_absent or assignment.is_covering:
+                continue
+
+            # If assignment doesn't match volunteer's station → fix it
+            if assignment.station_id != volunteer.station_id:
+                assignment.station_id = volunteer.station_id
 
         db.session.commit()
 
@@ -1748,7 +1752,7 @@ def debug_other_check():
                 "volunteer_id": v.id,
                 "is_assigned": v.id in assigned_volunteer_ids
             }
-            for v in volunteers[:15]
+            for v in volunteers[:16]
         ]
     }
 
