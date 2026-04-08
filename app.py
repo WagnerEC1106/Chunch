@@ -65,6 +65,8 @@ class Volunteer(db.Model, SoftDeleteMixin):
     unavailability = Column(String(100))
     capability_restrictions = Column(String(500))
     station_id = Column(Integer, ForeignKey("station.station_id"))
+    # added for station
+    station = relationship("Station", foreign_keys=[station_id])
     account = relationship("UserAccount", back_populates="volunteer", uselist=False)
     #station = relationship("Station")
 
@@ -335,6 +337,9 @@ def edit_volunteer():
                 role=new_role
             )
             db.session.add(new_account)
+
+    # added for station
+
     
     db.session.commit()
 
@@ -1557,6 +1562,7 @@ def debug_hourly_final():
             if current is None or assignment.assignment_id > current.assignment_id:
                 latest_assignment_by_volunteer[assignment.volunteer_id] = assignment
 
+
         for assignment in latest_assignment_by_volunteer.values():
             if assignment.is_covering and assignment.absence_id:
                 absence = Absence.query.get(assignment.absence_id)
@@ -1595,6 +1601,16 @@ def debug_hourly_final():
 
                     if covered:
                         covered.is_absent = False
+
+        # added for station
+        # Fix volunteers whose assignment.station_id doesn't match computed station
+        for station_id, volunteer_ids in station_to_volunteer_ids.items():
+            for vid in volunteer_ids:
+                assignment = latest_assignment_by_volunteer.get(vid)
+                if assignment and assignment.station_id != station_id:
+                    #print(f"Updating volunteer {vid} station from {assignment.station_id} to {station_id}")
+                    assignment.station_id = station_id
+
 
         db.session.commit()
 
