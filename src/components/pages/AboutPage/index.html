@@ -7,12 +7,17 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>About Us</title>
+
+        <!-- Import font and style -->
+        <link rel="stylesheet" href="../../../assets/fonts/fonts.css">
         <!-- Preload relevant fonts -->
-        <link rel="preload" href="/src/assets/fonts/Atkinson-Hyperlegible-Regular.woff2" as="font" type="font/woff2" crossorigin>
-        <link rel="preload" href="/src/assets/fonts/Atkinson-Hyperlegible-Regular.woff" as="font" type="font/woff" crossorigin>
+        <link rel="preload" href="/src/assets/fonts/Atkinson-Hyperlegible-Regular.woff2" as="font" type="font/woff2">
+        <link rel="preload" href="/src/assets/fonts/Atkinson-Hyperlegible-Regular.woff" as="font" type="font/woff">
+        
         <!-- Google Identity Services -->
         <script src="https://accounts.google.com/gsi/client" async defer></script>
         <script src="https://apis.google.com/js/platform.js" async defer></script>
+        <!-- Equivilant to gapi.init -->
         <meta name="google-signin-client_id" content="483439290581-t6qm63e9rcuvm62l6j3cghvj71eo5h1k.apps.googleusercontent.com">
     </head>
     <body>
@@ -30,7 +35,11 @@
         <section class="header">
             <!-- will have a colored background -->
             <h1>About Us</h1>
-            <p>Brief tagline/catchphrase</p>
+            <div class="verse">
+                <p>“Taste and see that the Lord is good.”</p>
+                <cite>– Psalm 34:8</cite>
+            </div>
+
         </section>
         <section class="define">
             <h2>What is Chunch?</h2>
