@@ -371,7 +371,7 @@
 
           <label>Station:</label>
           <select name="station_id" required>
-              <option value="" disabled selected>Select a station</option>
+              <option value="" disabled selected hidden>Select a station</option>
             {% for station in stations %}
               <option value="{{ station.id }}">{{ station.station_name }}</option>
             {% endfor %}
