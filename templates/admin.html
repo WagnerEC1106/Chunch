@@ -1265,7 +1265,7 @@ function saveVolunteer() {
     })
     .then(res => res.json())
     .then(data => {
-        location.reload();
+        window.location.reload();
     })
     .catch(err => console.error(err));
 
