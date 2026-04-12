@@ -956,13 +956,15 @@ function renderStationBoard(stationData) {
                         }
 
                         const displayTime = volunteer.display_time ? ` (${volunteer.display_time})` : "";
-
+                        
+                        // added fi=or captain symbol
+                        const captainBadge = isCaptain(volunteer) ? " (C)" : "";
                         return `
                             <button class="volunteer-pill" type="button" onclick='openVolunteerPanel(${JSON.stringify(JSON.stringify({...volunteer, 
                                 // added for station
                                 station: stationName,
                                 }))})'>
-                                ${displayName}${displayTime}
+                                ${displayName}${captainBadge}${displayTime}
                             </button>
                         `;
                     }).join("")}
