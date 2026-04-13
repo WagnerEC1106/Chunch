@@ -1890,7 +1890,7 @@ def accept_applicant():
     
     start_hour = request.form.get("start_hour", type=int)
     end_hour = request.form.get("end_hour", type=int)
-  
+
     applicant = Applicant.query.get_or_404(applicants_id)
     volunteer = Volunteer(
         first_name=applicant.first_name,
