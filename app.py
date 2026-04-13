@@ -2047,7 +2047,7 @@ def undo_delete(volunteer_id):
     return redirect("/admin/master-list/deleted-volunteers")
 
 @app.route("/admin/master-list/edit-volunteer/<int:volunteer_id>", methods=["POST"])
-def edit_volunteer(volunteer_id):
+def edit_master_volunteer(volunteer_id):
     if "user_id" not in session:
         return redirect("/")
 
