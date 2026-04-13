@@ -651,6 +651,7 @@ function formatHourPretty(h) {
 
 // Make the phone number more readable e.g. (123) 456-7890 or +1 (123) 456-7890
 function formatPhonePretty(phone) {
+    if (!phone) return "None Listed";
     if (phone.length === 10) {
         return `(${phone.slice(0,3)}) ${phone.slice(3,6)}-${phone.slice(6)}`;
     } else if (phone.length === 11 && phone[0] === '1') {
