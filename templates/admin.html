@@ -345,6 +345,11 @@ body {
     flex-direction: column;
     gap: 10px;
     margin-top: 4px;
+
+    /* added for scroll bar */
+    max-height: 260px;   /* controls how many show (about 5) */
+    overflow-y: auto;    /* enables vertical scroll */
+    padding-right: 6px;  /* space for scrollbar */
 }
 
 .volunteer-pill {
@@ -605,6 +610,12 @@ function isCaptain(volunteer) {
     const role = (volunteer.role || "").toString().toLowerCase();
 
     return captainStatus === "captain" || role === "captain";
+}
+
+// added for admin symbol
+function isAdmin(volunteer) {
+    if (!volunteer || typeof volunteer === "string") return false;
+    return (volunteer.role || "").toString().toLowerCase() === "admin";
 }
 
 function formatDatePretty(dateStr) {
@@ -928,7 +939,35 @@ function renderStationBoard(stationData) {
         if (stationName === "Other") return;
 
         const station = stationData[stationName];
-        const volunteers = station.volunteers || [];
+        //const volunteers = station.volunteers || [];
+
+        // added for A-Z stations
+        let volunteers = (station.volunteers || []).slice(); // copy so we don't mutate original
+
+        volunteers.sort((a, b) => {
+            const roleA = (a.role || "").toLowerCase();
+            const roleB = (b.role || "").toLowerCase();
+
+            // Priority: admin (0), captain (1), others (2)
+            const getPriority = (role) => {
+                if (role === "admin") return 0;
+                if (role === "captain") return 1;
+                return 2;
+            };
+
+            const priorityA = getPriority(roleA);
+            const priorityB = getPriority(roleB);
+
+            if (priorityA !== priorityB) {
+                return priorityA - priorityB;
+            }
+
+            // Same role, sort alphabetically
+            const nameA = (a.name || "").toLowerCase();
+            const nameB = (b.name || "").toLowerCase();
+
+            return nameA.localeCompare(nameB);
+        });
 
         totalVolunteers += volunteers.length;
 
@@ -966,13 +1005,16 @@ function renderStationBoard(stationData) {
                         }
 
                         const displayTime = volunteer.display_time ? ` (${volunteer.display_time})` : "";
-
+                        
+                        // added for captain/admin symbol
+                        const captainBadge = isCaptain(volunteer) ? " (C)" : "";
+                        const adminBadge = isAdmin(volunteer) ? " (A)" : "";
                         return `
                             <button class="volunteer-pill" type="button" onclick='openVolunteerPanel(${JSON.stringify(JSON.stringify({...volunteer, 
                                 // added for station
                                 station: stationName,
                                 }))})'>
-                                ${displayName}${displayTime}
+                                ${displayName}${captainBadge}${adminBadge}${displayTime}
                             </button>
                         `;
                     }).join("")}
@@ -1209,24 +1251,22 @@ function editVolunteer() {
     stationSelect.innerHTML = "";
 
     const stations = [
-        { id: 1, name: "Setup Team" },
-        { id: 2, name: "Teardown Team" },
-        { id: 3, name: "Line Servers" },
-        { id: 4, name: "Kitchen" },
-        { id: 5, name: "Drink Station" },
-        { id: 6, name: "Desserts" },
+        // { id: 14, name: "Absent" },
+        { id: 12, name: "Baked Potato Bar" },
         { id: 7, name: "Busboys/sanitation" },
+        { id: 6, name: "Desserts" },
         { id: 8, name: "Dishwashers" },
-        { id: 9, name: "Reserve" },
+        { id: 5, name: "Drink Station" },
         { id: 10, name: "General Manager" },
         { id: 11, name: "Greeters" },
-        { id: 12, name: "Baked Potato Bar" },
+        { id: 4, name: "Kitchen" },
+        { id: 3, name: "Line Servers" },
+        // { id: 15, name: "Other" },
+        { id: 9, name: "Reserve" },
         { id: 13, name: "Salad Bar" },
-        { id: 14, name: "Absent" },
-        { id: 15, name: "Other" },
+        { id: 1, name: "Setup Team" },
+        { id: 2, name: "Teardown Team" },
         { id: 16, name: "Vegan Station" }
-        
-        
     ];
 
     stations.forEach(station => {
