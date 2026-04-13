@@ -1121,7 +1121,7 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("detailName").textContent = volunteer.name || "Volunteer";
     document.getElementById("detailEmail").textContent = volunteer.email || "None listed";
     document.getElementById("detailPhone").textContent = formatPhonePretty(volunteer.phone) || "None listed";
-    document.getElementById("detailRole").textContent = formatRolePretty(volunteer.role);
+    document.getElementById("detailCaptain").textContent = formatRolePretty(volunteer.role);
     const roleSelect = document.getElementById("editRole");
     // roleSelect.value = formatRolePretty(volunteer.role) || "None listed";
     // roleSelect.value = (volunteer.role || "volunteer");
