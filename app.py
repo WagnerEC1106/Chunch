@@ -275,9 +275,9 @@ def google_login():
     session["role"] = user.role
     session["email"] = email
 
-    if user.role is "admin" or user.role is "tech":
+    if user.role == "admin" or user.role == "tech":
         render_template("admin.html")
-    elif user.role is "captain":
+    elif user.role == "captain":
         render_template("captain.html")
     
     return jsonify({"success": True, "role": user.role})
