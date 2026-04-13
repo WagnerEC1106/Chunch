@@ -618,6 +618,11 @@ function isAdmin(volunteer) {
     return (volunteer.role || "").toString().toLowerCase() === "admin";
 }
 
+function isTech(volunteer) {
+    if(!volunteer || typeof volunteer === "string") return false;
+    return (volunteer.role || "").toString().toLowerCase() === "tech";
+}
+
 function formatDatePretty(dateStr) {
     if (!dateStr) return "";
 
@@ -652,6 +657,12 @@ function formatPhonePretty(phone) {
         return `+1 (${phone.slice(1,4)}) ${phone.slice(4,7)}-${phone.slice(7)}`;
     }
     return phone;
+}
+
+// Display role capitalized
+function formatRolePretty(role) {
+    if (!role) return "Volunteer";
+    return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
 }
 
 function openAbsentEditPicker() {
@@ -1108,10 +1119,11 @@ function openVolunteerPanel(volunteerJson) {
 
     document.getElementById("detailName").textContent = volunteer.name || "Volunteer";
     document.getElementById("detailEmail").textContent = volunteer.email || "None listed";
-    document.getElementById("detailPhone").textContent = volunteer.phone || "None listed";
+    document.getElementById("detailPhone").textContent = formatPhonePretty(volunteer.phone) || "None listed";
     document.getElementById("detailCaptain").textContent = volunteer.role || volunteer.captain_status || "Volunteer";
     const roleSelect = document.getElementById("editRole");
-    roleSelect.value = (volunteer.role || "volunteer").toLowerCase();
+    roleSelect.value = formatRolePretty(volunteer.role) || "None listed";
+    // roleSelect.value = (volunteer.role || "volunteer");
     
     document.getElementById("detailShift").textContent = volunteer.display_time || volunteer.typical_shift || "None listed";
     document.getElementById("detailUnavailability").textContent = volunteer.unavailability || "None listed";

@@ -103,7 +103,7 @@ class UserAccount(db.Model):
             "admin",
             "captain",
             "volunteer",
-            "other",
+            "tech",
             name="role_enum"
         ), nullable=False
     ) 
@@ -344,7 +344,7 @@ def edit_volunteer():
     if "role" in data:
         new_role = data["role"]
         
-        if new_role not in {"admin", "captain", "volunteer", "other"}:
+        if new_role not in {"admin", "captain", "volunteer", "tech"}:
             return {"error": "Invalid role"}, 400
         
         if volunteer.account:
