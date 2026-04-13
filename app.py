@@ -2063,12 +2063,12 @@ def edit_master_volunteer(volunteer_id):
 
     if not first_name or not last_name or not email:
         flash("All fields are required.")
-        return redirect(f"/admin/master-list/edit-volunteer/{volunteer_id}")
+        return redirect(f"/master-list/edit-volunteer/{volunteer_id}")
 
     existing = Volunteer.query.filter_by(email=email).first()
     if existing and existing.id != volunteer.id:
         flash("Volunteer with that email already exists.")
-        return redirect(f"/admin/master-list/edit-volunteer/{volunteer_id}")
+        return redirect(f"/master-list/edit-volunteer/{volunteer_id}")
 
     volunteer.first_name = first_name
     volunteer.last_name = last_name
