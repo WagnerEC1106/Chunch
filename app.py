@@ -313,6 +313,76 @@ def me():
         "role": session["role"]
     })
 
+@app.route("/admin/sync-absences")
+def sync_absences():
+    try:
+        role, deny = require_admin_or_captain()
+        if deny:
+            return deny
+
+        sheet = get_sheet("Absence")
+        rows = sheet.get_all_records()
+
+        volunteers = Volunteer.query\
+            .filter(Volunteer.deleted_at.is_(None))\
+            .all()
+
+        lookup = {
+            (
+                (v.first_name or "").strip().lower(),
+                (v.last_name or "").strip().lower()
+            ): v.id
+            for v in volunteers
+        }
+
+        created = 0
+
+        for row in rows:
+            first = str(row.get("First name", "")).strip()
+            last = str(row.get("Last name", "")).strip()
+            start_date = str(row.get("Absence start date", "")).strip()
+            end_date = str(row.get("Absence end date", "")).strip()
+            notes = str(row.get("Additional comments", "")).strip()
+
+            volunteer_id = lookup.get((first.lower(), last.lower()))
+            if not volunteer_id or not start_date or not end_date:
+                continue
+
+            start_date_obj = date.fromisoformat(start_date)
+            end_date_obj = date.fromisoformat(end_date)
+
+            # prevent duplicates
+            existing = Absence.query.filter_by(
+                volunteer_id=volunteer_id,
+                start_date=start_date_obj,
+                end_date=end_date_obj
+            ).first()
+
+            if existing:
+                continue
+
+            absence = Absence(
+                volunteer_id=volunteer_id,
+                start_date=start_date_obj,
+                end_date=end_date_obj,
+                is_partial=False,
+                notes=notes or None
+            )
+
+            db.session.add(absence)
+            created += 1
+
+        db.session.commit()
+
+        return {
+            "success": True,
+            "created": created
+        }
+
+    except Exception as e:
+        db.session.rollback()
+        return {"error": str(e)}, 500
+
 @app.route("/admin/edit-volunteer", methods=["POST"])
 def edit_volunteer():
     data = request.get_json()
@@ -636,6 +706,59 @@ def volunteer_hours_captain():
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
+
+def sync_absences():
+    sheet = get_sheet("Absence")
+    rows = sheet.get_all_records()
+
+    volunteers = Volunteer.query\
+        .filter(Volunteer.deleted_at.is_(None))\
+        .all()
+
+    lookup = {
+        (
+            (v.first_name or "").strip().lower(),
+            (v.last_name or "").strip().lower()
+        ): v.id
+        for v in volunteers
+    }
+
+    for row in rows:
+        first = str(row.get("First name", "")).strip()
+        last = str(row.get("Last name", "")).strip()
+        start_date = str(row.get("Absence start date", "")).strip()
+        end_date = str(row.get("Absence end date", "")).strip()
+        notes = str(row.get("Additional comments", "")).strip()
+
+        volunteer_id = lookup.get((first.lower(), last.lower()))
+        if not volunteer_id or not start_date or not end_date:
+            continue
+
+        start_date_obj = date.fromisoformat(start_date)
+        end_date_obj = date.fromisoformat(end_date)
+
+        existing = Absence.query.filter_by(
+            volunteer_id=volunteer_id,
+            start_date=start_date_obj,
+            end_date=end_date_obj
+        ).first()
+
+        if existing:
+            continue
+
+        absence = Absence(
+            volunteer_id=volunteer_id,
+            start_date=start_date_obj,
+            end_date=end_date_obj,
+            is_partial=False,
+            notes=notes or None
+        )
+
+        db.session.add(absence)
+
+    db.session.commit()
+
+
 @app.route("/admin")
 def admin_page():
     try:
@@ -681,6 +804,7 @@ def coverage_details():
     if not latest_absence:
         return "<pre>No absence record found for this volunteer.</pre>", 404
 
+    sync_absences()
     sheet = get_sheet()
     rows = sheet.get_all_records()
 
