@@ -1301,40 +1301,153 @@ def absence_forms():
         sheet = get_sheet("Absence")
         rows = sheet.get_all_records()
 
-        volunteers = Volunteer.query\
-            .filter(Volunteer.deleted_at.is_(None))\
-            .all()
+        volunteer_sheet = get_sheet()
+        volunteer_rows = volunteer_sheet.get_all_records()
 
-        lookup = {
-            ((v.first_name or "").strip().lower(),
-             (v.last_name or "").strip().lower()): v.id
-            for v in volunteers
-        }
+        volunteer_row_by_name = {}
+        for row in volunteer_rows:
+            first = str(row.get("First Name", "")).strip().lower()
+            last = str(row.get("Last Name", "")).strip().lower()
+            if first and last:
+                volunteer_row_by_name[(first, last)] = row
+
+        def parse_time_to_hour(time_str):
+            time_str = str(time_str).strip().upper().replace(" ", "")
+            if not time_str:
+                return None
+
+            if time_str.endswith("AM"):
+                raw = time_str[:-2]
+                if ":" in raw:
+                    raw = raw.split(":")[0]
+                if not raw.isdigit():
+                    return None
+                hour = int(raw)
+                return 0 if hour == 12 else hour
+
+            if time_str.endswith("PM"):
+                raw = time_str[:-2]
+                if ":" in raw:
+                    raw = raw.split(":")[0]
+                if not raw.isdigit():
+                    return None
+                hour = int(raw)
+                return hour if hour == 12 else hour + 12
+
+            return None
+
+        def parse_hour_list(text):
+            text = str(text).strip()
+            if not text:
+                return []
+
+            normalized = text.replace("–", "-").replace("—", "-")
+            parts = [part.strip() for part in normalized.split(",") if part.strip()]
+
+            hours = set()
+
+            for part in parts:
+                if "-" in part:
+                    start_str, end_str = part.split("-", 1)
+                    start_hour = parse_time_to_hour(start_str)
+                    end_hour = parse_time_to_hour(end_str)
+
+                    if start_hour is None or end_hour is None:
+                        continue
+
+                    if start_hour > end_hour:
+                        continue
+
+                    for hour in range(start_hour, end_hour + 1):
+                        hours.add(hour)
+                else:
+                    single_hour = parse_time_to_hour(part)
+                    if single_hour is not None:
+                        hours.add(single_hour)
+
+            return sorted(hours)
 
         parsed = []
 
         for row in rows:
             first = str(row.get("First name", "")).strip()
             last = str(row.get("Last name", "")).strip()
+            start_date = str(row.get("Absence start date", "")).strip()
+            end_date = str(row.get("Absence end date", "")).strip()
+            comments = str(row.get("Additional comments", "")).strip()
+            start_time = str(row.get("Absence start time", "")).strip()
+            end_time = str(row.get("Absence end time", "")).strip()
 
-            vid = lookup.get((first.lower(), last.lower()))
+            volunteer_row = volunteer_row_by_name.get((first.lower(), last.lower()), {})
+            typical_shift = str(volunteer_row.get("Typical Shift", "")).strip()
+
+            shift_hours = parse_hour_list(typical_shift)
+            absence_start_hour = parse_time_to_hour(start_time)
+            absence_end_hour = parse_time_to_hour(end_time)
+
+            is_single_day = bool(start_date and end_date and start_date == end_date)
+
+            is_partial = False
+            partial_start_hour = None
+            partial_end_hour = None
+
+            if (
+                is_single_day and
+                absence_start_hour is not None and
+                absence_end_hour is not None and
+                shift_hours
+            ):
+                shift_start = min(shift_hours)
+                shift_end = max(shift_hours)
+
+                within_shift = (
+                    shift_start <= absence_start_hour <= shift_end and
+                    shift_start <= absence_end_hour <= shift_end
+                )
+
+                not_full_shift = not (
+                    absence_start_hour == shift_start and
+                    absence_end_hour == shift_end
+                )
+
+                if within_shift and not_full_shift and absence_start_hour <= absence_end_hour:
+                    is_partial = True
+                    partial_start_hour = absence_start_hour
+                    partial_end_hour = absence_end_hour
+
+            query = (
+                f"/admin/need-coverage"
+                f"?first_name={quote_plus(first)}"
+                f"&last_name={quote_plus(last)}"
+                f"&start_date={quote_plus(start_date)}"
+                f"&end_date={quote_plus(end_date)}"
+                f"&notes={quote_plus(comments)}"
+                f"&is_partial={'true' if is_partial else 'false'}"
+            )
+
+            if is_partial and partial_start_hour is not None and partial_end_hour is not None:
+                query += f"&partial_start_hour={partial_start_hour}&partial_end_hour={partial_end_hour}"
 
             parsed.append({
                 "first": first,
                 "last": last,
-                "volunteer_id": vid,
-                "start_date": row.get("Absence start date", ""),
-                "end_date": row.get("Absence end date", ""),
-                "comments": row.get("Additional comments", ""),
-                "start_time": row.get("Absence start time", ""),
-                "end_time": row.get("Absence end time", "")
+                "start_date": start_date,
+                "end_date": end_date,
+                "comments": comments,
+                "start_time": start_time,
+                "end_time": end_time,
+                "typical_shift": typical_shift,
+                "is_partial": is_partial,
+                "partial_start_hour": partial_start_hour,
+                "partial_end_hour": partial_end_hour,
+                "coverage_url": query
             })
 
         return render_template("absence-forms.html", absences=parsed)
 
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
-
+        
 @app.route("/admin/need-coverage/save", methods=["POST"])
 def save_need_coverage():
     try:
