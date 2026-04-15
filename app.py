@@ -678,8 +678,12 @@ def run_sync_absences():
         if not volunteer_id or not start_date or not end_date:
             continue
 
-        start_date_obj = date.fromisoformat(start_date)
-        end_date_obj = date.fromisoformat(end_date)
+        from datetime import datetime
+        try:
+            start_date_obj = datetime.strptime(start_date, "%m/%d/%Y").date()
+            end_date_obj = datetime.strptime(end_date, "%m/%d/%Y").date()
+        except Exception:
+            continue
 
         existing = Absence.query.filter_by(
             volunteer_id=volunteer_id,
