@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Absence Forms</title>
+</head>
+<body>
+
+<h1>Absence Requests</h1>
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Comments</th>
+        <th>Action</th>
+    </tr>
+
+    {% for a in absences %}
+    <tr>
+        <td>{{ a.first }} {{ a.last }}</td>
+        <td>{{ a.start_date }}</td>
+        <td>{{ a.end_date }}</td>
+        <td>{{ a.comments }}</td>
+        <td>
+            {% if a.volunteer_id %}
+            <a href="/admin/coverage/details?volunteer_id={{ a.volunteer_id }}">
+                Find Coverage
+            </a>
+            {% else %}
+            No match
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+</body>
+</html>
