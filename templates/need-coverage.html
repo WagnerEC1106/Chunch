@@ -172,35 +172,25 @@ function togglePartialFields() {
 
 document.addEventListener("DOMContentLoaded", function() {
     togglePartialFields();
-});
-</script>
 
-$(document).ready(function() {
     $('#volunteer_id').select2({
         placeholder: "Type to search a volunteer",
         allowClear: true,
         width: '100%',
-
         matcher: function(params, data) {
-            // If no search term, show all options
             if ($.trim(params.term) === '') {
                 return data;
             }
 
             const query = params.term.toLowerCase();
             const text = data.text.toLowerCase();
-
-            // Split full name into parts
             const parts = text.split(" ");
-
-            // Check if ANY part starts with the query
             const match = parts.some(part => part.startsWith(query));
 
             return match ? data : null;
         }
     });
 });
-
 </script>
 
 </body>
