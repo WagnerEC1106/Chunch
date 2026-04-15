@@ -232,6 +232,15 @@ with app.app_context():
     db.session.commit()
         
 # Serve your existing HTML pages
+
+def require_admin_or_captain():
+    if "user_id" not in session:
+        return None, redirect("/")
+    role = session.get("role")
+    if role not in {"admin", "captain", "tech"}:
+        return None, redirect("/")
+    return role, None
+
 @app.route("/")
 def home():
     return send_from_directory(".", "index.html")
@@ -630,13 +639,14 @@ def volunteer_hours_captain():
 @app.route("/admin")
 def admin_page():
     try:
-        debug_admin = request.args.get("debug_admin") == "1"
-
-        if "user_id" not in session and not debug_admin: 
+        if "user_id" not in session:
             return redirect("/")
-        elif "captain" in "role":
+
+        role = session.get("role")
+
+        if role == "captain":
             return redirect("/captain")
-            # return render_template("captain.html", volunteers=volunteers)
+
         volunteers = Volunteer.query\
             .filter(Volunteer.deleted_at.is_(None))\
             .order_by(Volunteer.last_name)\
@@ -1120,8 +1130,9 @@ def send_coverage_email(to_email, reserve_name, station_name):
 @app.route("/admin/coverage/assign", methods=["POST"])
 def assign_reserve_coverage():
     try:
-        if "user_id" not in session:
-            return redirect("/")
+        role, deny = require_admin_or_captain()
+        if deny:
+            return deny
 
         absence_id = request.form.get("absence_id", type=int)
         absent_volunteer_id = request.form.get("absent_volunteer_id", type=int)
@@ -1178,112 +1189,10 @@ def assign_reserve_coverage():
                 station_id=station.station_id,
                 schedule_id=None,
                 is_absent=False,
-                is_covering=False,
-                covering_for_volunteer_id=None,
-                original_station_id=None,
-                absence_id=None,
-                cover_start_hour=None,
-                cover_end_hour=None
+                is_covering=False
             )
             db.session.add(absent_assignment)
             db.session.flush()
-
-        reserve_volunteer = Volunteer.query.get(reserve_volunteer_id)
-        if not reserve_volunteer:
-            return "<pre>Reserve volunteer not found.</pre>", 404
-
-        def parse_time_to_hour(time_str):
-            time_str = str(time_str).strip().upper().replace(" ", "")
-
-            if not time_str:
-                return None
-
-            if time_str.endswith("AM"):
-                raw = time_str[:-2]
-                if ":" in raw:
-                    raw = raw.split(":")[0]
-                if not raw.isdigit():
-                    return None
-                hour = int(raw)
-                return 0 if hour == 12 else hour
-
-            if time_str.endswith("PM"):
-                raw = time_str[:-2]
-                if ":" in raw:
-                    raw = raw.split(":")[0]
-                if not raw.isdigit():
-                    return None
-                hour = int(raw)
-                return hour if hour == 12 else hour + 12
-
-            return None
-
-        def parse_hour_list(text):
-            text = str(text).strip()
-            if not text:
-                return []
-
-            normalized = text.replace("–", "-").replace("—", "-")
-            parts = [part.strip() for part in normalized.split(",") if part.strip()]
-
-            hours = set()
-
-            for part in parts:
-                if "-" in part:
-                    start_str, end_str = part.split("-", 1)
-                    start_hour = parse_time_to_hour(start_str)
-                    end_hour = parse_time_to_hour(end_str)
-
-                    if start_hour is None or end_hour is None:
-                        continue
-
-                    if start_hour > end_hour:
-                        continue
-
-                    for hour in range(start_hour, end_hour + 1):
-                        hours.add(hour)
-                else:
-                    single_hour = parse_time_to_hour(part)
-                    if single_hour is not None:
-                        hours.add(single_hour)
-
-            return sorted(hours)
-
-        if cover_start_hour is None or cover_end_hour is None:
-            if absence.is_partial:
-                cover_start_hour = absence.partial_start_hour
-                cover_end_hour = absence.partial_end_hour
-            else:
-                sheet = get_sheet()
-                rows = sheet.get_all_records()
-
-                absent_volunteer = Volunteer.query.get(absent_volunteer_id)
-                absent_email = (absent_volunteer.email or "").strip().lower()
-
-                absent_row = None
-                for row in rows:
-                    row_email = str(row.get("Email", "")).strip().lower()
-                    if row_email == absent_email:
-                        absent_row = row
-                        break
-
-                if not absent_row:
-                    return "<pre>Absent volunteer not found in sheet for shift hours.</pre>", 404
-
-                typical_shift = str(absent_row.get("Typical Shift", "")).strip()
-                shift_hours = parse_hour_list(typical_shift)
-
-                if not shift_hours:
-                    return "<pre>Could not determine absent volunteer shift hours.</pre>", 400
-
-                cover_start_hour = min(shift_hours)
-                cover_end_hour = max(shift_hours)
-
-        if cover_start_hour is None or cover_end_hour is None:
-            return "<pre>Missing coverage hours.</pre>", 400
-
-        if cover_start_hour > cover_end_hour:
-            return "<pre>Coverage start hour cannot be after end hour.</pre>", 400
 
         reserve_assignment = Assignment(
             volunteer_id=reserve_volunteer_id,
@@ -1292,28 +1201,15 @@ def assign_reserve_coverage():
             is_absent=False,
             is_covering=True,
             covering_for_volunteer_id=absent_volunteer_id,
-            original_station_id=None,
             absence_id=absence_id,
             cover_start_hour=cover_start_hour,
             cover_end_hour=cover_end_hour
         )
-        db.session.add(reserve_assignment)
 
+        db.session.add(reserve_assignment)
         absent_assignment.is_absent = True
 
         db.session.commit()
-
-        if send_email:
-            print("Email draft opened in client mail app for:", reserve_volunteer.email)
-
-        add_more = request.args.get("add_more") == "1"
-        return_volunteer_id = request.args.get("volunteer_id", type=int)
-
-        if add_more and return_volunteer_id:
-            return redirect(
-                f"/admin/coverage/details?volunteer_id={return_volunteer_id}"
-                f"&covered_start={cover_start_hour}&covered_end={cover_end_hour}"
-            )
 
         return redirect("/admin")
 
@@ -1321,11 +1217,57 @@ def assign_reserve_coverage():
         db.session.rollback()
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
+
+@app.route("/absence-forms")
+def absence_forms():
+    try:
+        role, deny = require_admin_or_captain()
+        if deny:
+            return deny
+
+        sheet = get_sheet("Absence")
+        rows = sheet.get_all_records()
+
+        volunteers = Volunteer.query\
+            .filter(Volunteer.deleted_at.is_(None))\
+            .all()
+
+        lookup = {
+            ((v.first_name or "").strip().lower(),
+             (v.last_name or "").strip().lower()): v.id
+            for v in volunteers
+        }
+
+        parsed = []
+
+        for row in rows:
+            first = str(row.get("First name", "")).strip()
+            last = str(row.get("Last name", "")).strip()
+
+            vid = lookup.get((first.lower(), last.lower()))
+
+            parsed.append({
+                "first": first,
+                "last": last,
+                "volunteer_id": vid,
+                "start_date": row.get("Absence start date", ""),
+                "end_date": row.get("Absence end date", ""),
+                "comments": row.get("Additional comments", ""),
+                "start_time": row.get("Absence start time", ""),
+                "end_time": row.get("Absence end time", "")
+            })
+
+        return render_template("absence-forms.html", absences=parsed)
+
+    except Exception as e:
+        return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
+
 @app.route("/admin/need-coverage/save", methods=["POST"])
 def save_need_coverage():
     try:
-        if "user_id" not in session:
-            return redirect("/")
+        role, deny = require_admin_or_captain()
+        if deny:
+            return deny
 
         volunteer_id = request.form.get("volunteer_id", type=int)
         start_date_str = request.form.get("start_date", "").strip()
@@ -1349,7 +1291,6 @@ def save_need_coverage():
         if is_partial:
             if partial_start_hour is None or partial_end_hour is None:
                 return "<pre>Partial absences require both start and end hours.</pre>", 400
-
             if partial_start_hour > partial_end_hour:
                 return "<pre>Partial start hour cannot be after partial end hour.</pre>", 400
         else:
@@ -2801,33 +2742,32 @@ def sync_volunteers():
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
     
 @app.route("/admin/need-coverage")
-def need_coverage():
-    if "user_id" not in session:
-        return redirect("/")
+def need_coverage_page():
+    try:
+        role, deny = require_admin_or_captain()
+        if deny:
+            return deny
 
-    sheet = get_sheet()
-    rows = sheet.get_all_records()
+        volunteers = Volunteer.query\
+            .filter(Volunteer.deleted_at.is_(None))\
+            .order_by(Volunteer.last_name, Volunteer.first_name)\
+            .all()
 
-    non_reserve_emails = set()
+        prefill = {
+            "volunteer_id": request.args.get("volunteer_id", type=int),
+            "start_date": request.args.get("start_date", ""),
+            "end_date": request.args.get("end_date", ""),
+            "notes": request.args.get("notes", "")
+        }
 
-    for row in rows:
-        email = str(row.get("Email", "")).strip().lower()
-        typical_station = str(row.get("Typical Station", "")).strip().lower()
+        return render_template(
+            "need-coverage.html",
+            volunteers=volunteers,
+            prefill=prefill
+        )
 
-        if email and typical_station != "reserve":
-            non_reserve_emails.add(email)
-
-    volunteers = Volunteer.query\
-        .filter(Volunteer.deleted_at.is_(None))\
-        .order_by(Volunteer.last_name, Volunteer.first_name)\
-        .all()
-
-    filtered_volunteers = [
-        v for v in volunteers
-        if (v.email or "").strip().lower() in non_reserve_emails
-    ]
-
-    return render_template("need-coverage.html", volunteers=filtered_volunteers)
+    except Exception as e:
+        return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
 #attempting to write a flask cli command to add admins
 import click
