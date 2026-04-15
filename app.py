@@ -707,7 +707,7 @@ def volunteer_hours_captain():
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
 
-def sync_absences():
+def run_sync_absences():
     sheet = get_sheet("Absence")
     rows = sheet.get_all_records()
 
@@ -805,7 +805,7 @@ def coverage_details():
         return "<pre>No absence record found for this volunteer.</pre>", 404
 
     sync_absences()
-    sheet = get_sheet()
+    run_sync_absences()
     rows = sheet.get_all_records()
 
     row_by_email = {}
