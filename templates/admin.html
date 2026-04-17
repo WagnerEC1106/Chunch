@@ -521,10 +521,14 @@ body {
         </button>
 
         
-        <button onclick="window.location.href='/absence-forms'">
-            <span class="icon">📄</span>
-            <span class="label">Absence Forms</span>
-        </button>
+        <a href="/absence-forms">
+            <button class="dashboard-btn">
+                Absence Forms
+                {% if unassigned_count > 0 %}
+                    <span class="badge">{{ unassigned_count }}</span>
+                {% endif %}
+            </button>
+        </a>
 
         <button onclick="window.location.href='/admin/master-list'">
             <span class="icon">👥</span>
