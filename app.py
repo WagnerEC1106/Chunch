@@ -706,11 +706,11 @@ def admin_page():
             .order_by(Volunteer.last_name)\
             .all()
 
-        from datetime import datetime
-
         unassigned_count = 0
 
         try:
+            from datetime import datetime
+
             rows = get_sheet_records("Absence")
 
             existing_absences = Absence.query.all()
@@ -751,7 +751,6 @@ def admin_page():
 
         except Exception as badge_error:
             print("BADGE ERROR:", badge_error)
-            unassigned_count = 0
 
         return render_template(
             "admin.html",
@@ -761,6 +760,7 @@ def admin_page():
 
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
+
 @app.route("/admin/coverage/details")
 def coverage_details():
     volunteer_id = request.args.get("volunteer_id", type=int)
