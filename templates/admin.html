@@ -1151,7 +1151,7 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("editStation").value = volunteer.station_id || "";
     const floater = volunteer.is_floater;
     const container = document.getElementById('status-container');
-    container.innerHTML = value ? '&#10003;' : '&#88;'; 
+    container.innerHTML = floater ? '&#10003;' : '&#88;'; 
     const absenceCard = document.getElementById("detailAbsenceCard");
     const absenceText = document.getElementById("detailAbsence");
     const absenceMessageCard = document.getElementById("detailAbsenceMessageCard");
