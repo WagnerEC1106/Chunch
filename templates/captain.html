@@ -406,6 +406,14 @@ button.logout-btn:hover { background: rgb(178, 59, 59); }
 </div>
 
 <script>
+
+import {
+    formatCountLabel,
+    getVolunteerDisplayName,
+    isCaptain,
+    isAdmin
+} from "./admin_captain_shared.js";
+
 let currentVolunteer = null;
 const stationClassMap = {
     "Setup Team": "setup",
@@ -430,6 +438,7 @@ const stationClassMap = {
 let currentStationData = {};
 let currentAbsentEditVolunteer = null;
 
+/*
 function formatCountLabel(count) {
     return count === 1 ? "1 volunteer" : `${count} volunteers`;
 }
@@ -453,7 +462,7 @@ function isAdmin(volunteer) {
     if (!volunteer || typeof volunteer === "string") return false;
     return (volunteer.role || "").toString().toLowerCase() === "admin";
 }
-
+*/
 function formatDatePretty(dateStr) {
     if (!dateStr) return "";
     const d = new Date(dateStr);

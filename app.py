@@ -345,24 +345,6 @@ def edit_volunteer():
     volunteer.is_floater = data.get("is_floater")
 
     assignment = Assignment.query.filter_by(volunteer_id=volunteer.id).order_by(Assignment.assignment_id.desc()).first()
-    # commenting out for reverting
-    # assignment = Assignment.query.filter_by(volunteer_id=volunteer.id).all() # returns None if volunteer is not in the system
-    # prev_station = assignment.get(volunteer.station_id) if assignment else None
-    # if assignment is None:
-    #     return jsonify({"error": "Volunteer has no assignment"}), 404 
-    # prev_station = {} # assignment.station_id
-    # # if the stations aren't the same, add the volunteer to the new station and remove them from the old station
-    # if(prev_station != volunteer.station_id):
-    #     # assigned_id.append(data["id"])
-    #     db.session.delete(Assignment(volunteer_id=volunteer.id, station_id=prev_station[assignment.volunteer_id]))
-    #     db.session.add(Assignment(volunteer_id=volunteer.id, station_id=volunteer.station_id))
-    #     assignment.station_id = volunteer.station_id 
-    #     current = prev_station.get(assignment.volunteer_id)
-    #     if current is None or assignment.assignment_id != current.assignment_id:
-    #         prev_station[assignment.volunteer_id] = assignment
-    #         db.session.add(assignment)
-    #         db.session.delete(prev_station)
-    #         db.session.commit()
     
     # The assignment of the new station, list of volunteers for that station
     # check for volunteer in this assignment    
@@ -1517,84 +1499,6 @@ def save_need_coverage():
         db.session.rollback()
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
-#     s = Station.query.filter_by(station_name="Line Servers").first()
-
-#     volunteers = Volunteer.query\
-#         .filter(Volunteer.deleted_at.is_(None))\
-#         .order_by(Volunteer.id)\
-#         .all()
-
-#     v = None
-#     for volunteer in volunteers:
-#         valid_hours = []
-#         for a in volunteer.availability:
-#             if a.deleted_at is not None:
-#                 continue
-#             try:
-#                 hour = int(str(a.hour).strip())
-#             except (ValueError, TypeError):
-#                 continue
-#             if 5 <= hour <= 16:
-#                 valid_hours.append(hour)
-
-#         if valid_hours:
-#             v = volunteer
-#             break
-
-#     if not v or not s:
-#         return "Missing volunteer with hours or station"
-
-#     existing = Assignment.query.filter_by(
-#         volunteer_id=v.id,
-#         station_id=s.station_id,
-#         schedule_id=None
-#     ).first()
-
-#     if existing:
-#         return {
-#             "message": "Assignment already exists",
-#             "volunteer": v.id,
-#             "station": s.station_id
-#         }
-
-#     assignment = Assignment(
-#         volunteer_id=v.id,
-#         station_id=s.station_id,
-#         schedule_id=None
-#     )
-
-#     db.session.add(assignment)
-#     db.session.commit()
-
-#     return {
-#         "message": "Assignment added",
-#         "volunteer": v.id,
-#         "station": s.station_id
-#     }
-
-# Delete assignments based on assignment number
-#@app.route("/debug/delete-assignment/<int:assignment_id>/get")
-#def delete_assignment(assignment_id):
-    #assignment = Assignment.query.get(assignment_id)
-    #if not assignment:
-        #return {"error": f"Assignment {assignment_id} not found"}, 404
-
-    #db.session.delete(assignment)
-    #db.session.commit()
-    #return {"message": f"Assignment {assignment_id} deleted"}
-
-# Delete assignments based on volunteer id
-#@app.route("/debug/delete-assignments-for-volunteer/<int:volunteer_id>", methods=["POST"])
-#def delete_assignments_for_volunteer(volunteer_id):
-#    assignments = Assignment.query.filter_by(volunteer_id=volunteer_id).all()
-#    if not assignments:
-#        return {"message": "No assignments to delete"}, 404
-#
-#    for a in assignments:
-#        db.session.delete(a)
-#
-#    db.session.commit()
-#    return {"message": f"Deleted {len(assignments)} assignments for volunteer {volunteer_id}"}
 
 @app.route("/admin/debug-hourly-final")
 def debug_hourly_final():
@@ -2719,56 +2623,6 @@ def sync_applicants():
     except Exception as e:
         db.session.rollback()
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
-
-# @app.route("/admin/sync-applicants", methods=["GET", "POST"])
-# def sync_applicants():
-#     try:
-#         if "user_id" not in session:
-#             return redirect("/")
-
-#         sheet = get_applicant_sheet()
-#         rows = sheet.get_all_records()
-
-#         for row in rows:
-#             first_name = str(row.get("First Name", "")).strip()
-#             last_name = str(row.get("Last Name", "")).strip()
-#             email = str(row.get("Email", "")).strip().lower()
-#             phone = str(row.get("Phone Number", "")).strip()
-
-#             member = str(row.get("Member", "")).strip()
-#             unavailability = str(row.get("Unavailability", "")).strip()
-#             other_info = str(row.get("Other Info", "")).strip()
-
-#             if not email:
-#                 continue
-
-#             existing = Applicant.query.filter_by(email=email).first()
-
-#             if not existing:
-#                 applicant = Applicant(
-#                     first_name=first_name,
-#                     last_name=last_name,
-#                     email=email,
-#                     phone=phone,
-#                     availability=member,
-#                     unavailability=unavailability,
-#                     status="pending"
-#                 )
-#                 db.session.add(applicant)
-#             else:
-#                 existing.first_name = first_name
-#                 existing.last_name = last_name
-#                 existing.phone = phone
-#                 existing.availability = member
-#                 existing.unavailability = unavailability
-
-#         db.session.commit()
-
-#         return redirect("/admin/inbox")
-
-#     except Exception as e:
-#         db.session.rollback()
-#         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
 
 def get_drive_service():
