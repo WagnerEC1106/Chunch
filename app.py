@@ -1209,11 +1209,11 @@ def assign_reserve_coverage():
         cover_start_hour = request.form.get("cover_start_hour", type=int)
         cover_end_hour = request.form.get("cover_end_hour", type=int)
 
+        # ✅ NEW (IMPORTANT)
+        timestamp = request.form.get("timestamp")
+
         if not absence_id or not absent_volunteer_id or not reserve_volunteer_id:
             return "<pre>Missing required coverage fields.</pre>", 400
-
-        if absent_volunteer_id == reserve_volunteer_id:
-            return "<pre>A volunteer cannot cover their own absence.</pre>", 400
 
         absence = Absence.query.get(absence_id)
         if not absence:
@@ -1243,21 +1243,14 @@ def assign_reserve_coverage():
 
         db.session.commit()
 
-        # ✅ REMOVE FROM GOOGLE SHEET (THIS FIXES THE BADGE)
         try:
             sheet = get_sheet("Absence")
             rows = sheet.get_all_records()
 
-            absent_volunteer = Volunteer.query.get(absent_volunteer_id)
+            for i, row in enumerate(rows, start=2):
+                row_timestamp = str(row.get("Timestamp", "")).strip()
 
-            for i, row in enumerate(rows, start=2):  # start=2 because row 1 is header
-                first = str(row.get("First name", "")).strip().lower()
-                last = str(row.get("Last name", "")).strip().lower()
-
-                if (
-                    first == (absent_volunteer.first_name or "").strip().lower() and
-                    last == (absent_volunteer.last_name or "").strip().lower()
-                ):
+                if row_timestamp == str(timestamp).strip():
                     sheet.delete_rows(i)
                     break
 
