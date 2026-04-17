@@ -120,9 +120,9 @@ class Station(db.Model):
             "Teardown Team",
             "Line Servers",
             "Kitchen",
-            "Drink Station",
+            "Drink",
             "Desserts",
-            "Busboys/sanitation",
+            "Busboys/ sanitation",
             "Dishwashers",
             "Reserve",
             "General Manager",
@@ -130,7 +130,7 @@ class Station(db.Model):
             "Baked Potato Bar",
             "Salad Bar",
             "Absent",
-            "Vegan Station",
+            "Vegan",
             "Other",
             name="station_enum"
         )
@@ -2208,7 +2208,7 @@ def volunteer_hours():
             "Teardown Team",
             "Line Servers",
             "Kitchen",
-            "Drink Station",
+            "Drink",
             "Desserts",
             "Busboys/sanitation",
             "Dishwashers",
@@ -2216,7 +2216,7 @@ def volunteer_hours():
             "Greeters",
             "Baked Potato Bar",
             "Salad Bar",
-            "Vegan Station"
+            "Vegan"
         ]
 
         existing_station_names = {
