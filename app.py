@@ -729,6 +729,7 @@ def coverage_details():
     volunteer_id = request.args.get("volunteer_id", type=int)
     covered_start = request.args.get("covered_start", type=int)
     covered_end = request.args.get("covered_end", type=int)
+    timestamp = request.args.get("timestamp")
 
     if not volunteer_id:
         return {"error": "Missing volunteer_id"}, 400
@@ -932,6 +933,7 @@ def coverage_details():
             fully_available_reserves.append(reserve_info)
         elif shift_length > 0 and (overlap_count / shift_length) < 0.5:
             partial_overlap_reserves.append(reserve_info)
+
     absent_assignment = Assignment.query.filter_by(
         volunteer_id=absent_volunteer.id
     ).first()
@@ -958,7 +960,8 @@ def coverage_details():
             "covered_end": covered_end
         },
         fully_available_reserves=fully_available_reserves,
-        partial_overlap_reserves=partial_overlap_reserves
+        partial_overlap_reserves=partial_overlap_reserves,
+        timestamp=timestamp
     )
 
 @app.route("/debug/restore-reserve/<int:volunteer_id>")
