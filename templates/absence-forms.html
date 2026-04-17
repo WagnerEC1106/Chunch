@@ -196,6 +196,7 @@
                 <thead>
                     <tr>
                         <th>Volunteer</th>
+                        <th>Station</th>
                         <th>Dates</th>
                         <th>Time Request</th>
                         <th>Shift Type</th>
@@ -209,6 +210,7 @@
                         <td>
                             <div class="name-cell">{{ a.first }} {{ a.last }}</div>
                         </td>
+                        <td>{{ a.station or "—" }}</td>
                         <td>
                             <div>{{ a.start_date }}</div>
                             <div class="subtle">
