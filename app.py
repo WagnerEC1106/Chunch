@@ -1363,6 +1363,7 @@ def absence_forms():
         for row in rows:
             first = str(row.get("First name", "")).strip()
             last = str(row.get("Last name", "")).strip()
+            station = str(row.get("Station", "")).strip()
             start_date_raw = str(row.get("Absence start date", "")).strip()
             end_date_raw = str(row.get("Absence end date", "")).strip()
             comments = str(row.get("Additional comments", "")).strip()
@@ -1428,6 +1429,7 @@ def absence_forms():
             parsed.append({
                 "first": first,
                 "last": last,
+                "station": station,
                 "start_date": start_date_raw,
                 "end_date": end_date_raw,
                 "comments": comments,
