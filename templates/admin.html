@@ -224,6 +224,17 @@ body {
 .header button:hover {
     background: #1d4ed8;
 }
+.badge {
+    background: #dc2626;
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 4px 8px;
+    margin-left: 8px;
+    min-width: 20px;
+    text-align: center;
+}
 
 .secondary-btn {
     background: #475569 !important;
@@ -521,10 +532,14 @@ body {
         </button>
 
         
-        <button onclick="window.location.href='/absence-forms'">
-            <span class="icon">📄</span>
-            <span class="label">Absence Forms</span>
-        </button>
+        <a href="/absence-forms">
+            <button class="dashboard-btn">
+                Absence Forms
+                {% if unassigned_count > 0 %}
+                    <span class="badge">{{ unassigned_count }}</span>
+                {% endif %}
+            </button>
+        </a>
 
         <button onclick="window.location.href='/admin/master-list'">
             <span class="icon">👥</span>
@@ -1151,7 +1166,7 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("editStation").value = volunteer.station_id || "";
     const floater = volunteer.is_floater;
     const container = document.getElementById('status-container');
-    container.innerHTML = floater ? '&#10003;' : '&#88;'; 
+    document.getElementById("detailFloater").innerHTML = floater ? '&#10003;' : '&#88;'; 
     const absenceCard = document.getElementById("detailAbsenceCard");
     const absenceText = document.getElementById("detailAbsence");
     const absenceMessageCard = document.getElementById("detailAbsenceMessageCard");
@@ -1504,6 +1519,14 @@ loadStationBoard();
         <!-- working on getting checkbox to display if floater status is true -->
         <div id="status-container">
             <label>Floater Status</label>
+        </div>
+        
+        <div class="status-container">
+            <div class="detail-label">Floater Status</div>
+            <div class="detail-value">
+                <span id="detailFloater">—</span>
+                <input id="editFloater" style="display:none;">
+            </div>
         </div>
         
         <div class="detail-card" id="detailAbsenceCard" style="display:none;">
