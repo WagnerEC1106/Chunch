@@ -1149,7 +1149,9 @@ function openVolunteerPanel(volunteerJson) {
     // added for station
     document.getElementById("detailStation").textContent = volunteer.station || "Unassigned";
     document.getElementById("editStation").value = volunteer.station_id || "";
-
+    const floater = volunteer.is_floater;
+    const container = document.getElementById('status-container');
+    container.innerHTML = value ? '&#10003;' : '&#88;'; 
     const absenceCard = document.getElementById("detailAbsenceCard");
     const absenceText = document.getElementById("detailAbsence");
     const absenceMessageCard = document.getElementById("detailAbsenceMessageCard");
@@ -1187,6 +1189,7 @@ function openVolunteerPanel(volunteerJson) {
         absenceCard.style.display = "none";
         absenceMessageCard.style.display = "none";
     }
+
 
     document.getElementById("detailPanel").classList.add("open");
     document.getElementById("detailOverlay").classList.add("open");
@@ -1498,6 +1501,9 @@ loadStationBoard();
                 <input id="editRestrictions" style="display:none;">
             </div>
         </div>
+        <!-- working on getting checkbox to display if floater status is true -->
+        <div id="status-container"></div>
+        
         <div class="detail-card" id="detailAbsenceCard" style="display:none;">
             <div class="detail-label">Absence</div>
             <div class="detail-value" id="detailAbsence">—</div>
