@@ -1237,19 +1237,7 @@ def assign_reserve_coverage():
         cover_end_hour = request.form.get("cover_end_hour", type=int)
         timestamp = request.form.get("timestamp")
 
-        # ✅ SHOW DEBUG IN BROWSER INSTEAD OF LOGS
-        return f"""
-<pre>
-ASSIGN DEBUG
-
-absence_id: {absence_id}
-absent_volunteer_id: {absent_volunteer_id}
-reserve_volunteer_id: {reserve_volunteer_id}
-</pre>
-"""
-
-        # 🔴 EVERYTHING BELOW TEMPORARILY DISABLED FOR DEBUGGING
-
+        # validation
         if not absence_id or not absent_volunteer_id or not reserve_volunteer_id:
             return "<pre>Missing required coverage fields.</pre>", 400
 
@@ -1264,6 +1252,7 @@ reserve_volunteer_id: {reserve_volunteer_id}
         if not absent_assignment:
             return "<pre>Absent assignment not found.</pre>", 404
 
+        # create coverage assignment
         reserve_assignment = Assignment(
             volunteer_id=reserve_volunteer_id,
             station_id=absent_assignment.station_id,
@@ -1277,10 +1266,13 @@ reserve_volunteer_id: {reserve_volunteer_id}
         )
 
         db.session.add(reserve_assignment)
+
+        # mark original as absent
         absent_assignment.is_absent = True
 
         db.session.commit()
 
+        # optional: remove from Google Sheet
         try:
             sheet = get_sheet("Absence")
             rows = sheet.get_all_records()
@@ -1301,6 +1293,7 @@ reserve_volunteer_id: {reserve_volunteer_id}
         db.session.rollback()
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
+        
 @app.route("/absence-forms")
 def absence_forms():
     run_sync_absences()
