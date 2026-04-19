@@ -1400,7 +1400,6 @@ def absence_forms():
             return datetime.strptime(date_str, "%m/%d/%Y").strftime("%Y-%m-%d")
 
         parsed = []
-        debug_lines = []
 
         for row in rows:
             first = str(row.get("First name", "")).strip()
@@ -1422,53 +1421,20 @@ def absence_forms():
             except Exception:
                 continue
 
+            # always use most recent absence 
             absence = Absence.query.filter_by(
-                volunteer_id=volunteer_id,
-                start_date=start_date_obj,
-                end_date=end_date_obj
-            ).first()
+                volunteer_id=volunteer_id
+            ).order_by(Absence.absence_id.desc()).first()
 
-            # DEBUG OUTPUT
-            debug_lines.append("\n--- ABSENCE DEBUG ---")
-            debug_lines.append(f"Name: {first} {last}")
-            debug_lines.append(f"Dates: {start_date_raw} → {end_date_raw}")
-            debug_lines.append(f"Volunteer ID: {volunteer_id}")
-
+            #skip if covered
             if absence:
-                debug_lines.append(f"Matched Absence ID: {absence.absence_id}")
-            else:
-                debug_lines.append("No matching Absence found")
-                all_absences = Absence.query.filter_by(volunteer_id=volunteer_id).all()
-                for a in all_absences:
-                    debug_lines.append(str({
-                        "id": a.absence_id,
-                        "start": str(a.start_date),
-                        "end": str(a.end_date)
-                    }))
+                has_coverage = Assignment.query.filter_by(
+                    absence_id=absence.absence_id,
+                    is_covering=True
+                ).first()
 
-            coverage = []
-            if absence:
-                coverage = Assignment.query.filter_by(
-                    absence_id=absence.absence_id
-                ).all()
-
-                debug_lines.append(f"Assignments: {len(coverage)}")
-
-                for c in coverage:
-                    debug_lines.append(str({
-                        "assignment_id": c.assignment_id,
-                        "is_covering": c.is_covering,
-                        "absence_id": c.absence_id
-                    }))
-
-            has_coverage = any(c.is_covering for c in coverage)
-            debug_lines.append(f"Has coverage: {has_coverage}")
-
-            if has_coverage:
-                debug_lines.append(">>> SKIPPED <<<")
-                continue
-
-            debug_lines.append("--- END DEBUG ---\n")
+                if has_coverage:
+                    continue
 
             volunteer_row = volunteer_row_by_name.get((first.lower(), last.lower()), {})
             typical_shift = str(volunteer_row.get("Typical Shift", "")).strip()
@@ -1504,9 +1470,13 @@ def absence_forms():
             start_date = to_iso_date(start_date_raw)
             end_date = to_iso_date(end_date_raw)
 
+            # pass correct absence_id forward
+            absence_id_param = absence.absence_id if absence else ""
+
             coverage_url = (
                 f"/admin/need-coverage"
-                f"?first_name={quote_plus(first)}"
+                f"?absence_id={quote_plus(str(absence_id_param))}"
+                f"&first_name={quote_plus(first)}"
                 f"&last_name={quote_plus(last)}"
                 f"&start_date={quote_plus(start_date)}"
                 f"&end_date={quote_plus(end_date)}"
@@ -1536,11 +1506,7 @@ def absence_forms():
                 "coverage_url": coverage_url
             })
 
-        return render_template(
-            "absence-forms.html",
-            absences=parsed,
-            debug="\n".join(debug_lines)
-        )
+        return render_template("absence-forms.html", absences=parsed)
 
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
