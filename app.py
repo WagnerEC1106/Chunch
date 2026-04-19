@@ -1430,7 +1430,7 @@ def absence_forms():
             else:
                 print("No matching Absence found")
 
-                                print("DB absences for this volunteer:")
+                print("DB absences for this volunteer:")
                 all_absences = Absence.query.filter_by(volunteer_id=volunteer_id).all()
                 for a in all_absences:
                     print({
@@ -1463,8 +1463,7 @@ def absence_forms():
 
             print("--- END DEBUG ---\n")
 
-            
-
+        
             #skip if already covered
             if absence:
                 has_coverage = Assignment.query.filter_by(
