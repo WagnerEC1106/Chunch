@@ -416,7 +416,7 @@ button.logout-btn:hover { background: rgb(178, 59, 59); }
 
 
 let currentVolunteer = null;
-/*
+
 const stationClassMap = {
     "Setup Team": "setup",
     "Teardown Team": "teardown",
@@ -435,13 +435,13 @@ const stationClassMap = {
     "Absent": "absent",
     "Other": "other"
 };
-*/
+
 
 // Initialize station data empty
 let currentStationData = {};
 let currentAbsentEditVolunteer = null;
 
-/*
+
 function formatCountLabel(count) {
     return count === 1 ? "1 volunteer" : `${count} volunteers`;
 }
@@ -465,7 +465,7 @@ function isAdmin(volunteer) {
     if (!volunteer || typeof volunteer === "string") return false;
     return (volunteer.role || "").toString().toLowerCase() === "admin";
 }
-*/
+
 
 function formatDatePretty(dateStr) {
     if (!dateStr) return "";
@@ -494,7 +494,7 @@ function formatPhonePretty(phone) {
     return phone;
 }
 
-/*
+
 function renderStationBoard(stationData) {
     currentStationData = stationData || {};
 
@@ -596,7 +596,7 @@ function renderStationBoard(stationData) {
         grid.appendChild(card);
     });
 }
-*/
+
 
 async function loadStationBoard() {
     try {
@@ -647,26 +647,26 @@ async function loadSchedule() {
     }
 }
 
-// function openVolunteerPanel(volunteerJson) {
-//     const volunteer = JSON.parse(volunteerJson);
+function openVolunteerPanel(volunteerJson) {
+    const volunteer = JSON.parse(volunteerJson);
     
-//     document.getElementById("detailName").style.display = "inline";
-//     document.getElementById("detailEmail").style.display = "block";
-//     document.getElementById("detailPhone").style.display = "block";
+    document.getElementById("detailName").style.display = "inline";
+    document.getElementById("detailEmail").style.display = "block";
+    document.getElementById("detailPhone").style.display = "block";
 
-//     currentVolunteer = volunteer;
+    currentVolunteer = volunteer;
 
-//     document.getElementById("detailName").textContent = volunteer.name || "Volunteer";
-//     document.getElementById("detailEmail").textContent = volunteer.email || "None listed";
-//     document.getElementById("detailPhone").textContent = formatPhonePretty(volunteer.phone) || "None listed";
-//     document.getElementById("detailCaptain").textContent = volunteer.captain_status || "Volunteer";
-//     document.getElementById("detailShift").textContent = volunteer.typical_shift || "None listed";
-//     document.getElementById("detailUnavailability").textContent = volunteer.unavailability || "None listed";
-//     document.getElementById("detailRestrictions").textContent = volunteer.capability_restrictions || "None listed";
+    document.getElementById("detailName").textContent = volunteer.name || "Volunteer";
+    document.getElementById("detailEmail").textContent = volunteer.email || "None listed";
+    document.getElementById("detailPhone").textContent = formatPhonePretty(volunteer.phone) || "None listed";
+    document.getElementById("detailCaptain").textContent = volunteer.captain_status || "Volunteer";
+    document.getElementById("detailShift").textContent = volunteer.typical_shift || "None listed";
+    document.getElementById("detailUnavailability").textContent = volunteer.unavailability || "None listed";
+    document.getElementById("detailRestrictions").textContent = volunteer.capability_restrictions || "None listed";
 
-//     document.getElementById("detailPanel").classList.add("open");
-//     document.getElementById("detailOverlay").classList.add("open");
-// }
+    document.getElementById("detailPanel").classList.add("open");
+    document.getElementById("detailOverlay").classList.add("open");
+}
 
 function closeVolunteerPanel() {
     document.getElementById("detailPanel").classList.remove("open");
