@@ -609,10 +609,8 @@ async function loadStationBoard() {
             throw new Error(stationData.error || "Failed to load station board response.");
         }
 
-        //renderStationBoard(stationData);
-        renderStationBoard({
-            stationData
-        });
+        renderStationBoard(stationData);
+        
     } catch (error) {
         document.getElementById("scheduleGrid").innerHTML = `
         <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
