@@ -2015,7 +2015,7 @@ def undo_rejection(applicants_id):
 def master_list():
     volunteers = Volunteer.query\
         .filter(Volunteer.deleted_at.is_(None))\
-        .order_by(Volunteer.last_name)\
+        .order_by(Volunteer.last_name, Volunteer.first_name)\
         .all()
     
     accounts = UserAccount.query.all()
