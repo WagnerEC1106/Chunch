@@ -1134,14 +1134,28 @@ function openVolunteerPanel(volunteerJson) {
         isSelectionLocked = false;
     }
 
+    // Why does this only have some of the fields? What is the purpose of the elements listed below?
     const volunteer = JSON.parse(volunteerJson);
     document.getElementById("editName").style.display = "none";
     document.getElementById("editEmail").style.display = "none";
     document.getElementById("editPhone").style.display = "none";
+
+    // Maybe unnecessary
+    document.getElementById("editRole").style.display = "none";
+    document.getElementById("editStation").style.display = "none";
+    document.getElementById("editFloater").style.display = "none";
     
     document.getElementById("detailName").style.display = "inline";
     document.getElementById("detailEmail").style.display = "block";
     document.getElementById("detailPhone").style.display = "block";
+    
+    // Maybe unnecessary
+    document.getElementById("detailRole").style.display = "block";
+    document.getElementById("detailStation").style.display = "block";
+    document.getElementById("detailFloater").style.display = "block";
+    document.getElementById("detailShift").style.display = "block";
+    document.getElementById("detailUnavailability").style.display = "block";
+    document.getElementById("detailRestrictions").style.display = "block";
 
     document.getElementById("editBtn").style.display = "inline-block";
     document.getElementById("saveBtn").style.display = "none";
@@ -1153,7 +1167,6 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("detailEmail").textContent = volunteer.email || "None listed";
     document.getElementById("detailPhone").textContent = formatPhonePretty(volunteer.phone) || "None listed";
     document.getElementById("detailRole").textContent = formatRolePretty(volunteer.role);
-    const roleSelect = document.getElementById("editRole");
     
     document.getElementById("detailShift").textContent = volunteer.display_time || volunteer.typical_shift || "None listed";
     document.getElementById("detailUnavailability").textContent = volunteer.unavailability || "None listed";
@@ -1161,10 +1174,10 @@ function openVolunteerPanel(volunteerJson) {
 
     // added for station
     document.getElementById("detailStation").textContent = volunteer.station || "Unassigned";
-    document.getElementById("editStation").value = volunteer.station_id || "";
-    const floater = volunteer.is_floater;
+    // document.getElementById("editStation").value = volunteer.station_id || "";
+    // const floater = volunteer.is_floater;
     const container = document.getElementById('status-container');
-    document.getElementById("detailFloater").innerHTML = floater ? '&#10003;' : '&#88;'; 
+    // document.getElementById("detailFloater").innerHTML = floater ? '&#10003;' : '&#88;'; x
     const absenceCard = document.getElementById("detailAbsenceCard");
     const absenceText = document.getElementById("detailAbsence");
     const absenceMessageCard = document.getElementById("detailAbsenceMessageCard");
@@ -1263,6 +1276,7 @@ function editVolunteer() {
     document.getElementById("detailUnavailability").style.display = "none";
     document.getElementById("detailRestrictions").style.display = "none";
     document.getElementById("detailStation").style.display = "none";
+    document.getElementById("detailFloater").style.display = "block";
 
     const nameInput = document.getElementById("editName");
     const emailInput = document.getElementById("editEmail");
@@ -1271,6 +1285,7 @@ function editVolunteer() {
     const unavailabilityInput = document.getElementById("editUnavailability");
     const restrictionsInput = document.getElementById("editRestrictions");
     const captainInput = document.getElementById("editRole");
+    const floaterCheck = document.getElementById("editFloater");
 
     // added for station
     const stationSelect = document.getElementById("editStation");
@@ -1283,6 +1298,7 @@ function editVolunteer() {
     restrictionsInput.style.display = "block";
     captainInput.style.display = "block";
     stationSelect.style.display = "block";
+    floaterCheck.style.display = "block";
     
     nameInput.value = currentVolunteer.name || "";
     emailInput.value = currentVolunteer.email || "";
@@ -1293,6 +1309,7 @@ function editVolunteer() {
     captainInput.value = currentVolunteer.role || "";
     
     stationSelect.innerHTML = "";
+    floaterCheck.innerHTML = "";
 
     const stations = [
         // { id: 14, name: "Absent" },
@@ -1325,6 +1342,16 @@ function editVolunteer() {
         stationSelect.appendChild(option);
     });
     stationSelect.value = currentVolunteer.station_id || "";
+
+    // Floater checkbox settings
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.name = "is_floater";
+    checkbox.id = "floater";
+    checkbox.checked = currentVolunteer.is_floater;
+    
+    floaterCheck.append(checkbox);
+    
     document.getElementById("editBtn").style.display = "none";
     document.getElementById("saveBtn").style.display = "inline-block";
     
@@ -1348,7 +1375,8 @@ function saveVolunteer() {
         capability_restrictions: document.getElementById("editRestrictions").value,
         role: document.getElementById("editRole").value,
         // added for station
-        station_id: document.getElementById("editStation").value
+        station_id: document.getElementById("editStation").value,
+        is_floater: document.getElementById("editFloater").value
     };
 
     fetch("/admin/edit-volunteer", {
