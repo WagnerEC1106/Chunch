@@ -1420,7 +1420,7 @@ def absence_forms():
                 end_date=end_date_obj
             ).first()
             
-                        print("\n--- ABSENCE DEBUG ---")
+            print("\n--- ABSENCE DEBUG ---")
             print("Name:", first, last)
             print("Raw dates:", start_date_raw, end_date_raw)
             print("Volunteer ID:", volunteer_id)
@@ -1429,6 +1429,15 @@ def absence_forms():
                 print("Matched Absence ID:", absence.absence_id)
             else:
                 print("No matching Absence found")
+
+                                print("DB absences for this volunteer:")
+                all_absences = Absence.query.filter_by(volunteer_id=volunteer_id).all()
+                for a in all_absences:
+                    print({
+                        "id": a.absence_id,
+                        "start": a.start_date,
+                        "end": a.end_date
+                    })
 
             coverage = None
             if absence:
