@@ -2051,6 +2051,7 @@ def add_volunteer():
     last_name = request.form.get("last_name", "").strip()
     email = request.form.get("email", "").strip().lower()
     phone = request.form.get("phone", "").strip()
+    station_id = request.form.get("station_id", "")
     # default is false if get has no return, if true then becomes true
     is_floater = (request.form.get("is_floater", "no") == "yes") 
 
@@ -2064,6 +2065,7 @@ def add_volunteer():
         last_name=last_name,
         email=email,
         phone=phone,
+        station_id = station_id
         is_floater=is_floater
     )
 
