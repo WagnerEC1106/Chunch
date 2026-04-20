@@ -83,7 +83,7 @@ class Applicant(db.Model, SoftDeleteMixin):
     phone = Column(String(50))
     status = Column(
         Enum(
-            "accepted",
+            "accepted
             "rejected",
             "pending",
             name="status_enum"
@@ -2175,19 +2175,33 @@ def add_volunteer():
     if existing:
         flash("Volunteer with that email already exists.")
         return redirect("/admin/master-list")
+        
+    if end_hour <= start_hour:
+        return "Invalid time range", 400
+    
+    def format_hour(hour):
+        if hour == 0:
+            return "12AM"
+        elif hour < 12:
+            return f"{hour}AM"
+        elif hour == 12:
+            return "12PM"
+        else:
+            return f"{hour - 12}PM"
 
+    typical_shift = f"{format_hour(start_hour)} - {format_hour(end_hour)}"
+    
     new_volunteer = Volunteer(
         first_name=first_name,
         last_name=last_name,
         email=email,
         phone=phone,
         station_id = station_id,
-        is_floater=is_floater
+        is_floater=is_floater,
+        typical_shift=typical_shift
     )
     db.session.add(new_volunteer)
     db.session.flush()
-    if end_hour <= start_hour:
-        return "Invalid time range", 400
         
     for hour in range(start_hour, end_hour+1):
         availability = Availability(
