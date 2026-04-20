@@ -183,23 +183,6 @@ tr:hover {
     </form>
 </div>
 
-<div id="editForm">
-    <form method="POST" action="/admin/master-list/edit-volunteer">
-        <input type="text" name="first_name" id="editFirstName">
-        <input type="text" name="last_name" id="editLastName">
-        <input type="email" name="email" id="editEmail">
-        <input type="tel" name="phone" id="editPhone">
-        <select name="editRole" id="editRole" style="display:none;">
-            <option value="">Select Role</option>
-            <option value="volunteer">Volunteer</option>
-            <option value="captain">Captain</option>
-            <option value="admin">Admin</option>
-            <option value="tech">Tech</option>
-        </select>
-        <input type="checkbox" name="is_floater" id="editFloater" style="display:none;">
-        <button class="primary" type="button" id="saveBtn" onclick="saveVolunteer()" style="display:none;">Save</button>
-</div>
-
 <table>
     <thead>
         <tr>
