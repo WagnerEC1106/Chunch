@@ -1200,7 +1200,7 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("detailStation").textContent = volunteer.station || "Unassigned";
     // document.getElementById("detailFloater").value = volunteer.is_floater.value;
     document.getElementById("detailFloater").ariaReadOnly = true;
-    
+
     const container = document.getElementById('status-container');
     // document.getElementById("detailFloater").innerHTML = floater ? '&#10003;' : '&#88;'; x
     const absenceCard = document.getElementById("detailAbsenceCard");
@@ -1590,7 +1590,7 @@ loadStationBoard();
         <div class="status-container">
             <div class="detail-label">Floater Status</div>
             <div class="detail-value">
-                <span id="detailFloater">—</span>
+                <input type="checkbox" id="detailFloater" readonly>
                 <input id="editFloater" style="display:none;">
             </div>
         </div>
