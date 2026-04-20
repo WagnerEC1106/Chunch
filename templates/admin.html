@@ -6,10 +6,7 @@
 <title>Administrator Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://apis.google.com/js/platform.js" async defer></script>
-    <!-- onload="this.onload=function(){};handleClientLoad()" 
-    onreadystatechange="if (this.readyState === 'complete') this.onload()"
-    async defer
-></script> -->
+
 <meta name="google-signin-client_id" content="483439290581-t6qm63e9rcuvm62l6j3cghvj71eo5h1k.apps.googleusercontent.com">
 
 <style>
@@ -618,8 +615,8 @@ const stationClassMap = {
     "Baked Potato Bar": "potato",
     "Salad Bar": "salad",
     "Vegan": "vegan",
-    "Absent": "absent"//,
-    // "Other": "other"
+    "Absent": "absent",
+    "Other": "other"
 };
 
 let currentStationData = {};
@@ -1358,7 +1355,7 @@ function editVolunteer() {
         { id: 13, name: "Salad Bar" },
         { id: 1, name: "Setup Team" },
         { id: 2, name: "Teardown Team" },
-        { id: 16, name: "Vegan" }
+        { id: 15, name: "Vegan" }
     ];
 
     stations.forEach(station => {
@@ -1587,7 +1584,7 @@ loadStationBoard();
             </div>
         </div>
         <!-- working on getting checkbox to display if floater status is true -->
-        <div class="status-container">
+        <div class="detail-card">
             <div class="detail-label">Floater Status</div>
             <div class="detail-value">
                 <input type="checkbox" id="detailFloater" readonly>
