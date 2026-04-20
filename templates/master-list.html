@@ -172,19 +172,58 @@ tr:hover {
 </div>
 
 <div id="editForm">
-    <form method="POST" action="/admin/master-list/edit-volunteer">
-        <input type="text" name="name" id="editName" placeholder="Full Name" required style="display:none;">
-        <input type="email" name="email" id="editEmail" placeholder="Email" required style="display:none;">
-        <input type="tel" name="phone" id="editPhone" placeholder="Phone Number" required style="display:none;">
-        <select name="role" id="editRole" style="display:none;">
-            <option value="">Select Role</option>
-            <option value="volunteer">Volunteer</option>
-            <option value="captain">Captain</option>
-            <option value="admin">Admin</option>
-            <option value="tech">Tech</option>
+    <form method="POST" action="/admin/master-list/edit-volunteer/{{ volunteer.id }}">
+        <input type="text" name="first_name" placeholder="First Name"
+               value="{{ volunteer.first_name }}" required>
+
+        <input type="text" name="last_name" placeholder="Last Name"
+               value="{{ volunteer.last_name }}" required>
+
+        <input type="email" name="email" placeholder="Email"
+               value="{{ volunteer.email }}" required>
+
+        <input type="tel" name="phone" placeholder="Phone Number"
+               value="{{ volunteer.phone or '' }}">
+
+        <select name="station_id" id="editStation" required>
+            <option value="1" {% if volunteer.station_id == 1 %}selected{% endif %}>Setup Team</option>
+            <option value="2" {% if volunteer.station_id == 2 %}selected{% endif %}>Teardown Team</option>
+            <option value="3" {% if volunteer.station_id == 3 %}selected{% endif %}>Line Servers</option>
+            <option value="4" {% if volunteer.station_id == 4 %}selected{% endif %}>Kitchen</option>
+            <option value="5" {% if volunteer.station_id == 5 %}selected{% endif %}>Drinks</option>
+            <option value="6" {% if volunteer.station_id == 6 %}selected{% endif %}>Desserts</option>
+            <option value="7" {% if volunteer.station_id == 7 %}selected{% endif %}>Busboys/ sanitation</option>
+            <option value="8" {% if volunteer.station_id == 8 %}selected{% endif %}>Dishwashers</option>
+            <option value="9" {% if volunteer.station_id == 9 %}selected{% endif %}>Reserve</option>
+            <option value="10" {% if volunteer.station_id == 10 %}selected{% endif %}>General Manager</option>
+            <option value="11" {% if volunteer.station_id == 11 %}selected{% endif %}>Greeters</option>
+            <option value="12" {% if volunteer.station_id == 12 %}selected{% endif %}>Baked Potato Bar</option>
+            <option value="13" {% if volunteer.station_id == 13 %}selected{% endif %}>Salad Bar</option>
+            <option value="14" {% if volunteer.station_id == 14 %}selected{% endif %}>Absent</option>
+            <option value="15" {% if volunteer.station_id == 15 %}selected{% endif %}>Other</option>
+            <option value="16" {% if volunteer.station_id == 16 %}selected{% endif %}>Vegan</option>
         </select>
-        <input type="checkbox" name="is_floater" id="editFloater" style="display:none;">
-        <button class="primary" type="button" id="saveBtn" onclick="saveVolunteer()" style="display:none;">Save</button>
+        
+        <input type="text" name="unavailability" placeholder="Unavailability"
+       value="{{ volunteer.unavailability or '' }}">
+
+        <input type="text" name="capability_restrictions" placeholder="Capability Restrictions"
+       value="{{ volunteer.capability_restrictions or '' }}">
+        
+        <label for="start_hour">Start Hour:</label>
+        <input type="number" name="start_hour" id="start_hour" min="5" max="16"
+            value="{{ start_hour or '' }}" required>
+        
+        <label for="end_hour">End Hour:</label>
+        <input type="number" name="end_hour" id="end_hour" min="5" max="16"
+           value="{{ end_hour or '' }}" required>
+
+        <label for="floater">Floater:</label>
+        <input type="checkbox" name="is_floater" id="floater"
+               {% if volunteer.is_floater %}checked{% endif %}>
+
+        <button class="primary" type="submit">Save Changes</button>
+    </form>
 </div>
 
 <table>
