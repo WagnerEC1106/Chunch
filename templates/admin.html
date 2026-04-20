@@ -617,9 +617,9 @@ const stationClassMap = {
     "Greeters": "greeters",
     "Baked Potato Bar": "potato",
     "Salad Bar": "salad",
-    "Vegan": "vegan",
-    "Absent": "absent",
-    "Other": "other"
+    "Vegan": "vegan"//,
+    // "Absent": "absent",
+    // "Other": "other"
 };
 
 let currentStationData = {};
@@ -991,11 +991,12 @@ function renderStationBoard(stationData) {
             const roleA = (a.role || "").toLowerCase();
             const roleB = (b.role || "").toLowerCase();
 
-            // Priority: admin (0), captain (1), others (2)
+            // Priority: admin (0), captain (1), tech (3)
             const getPriority = (role) => {
                 if (role === "admin") return 0;
                 if (role === "captain") return 1;
-                return 2;
+                if (role === "tech") return 2;
+                return 3;
             };
 
             const priorityA = getPriority(roleA);
@@ -1523,7 +1524,7 @@ loadStationBoard();
                 <option value="captain">Captain</option>
                 <option value="volunteer">Volunteer</option>
                 <!-- Might want to comment out because tech shouldn't be changed by admin -->
-                <option value="tech">Tech</option>
+                <!-- <option value="tech">Tech</option> -->
             </select>
         </div>
 
@@ -1589,16 +1590,11 @@ loadStationBoard();
                 <option value="11">Greeters</option>
                 <option value="12">Baked Potato Bar</option>
                 <option value="13">Salad Bar</option>
-                <option value="14">Absent</option>
-                <option value="15">Other</option>
+                <!-- <option value="14">Absent</option> -->
+                <!-- <option value="15">Other</option> -->
                 <option value="16">Vegan</option>
                 
             </select>
-
-            <!-- <div id="floater" style="position:absolute; right:20px; top:20px; font-size:12px; color:#718096;">
-                <input type="checkbox" id="lockSelectionCheckbox" onchange="isSelectionLocked = this.checked;">
-                <label for="lockSelectionCheckbox">Floater</label>
-            </div> -->
         </div>
     </div>
 </div>
