@@ -244,12 +244,20 @@ tr:hover {
                         <input type="email" name="email" value="{{ v.email }}">
 
                         <input type="tel" name="phone" placeholder="Phone Number" value="{{ v.phone }}"> 
-                        <br>
+                        <!-- <br> -->
+                        <select name="editRole" id="editRole">
+                            <option value="">Select Role</option>
+                            <option value="volunteer">Volunteer</option>
+                            <option value="captain">Captain</option>
+                            <option value="admin">Admin</option>
+                            <option value="tech">Tech</option>
+                        </select>
+                        
                         <input type="text" name="unavailability" placeholder="Unavailability" value="{{ v.unavailability }}">
 
                         <input type="text" name="capability_restrictions" placeholder="Capability Restrictions"
                             value="{{ v.capability_restrictions }}">
-                        <br>
+                        <!-- <br> -->
                         <select name="station_id">
                             <option value="">Select Station</option>
                             <option value="1" {% if v.station_id == 1 %}selected{% endif %}>Setup Team</option>
