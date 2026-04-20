@@ -1267,12 +1267,16 @@ def assign_reserve_coverage():
 
         db.session.add(reserve_assignment)
 
-        # mark original as absent
-        absent_assignment.is_absent = True
+        # only mark absent if absence has started
+        from datetime import date
+        today = date.today()
+
+        if absence.start_date <= today:
+            absent_assignment.is_absent = True
 
         db.session.commit()
 
-        # optional: remove from Google Sheet
+        # remove from Google Sheet
         try:
             sheet = get_sheet("Absence")
             rows = sheet.get_all_records()
