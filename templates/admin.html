@@ -1195,7 +1195,7 @@ function openVolunteerPanel(volunteerJson) {
     // TODO: Change to be the current station, not volunteer's station
     // TODO: Change sections involving volunteer.station to work with this
     document.getElementById("detailStation").textContent = volunteer.station || "Unassigned";
-    document.getElementById("detailFloater").checked = volunteer.is_floater.value;
+    document.getElementById("detailFloater").checked = volunteer.is_floater;
     
     // document.getElementById("detailFloater").checked = !!volunteer.is_floater;
     document.getElementById("detailFloater").disabled = true;
@@ -1355,7 +1355,7 @@ function editVolunteer() {
         { id: 13, name: "Salad Bar" },
         { id: 1, name: "Setup Team" },
         { id: 2, name: "Teardown Team" },
-        { id: 15, name: "Vegan" }
+        { id: 16, name: "Vegan" }
     ];
 
     stations.forEach(station => {
@@ -1375,7 +1375,7 @@ function editVolunteer() {
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.name = "is_floater";
-    checkbox.id = "detailFloater";
+    checkbox.id = "floater";
     checkbox.checked = currentVolunteer.is_floater.value;
     
     floaterCheck.append(checkbox);
