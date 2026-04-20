@@ -425,15 +425,15 @@ def volunteer_hours_captain():
             "Teardown Team",
             "Line Servers",
             "Kitchen",
-            "Drink",
+            "Drink Station",
             "Desserts",
-            "Busboys/ sanitation",
+            "Busboys/sanitation",
             "Dishwashers",
             "General Manager",
             "Greeters",
             "Baked Potato Bar",
             "Salad Bar",
-            "Vegan"
+            "Vegan Station"
         ]
 
         existing_station_names = {
@@ -610,7 +610,7 @@ def volunteer_hours_captain():
         #         assignment.station_id, set()
         #     ).add(volunteer_id)
 
-        station_to_volunteer_ids = build_station_state(volunteers, stations)
+        station_to_volunteer_ids, debug = build_station_state(volunteers, stations)
 
         station_data = {}
         for station in stations:
@@ -629,7 +629,8 @@ def volunteer_hours_captain():
 
         return render_template(
             "volunteer-hours-cap.html",
-            station_data=station_data
+            station_data=station_data,
+            debug=debug
         )
 
     except Exception as e:
@@ -640,6 +641,8 @@ from datetime import date
 
 def build_station_state(volunteers, stations):
     today = date.today()
+
+    debug_lines = []
 
     station_to_volunteer_ids = {
         station.station_id: set()
@@ -665,24 +668,34 @@ def build_station_state(volunteers, stations):
 
     for volunteer_id, assignment in latest_assignment_by_volunteer.items():
 
+        debug_lines.append(f"\n--- VOLUNTEER {volunteer_id} ---")
+        debug_lines.append(f"TODAY: {today}")
+        debug_lines.append(f"is_covering: {assignment.is_covering}")
+        debug_lines.append(f"assignment.station_id: {assignment.station_id}")
+        debug_lines.append(f"absence_id: {assignment.absence_id}")
+
         # coverage
         if assignment.is_covering and assignment.absence_id:
             absence = Absence.query.get(assignment.absence_id)
 
             if absence:
+                debug_lines.append(f"absence.start: {absence.start_date}")
+                debug_lines.append(f"absence.end: {absence.end_date}")
+                debug_lines.append(f"today < start: {today < absence.start_date}")
+
                 if today < absence.start_date:
-                    # before absence reserve stays reserve
+                    debug_lines.append("→ FORCE RESERVE (before start)")
                     if reserve_id:
                         station_to_volunteer_ids[reserve_id].add(volunteer_id)
                     continue
 
                 if today > absence.end_date:
-                    # after absence go back to reserve
+                    debug_lines.append("→ AFTER absence → reserve")
                     if reserve_id:
                         station_to_volunteer_ids[reserve_id].add(volunteer_id)
                     continue
 
-                # during absence take over station
+                debug_lines.append("→ DURING absence → takes station")
                 if assignment.station_id:
                     station_to_volunteer_ids[assignment.station_id].add(volunteer_id)
                 continue
@@ -694,16 +707,21 @@ def build_station_state(volunteers, stations):
             Absence.end_date >= today
         ).first()
 
+        debug_lines.append(f"active_absence: {bool(active_absence)}")
+
         if active_absence:
+            debug_lines.append("→ MARKED ABSENT")
             if absent_id:
                 station_to_volunteer_ids[absent_id].add(volunteer_id)
             continue
 
         # normal
+        debug_lines.append("→ NORMAL STATION")
+
         if assignment.station_id:
             station_to_volunteer_ids[assignment.station_id].add(volunteer_id)
 
-    return station_to_volunteer_ids
+    return station_to_volunteer_ids, "\n".join(debug_lines)
 
 def run_sync_absences():
     sheet = get_sheet("Absence")
@@ -1308,7 +1326,6 @@ def assign_reserve_coverage():
         cover_end_hour = request.form.get("cover_end_hour", type=int)
         timestamp = request.form.get("timestamp")
 
-        # validation
         if not absence_id or not absent_volunteer_id or not reserve_volunteer_id:
             return "<pre>Missing required coverage fields.</pre>", 400
 
@@ -1323,10 +1340,19 @@ def assign_reserve_coverage():
         if not absent_assignment:
             return "<pre>Absent assignment not found.</pre>", 404
 
-        # create coverage assignment
+        from datetime import date
+        today = date.today()
+
+        # dont assign reserve to station early
+        if absence.start_date <= today:
+            reserve_station_id = absent_assignment.station_id
+        else:
+            reserve_station = Station.query.filter_by(station_name="Reserve").first()
+            reserve_station_id = reserve_station.station_id if reserve_station else None
+
         reserve_assignment = Assignment(
             volunteer_id=reserve_volunteer_id,
-            station_id=absent_assignment.station_id,
+            station_id=reserve_station_id,
             schedule_id=None,
             is_absent=False,
             is_covering=True,
@@ -1339,26 +1365,20 @@ def assign_reserve_coverage():
         db.session.add(reserve_assignment)
 
         # only mark absent if absence has started
-        from datetime import date
-        today = date.today()
-
         if absence.start_date <= today:
             absent_assignment.is_absent = True
 
         db.session.commit()
 
-        # remove from Google Sheet
+        # remove from sheet
         try:
             sheet = get_sheet("Absence")
             rows = sheet.get_all_records()
 
             for i, row in enumerate(rows, start=2):
-                row_timestamp = str(row.get("Timestamp", "")).strip()
-
-                if row_timestamp == str(timestamp).strip():
+                if str(row.get("Timestamp", "")).strip() == str(timestamp).strip():
                     sheet.delete_rows(i)
                     break
-
         except Exception:
             pass
 
@@ -2374,7 +2394,7 @@ def volunteer_hours():
             "Kitchen",
             "Drink",
             "Desserts",
-            "Busboys/ sanitation",
+            "Busboys/sanitation",
             "Dishwashers",
             "General Manager",
             "Greeters",
@@ -2557,7 +2577,7 @@ def volunteer_hours():
         #         assignment.station_id, set()
         #     ).add(volunteer_id)
 
-        station_to_volunteer_ids = build_station_state(volunteers, stations)
+        station_to_volunteer_ids, debug = build_station_state(volunteers, stations)
 
         station_data = {}
         for station in stations:
@@ -2574,11 +2594,11 @@ def volunteer_hours():
 
             station_data[station_name] = volunteers_for_station
 
-        return render_template(
-            "volunteer-hours.html",
-            station_data=station_data
-        )
-
+            return render_template(
+                "volunteer-hours.html",
+                station_data=station_data,
+                debug=debug
+            )
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
