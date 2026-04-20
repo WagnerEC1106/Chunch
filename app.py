@@ -2158,11 +2158,38 @@ def master_list():
         for account in accounts
         if account.volunteer_id is not None
     }
+    def parse_shift(shift_str):
+        if not shift_str:
+            return None, None
 
+        try:
+            start_str, end_str = shift_str.split(" - ")
+
+            def parse_hour(h):
+                h = h.strip().upper()
+
+                if h.endswith("AM"):
+                    hour = int(h[:-2])
+                    return 0 if hour == 12 else hour
+
+                if h.endswith("PM"):
+                    hour = int(h[:-2])
+                    return 12 if hour == 12 else hour + 12
+
+                return None
+
+            start_hour = parse_hour(start_str)
+            end_hour = parse_hour(end_str)
+            return start_hour, end_hour
+
+        except Exception:
+            return None, None
     volunteer_rows = []
     for v in volunteers:
         #role = role_by_volunteer_id.get(v.id, "volunteer")
         user = UserAccount.query.filter(UserAccount.volunteer_id == v.id).first() 
+        start_hour, end_hour = parse_shift(v.typical_shift)
+
         volunteer_rows.append({
             "id": v.id,
             "first_name": v.first_name,
@@ -2170,7 +2197,12 @@ def master_list():
             "email": v.email,
             "phone": v.phone,
             "role": user.role.capitalize() if user is not None else "Volunteer",
-            "is_floater": v.is_floater
+            "station_id": v.station_id,
+            "unavailability": v.unavailability,
+            "capability_restrictions": v.capability_restrictions,
+            "is_floater": v.is_floater,
+            "start_hour": start_hour,
+            "end_hour": end_hour
         })
 
     return render_template("master-list.html", volunteers=volunteer_rows)
