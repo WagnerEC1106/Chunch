@@ -1197,9 +1197,7 @@ function openVolunteerPanel(volunteerJson) {
     // TODO: Change sections involving volunteer.station to work with this
     document.getElementById("detailStation").textContent = volunteer.station || "Unassigned";
     document.getElementById("detailFloater").checked = volunteer.is_floater;
-    
-    // document.getElementById("detailFloater").checked = !!volunteer.is_floater;
-    document.getElementById("detailFloater").disabled = true;
+    document.getElementById("detailFloater").disabled = true; // Shouldn't be editable
 
     const absenceCard = document.getElementById("detailAbsenceCard");
     const absenceText = document.getElementById("detailAbsence");
