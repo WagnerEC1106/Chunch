@@ -51,7 +51,6 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 # creating a volunteer class
-#class Volunteer(db.Model, SoftDeleteMixin):
 class Volunteer(db.Model, SoftDeleteMixin):
 
     __tablename__ = "volunteers"
@@ -434,7 +433,7 @@ def volunteer_hours_captain():
             "Greeters",
             "Baked Potato Bar",
             "Salad Bar",
-            "Vegan Station"
+            "Vegan"
         ]
 
         existing_station_names = {
