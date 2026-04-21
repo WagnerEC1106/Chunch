@@ -241,6 +241,38 @@ def require_admin_or_captain():
     if role not in {"admin", "captain", "tech"}:
         return None, redirect("/")
     return role, None
+    
+@app.route("/admin/fill-assignments", methods=["POST"])
+def backfill_assignments():
+    if "user_id" not in session:
+        return redirect("/")
+
+    volunteers = Volunteer.query.filter(Volunteer.deleted_at.is_(None)).all()
+
+    existing_assignment_volunteer_ids = {
+        a.volunteer_id
+        for a in Assignment.query.all()
+        if a.volunteer_id is not None
+    }
+
+    created_count = 0
+
+    for v in volunteers:
+        if v.id in existing_assignment_volunteer_ids:
+            continue
+
+        if v.station_id is None:
+            continue
+
+        assignment = Assignment(
+            volunteer_id=v.id,
+            station_id=v.station_id
+        )
+        db.session.add(assignment)
+        created_count += 1
+
+    db.session.commit()
+    return f"Created {created_count} missing assignments."
 
 # PUBLIC FACING PAGES
 @app.route("/")
