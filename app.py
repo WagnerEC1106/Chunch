@@ -574,6 +574,8 @@ def absence_forms():
 def static_files(path):
     return send_from_directory(".", path)
 
+
+# API
 @app.route("/api/google-login", methods=["POST"])
 def google_login():
     GOOGLE_CLIENT_ID = os.environ["GOOGLE_CLIENT_ID"]
@@ -626,6 +628,8 @@ def me():
         "role": session["role"]
     })
 
+
+# ADMIN
 @app.route("/admin/sync-absences")
 def sync_absences():
     try:
@@ -715,7 +719,7 @@ def captain_page():
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
-# Sign out of admin/captain
+# Sign out of admin/captain: NOT USED
 @app.route("/api/google-logout", methods=["POST"])
 def google_logout():
     if "user_id" in session:
