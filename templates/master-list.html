@@ -162,18 +162,18 @@ tr:hover {
             <option value="4">Tech</option>
         </select>
 
-        <label>Start Hour:</label>
+        <!-- <label>Start Hour:</label>
         <select name="start_hour" required>
             {% for h in range(0, 24) %}
                 <option value="{{ h }}">{{ h }}:00</option>
             {% endfor %}
-        </select>
-        <label>End Hour:</label>
+        </select> -->
+        <!-- <label>End Hour:</label>
         <select name="end_hour" required>
             {% for h in range(1, 25) %}
                 <option value="{{ h }}">{{ h }}:00</option>
             {% endfor %}
-        </select>
+        </select> -->
         
         <!-- Floater input -->
         <label for="floater">Floater: </label>
@@ -245,7 +245,7 @@ tr:hover {
 
                         <input type="tel" name="phone" placeholder="Phone Number" value="{{ v.phone or '' }}"> 
                         <!-- <br> -->
-                        <select name="editRole" id="editRole">
+                        <select name="role" id="editRole">
                             <option value="">Select Role</option>
                             <option value="volunteer" {% if v.role == "volunteer" %}selected{% endif %}>Volunteer</option>
                             <option value="captain" {% if v.role == "captain" %}selected{% endif %}>Captain</option>
