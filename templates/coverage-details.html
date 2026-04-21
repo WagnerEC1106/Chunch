@@ -148,8 +148,16 @@
                             <input type="hidden" name="cover_start_hour" class="cover-start-hour">
                             <input type="hidden" name="cover_end_hour" class="cover-end-hour">
                             <input type="hidden" class="reserve-email" value="{{ r.email or '' }}">
+                            <input type="hidden" name="stay_on_page" value="false" class="stay-flag">
 
-                            <button type="submit">    
+                            <button
+                                type="button"
+                                onclick="openCoverageHourModal(
+                                    this.form,
+                                    '{{ r.name|escape }}',
+                                    '{{ absent_volunteer.station_name|default('Assigned Station', true)|escape }}',
+                                    '{{ absent_volunteer.typical_shift|default('', true)|escape }}'
+                                )">
                                 Assign This Reserve
                             </button>
                         </form>
@@ -184,7 +192,7 @@
                             <input type="hidden" name="cover_start_hour" value="5">
                             <input type="hidden" name="cover_end_hour" value="16">
                             <input type="hidden" class="reserve-email" value="{{ r.email or '' }}">
-
+                            <input type="hidden" name="stay_on_page" value="false" class="stay-flag">
                             <button
                                 type="button"
                                 onclick="openCoverageHourModal(
@@ -232,8 +240,11 @@
         <button type="button" onclick="closeCoverageHourModal()" style="padding:10px 14px; border:none; border-radius:10px; background:#e2e8f0; color:#0f172a; font-weight:700; cursor:pointer;">
             Cancel
         </button>
-        <button type="button" onclick="goToEmailPopup()" style="padding:10px 14px; border:none; border-radius:10px; background:#2563eb; color:white; font-weight:700; cursor:pointer;">
-            Continue
+        <button type="button" onclick="submitAndExit()" style="padding:10px 14px; border:none; border-radius:10px; background:#64748b; color:white; font-weight:700; cursor:pointer;">
+            Assign & Return to Dashboard
+        </button>
+        <button type="button" onclick="submitAndStay()" style="padding:10px 14px; border:none; border-radius:10px; background:#2563eb; color:white; font-weight:700; cursor:pointer;">
+            Assign & Add More Coverage
         </button>
     </div>
 </div>
@@ -442,6 +453,8 @@ Thank you.;
         document.getElementById("assignPopup").style.display = "none";
     }
 
+    
+
     function openMoreCoveragePopup() {
         const message = `Selected coverage: ${formatRange(selectedCoverageStart, selectedCoverageEnd)}. Would you like to add another reserve or keep this coverage?`;
         document.getElementById("moreCoverageMessage").innerText = message;
@@ -519,6 +532,35 @@ Thank you.;
 
         closeAssignPopup();
         activeAssignForm.submit();
+    }
+
+
+    function submitCoverageForm() {
+        if (!activeAssignForm) return;
+        const fullShift = document.getElementById("coverFullShiftCheckbox").checked;
+        if (fullShift) {
+            activeAssignForm.querySelector(".cover-start-hour").value = modalDefaultStart;
+            activeAssignForm.querySelector(".cover-end-hour").value = modalDefaultEnd;
+        } else {
+            activeAssignForm.querySelector(".cover-start-hour").value =
+                document.getElementById("coverStartHour").value;
+            activeAssignForm.querySelector(".cover-end-hour").value =
+                document.getElementById("coverEndHour").value;
+        }
+        activeAssignForm.submit();
+    }
+
+    function submitAndExit() {
+        if (!activeAssignForm) return;
+
+        activeAssignForm.querySelector(".stay-flag").value = "false";
+        submitCoverageForm();
+    }
+        
+    function submitAndStay() {
+        if (!activeAssignForm) return;
+        activeAssignForm.querySelector(".stay-flag").value = "true";
+        submitCoverageForm();
     }
 
     document.getElementById("coverFullShiftCheckbox").addEventListener("change", function() {
