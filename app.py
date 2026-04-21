@@ -242,7 +242,7 @@ def require_admin_or_captain():
         return None, redirect("/")
     return role, None
     
-@app.route("/admin/fill-assignments", methods=["POST"])
+@app.route("/admin/fill-assignments", methods=["GET"])
 def backfill_assignments():
     if "user_id" not in session:
         return redirect("/")
