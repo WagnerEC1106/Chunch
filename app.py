@@ -181,6 +181,7 @@ class Assignment(db.Model):
     absence_id = Column(Integer, ForeignKey("absences.absence_id"), nullable=True)
     cover_start_hour = Column(Integer, nullable=True)
     cover_end_hour = Column(Integer, nullable=True)
+    is_extra_coverage = Column(Boolean, default=False)
 
     volunteer = relationship("Volunteer", foreign_keys=[volunteer_id])
     station = relationship("Station", foreign_keys=[station_id])
@@ -197,6 +198,11 @@ class Availability(db.Model, SoftDeleteMixin):
     hour = Column(String(50))       # Example: 8, 9, 10, 11
 
     volunteer = relationship("Volunteer", backref=backref("availability", cascade = "all, delete-orphan"))
+
+db.session.execute(text("""
+    ALTER TABLE assignments
+    ADD COLUMN IF NOT EXISTS is_extra_coverage BOOLEAN DEFAULT FALSE
+"""))
 
 with app.app_context():
     db.create_all()
