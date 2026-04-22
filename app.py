@@ -1151,10 +1151,25 @@ def admin_page():
         except Exception:
             unassigned_count = 0
 
+        stations = Station.query.order_by(Station.station_name).all()
+
+        station_to_volunteer_ids, debug = build_station_state(volunteers, stations)
+
+        station_data = {}
+        for station in stations:
+            station_name = str(station.station_name)
+            assigned_ids = station_to_volunteer_ids.get(station.station_id, set())
+
+            station_data[station_name] = [
+                v for v in volunteers if v.id in assigned_ids
+            ]
+
         return render_template(
             "admin.html",
             volunteers=volunteers,
-            unassigned_count=unassigned_count
+            unassigned_count=unassigned_count,
+            station_data=station_data,
+            debug=debug
         )
 
     except Exception as e:
