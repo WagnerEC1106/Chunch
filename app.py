@@ -1335,8 +1335,13 @@ def coverage_details():
             Assignment.assignment_id.desc()
         ).first()
 
-        if latest_assignment and reserve_station_id is not None:
-            if latest_assignment.station_id != reserve_station_id:
+        if latest_assignment:
+            # skip if already assigned as coverage
+            if latest_assignment.is_covering:
+                continue
+
+            # if not not in reserve, skip
+            if reserve_station_id is not None and latest_assignment.station_id != reserve_station_id:
                 continue
 
         unavailability_text = str(row.get("Unavailability", "")).strip()
