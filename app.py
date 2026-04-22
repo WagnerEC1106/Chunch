@@ -986,8 +986,16 @@ def build_station_state(volunteers, stations):
         debug_lines.append(f"absence_id: {assignment.absence_id}")
 
         # coverage
-        if assignment.is_covering and assignment.absence_id:
-            absence = Absence.query.get(assignment.absence_id)
+        if assignment.is_covering:
+            absence = None
+
+            if assignment.absence_id:
+                absence = Absence.query.get(assignment.absence_id)
+
+            if not absence:
+                absence = Absence.query.filter(
+                    Absence.volunteer_id == assignment.covering_for_volunteer_id
+            ).order_by(Absence.start_date.desc()).first()
 
             if absence:
                 debug_lines.append(f"absence.start: {absence.start_date}")
@@ -1007,9 +1015,11 @@ def build_station_state(volunteers, stations):
                     continue
 
                 debug_lines.append("→ DURING absence → takes station")
-                target_station_id = assignment.original_station_id or assignment.station_id
+                target_station_id = assignment.original_station_id
                 if target_station_id:
                     station_to_volunteer_ids[target_station_id].add(volunteer_id)
+                else:
+                    debug_lines.append("missing original_station_id")
                 continue
 
         # absent
@@ -1744,13 +1754,13 @@ from datetime import datetime, timedelta
 
 LAST_VOLUNTEER_SYNC = None
 
-def should_sync_volunteers():
-    global LAST_VOLUNTEER_SYNC
+#def should_sync_volunteers():
+    #global LAST_VOLUNTEER_SYNC
 
-    if LAST_VOLUNTEER_SYNC is None:
-        return True
+    #if LAST_VOLUNTEER_SYNC is None:
+        #return True
 
-    return datetime.utcnow() - LAST_VOLUNTEER_SYNC > timedelta(minutes=10)
+    #return datetime.utcnow() - LAST_VOLUNTEER_SYNC > timedelta(minutes=10)
 
 # MASTERLIST
 @app.route("/admin/master-list")
@@ -1760,14 +1770,14 @@ def master_list():
     if "user_id" not in session:
         return redirect("/")
 
-    try:
-        if should_sync_volunteers():
-            sync_volunteers()
-            LAST_VOLUNTEER_SYNC = datetime.utcnow()
+    #try:
+        #if should_sync_volunteers():
+           # sync_volunteers()
+            #LAST_VOLUNTEER_SYNC = datetime.utcnow()
     
-    except Exception as e:
-        db.session.rollback()
-        print(f"Volunteer sync failed: {e}")
+    #except Exception as e:
+        #db.session.rollback()
+        #print(f"Volunteer sync failed: {e}")
         
     volunteers = Volunteer.query\
         .filter(Volunteer.deleted_at.is_(None))\
@@ -2517,17 +2527,17 @@ def sync_volunteers():
                     station_id = station_id
                 )
                 db.session.add(volunteer)
-            if not volunteer.phone and phone:
+            if phone:
                 volunteer.phone = phone
-            if not volunteer.email and email:
+            if email:
                 volunteer.email = email
-            if not volunteer.capability_restrictions and capability_restrictions:
+            if capability_restrictions:
                 volunteer.capability_restrictions = capability_restrictions
-            if not volunteer.typical_shift and typical_shift:
+            if typical_shift:
                 volunteer.typical_shift = typical_shift
-            if not volunteer.unavailability and unavailability:
+            if unavailability:
                 volunteer.unavailability = unavailability
-            if not volunteer.station_id and station_id:
+            if station_id:
                 volunteer.station_id = station_id
             
         db.session.commit()
@@ -2561,7 +2571,9 @@ def sync_volunteers():
 
         for row in rows:
             email = str(row.get("Email", "")).strip().lower()
-            volunteer = Volunteer.query.filter_by(email=email).first()
+            first_name = str(row.get("First Name", "")).strip()
+            last_name = str(row.get("Last Name", "")).strip()
+            volunteer = Volunteer.query.filter_by(first_name = first_name, last_name = last_name, email = email).first()
             if not volunteer:
                 continue
 
