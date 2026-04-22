@@ -2898,7 +2898,7 @@ def debug_hourly_data():
 
     volunteer_rows_by_id = {}
     for v in volunteers:
-        hours = parse_hours(v.availability)
+        hours = parse_hours(v.typical_shift)
         ranges = build_ranges(hours)
 
         if ranges:
