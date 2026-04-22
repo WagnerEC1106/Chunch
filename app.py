@@ -2619,7 +2619,7 @@ def sync_volunteers():
 
         db.session.commit()
 
-        return redirect("/admin/master-list")
+        return redirect(request.url)
 
     except Exception as e:
         db.session.rollback()
