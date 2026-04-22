@@ -189,8 +189,8 @@
                             <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
                             <input type="hidden" name="send_email" value="no">
                             <input type="hidden" name="timestamp" value="{{ timestamp }}">
-                            <input type="hidden" name="cover_start_hour" value="5">
-                            <input type="hidden" name="cover_end_hour" value="16">
+                            <input type="hidden" name="cover_start_hour" class="cover-start-hour">
+                            <input type="hidden" name="cover_end_hour" class="cover-end-hour">
                             <input type="hidden" class="reserve-email" value="{{ r.email or '' }}">
                             <input type="hidden" name="stay_on_page" value="false" class="stay-flag">
                             <button
