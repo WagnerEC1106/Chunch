@@ -660,6 +660,72 @@ def edit_volunteer():
     
     # The assignment of the new station, list of volunteers for that station
     # check for volunteer in this assignment    
+    
+    def parse_time_to_hour(time_str):
+            time_str = str(time_str).strip().upper()
+            time_str = time_str.replace(" ", "")
+
+            if not time_str:
+                return None
+
+            if time_str.endswith("AM"):
+                raw = time_str[:-2]
+                if ":" in raw:
+                    raw = raw.split(":")[0]
+                if not raw.isdigit():
+                    return None
+                hour = int(raw)
+                return 0 if hour == 12 else hour
+
+            if time_str.endswith("PM"):
+                raw = time_str[:-2]
+                if ":" in raw:
+                    raw = raw.split(":")[0]
+                if not raw.isdigit():
+                    return None
+                hour = int(raw)
+                return hour if hour == 12 else hour + 12
+
+            return None
+
+    Availability.query.filter_by(volunteer_id=volunteer.id).delete()
+
+    availability_text = str(row.get("Typical Shift", "")).strip()
+    if not availability_text:
+        continue
+
+    normalized_text = availability_text.replace("–", "-").replace("—", "-")
+    entries = normalized_text.split(",")
+    for entry in entries:
+        part = entry.strip()
+        if not part:
+            continue
+
+        if "-" in part:
+            start_str, end_str = part.split("-", 1)
+            start_hour = parse_time_to_hour(start_str)
+            end_hour = parse_time_to_hour(end_str)
+
+            if start_hour is None or end_hour is None:
+                continue
+
+            if start_hour <= end_hour:
+                hours_to_add = range(start_hour, end_hour + 1)
+            else:
+                continue
+        else:
+            single_hour = parse_time_to_hour(part)
+            if single_hour is None:
+                continue
+            hours_to_add = [single_hour]
+            
+        for hour in hours_to_add:
+            db.session.add(
+                Availability(
+                    volunteer_id=volunteer.id,
+                    hour=hour
+                )
+            )
 
     if "role" in data:
         new_role = data["role"]
@@ -1101,6 +1167,34 @@ def run_sync_absences():
     db.session.commit()
 
 
+@app.route("/admin/station-data")
+def admin_station_data():
+    volunteers = Volunteer.query.filter(Volunteer.deleted_at.is_(None)).all()
+    stations = Station.query.all()
+
+    station_to_volunteer_ids, _ = build_station_state(volunteers, stations)
+
+    result = {}
+
+    for station in stations:
+        assigned_ids = station_to_volunteer_ids.get(station.station_id, set())
+
+        result[station.station_name] = {
+            "volunteers": [
+                {
+                    "id": v.id,
+                    "name": f"{v.first_name} {v.last_name}",
+                    "role": v.role,
+                    "email": v.email,
+                    "phone": v.phone,
+                    "station_id": station.station_id
+                }
+                for v in volunteers if v.id in assigned_ids
+            ]
+        }
+
+    return jsonify(result)
+
 # DASHBOARD
 @app.route("/admin")
 def admin_page():
@@ -1151,10 +1245,25 @@ def admin_page():
         except Exception:
             unassigned_count = 0
 
+        stations = Station.query.order_by(Station.station_name).all()
+
+        station_to_volunteer_ids, debug = build_station_state(volunteers, stations)
+
+        station_data = {}
+        for station in stations:
+            station_name = str(station.station_name)
+            assigned_ids = station_to_volunteer_ids.get(station.station_id, set())
+
+            station_data[station_name] = [
+                v for v in volunteers if v.id in assigned_ids
+            ]
+
         return render_template(
             "admin.html",
             volunteers=volunteers,
-            unassigned_count=unassigned_count
+            unassigned_count=unassigned_count,
+            station_data=station_data,
+            debug=debug
         )
 
     except Exception as e:
@@ -2619,7 +2728,7 @@ def sync_volunteers():
 
         db.session.commit()
 
-        return redirect("/admin/master-list")
+        return redirect(request.url)
 
     except Exception as e:
         db.session.rollback()
@@ -2935,17 +3044,7 @@ def debug_hourly_data():
 
     assignments = Assignment.query.all()
 
-    station_to_volunteer_ids = {}
-    for station in stations:
-        station_to_volunteer_ids[station.station_id] = set()
-
-    for assignment in assignments:
-        if assignment.station_id is None or assignment.volunteer_id is None:
-            continue
-
-        station_to_volunteer_ids.setdefault(
-            assignment.station_id, set()
-        ).add(assignment.volunteer_id)
+    station_to_volunteer_ids, debug = build_station_state(volunteers, stations)
 
     station_data = {}
     for station in stations:
