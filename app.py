@@ -995,7 +995,7 @@ def build_station_state(volunteers, stations):
             if not absence:
                 absence = Absence.query.filter(
                     Absence.volunteer_id == assignment.covering_for_volunteer_id
-                ).order_by(Absence.start_date.desc()).first()
+            ).order_by(Absence.start_date.desc()).first()
 
             if absence:
                 debug_lines.append(f"absence.start: {absence.start_date}")
@@ -1015,9 +1015,11 @@ def build_station_state(volunteers, stations):
                     continue
 
                 debug_lines.append("→ DURING absence → takes station")
-                target_station_id = assignment.original_station_id or assignment.station_id
+                target_station_id = assignment.original_station_id
                 if target_station_id:
                     station_to_volunteer_ids[target_station_id].add(volunteer_id)
+                else:
+                    debug_lines.append("missing original_station_id")
                 continue
 
         # absent
