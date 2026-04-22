@@ -2517,17 +2517,17 @@ def sync_volunteers():
                     station_id = station_id
                 )
                 db.session.add(volunteer)
-            if not volunteer.phone and phone:
+            if phone:
                 volunteer.phone = phone
-            if not volunteer.email and email:
+            if email:
                 volunteer.email = email
-            if not volunteer.capability_restrictions and capability_restrictions:
+            if capability_restrictions:
                 volunteer.capability_restrictions = capability_restrictions
-            if not volunteer.typical_shift and typical_shift:
+            if typical_shift:
                 volunteer.typical_shift = typical_shift
-            if not volunteer.unavailability and unavailability:
+            if unavailability:
                 volunteer.unavailability = unavailability
-            if not volunteer.station_id and station_id:
+            if station_id:
                 volunteer.station_id = station_id
             
         db.session.commit()
@@ -2561,7 +2561,9 @@ def sync_volunteers():
 
         for row in rows:
             email = str(row.get("Email", "")).strip().lower()
-            volunteer = Volunteer.query.filter_by(email=email).first()
+            first_name = str(row.get("First Name", "")).strip()
+            last_name = str(row.get("Last Name", "")).strip()
+            volunteer = Volunteer.query.filter_by(first_name = first_name, last_name = last_name, email = email).first()
             if not volunteer:
                 continue
 
