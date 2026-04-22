@@ -123,6 +123,9 @@
         <div class="top-bar-actions">
             <button onclick="window.location.href='/admin'">Back to Dashboard</button>
             <button onclick="printCurrentChart()">Print Current Chart</button>
+            <form method="POST" action="/admin/sync-volunteers">
+                <button class="secondary" type="submit">Update Volunteer List</button>
+            </form>
         </div>
     </div>
 
