@@ -1007,8 +1007,9 @@ def build_station_state(volunteers, stations):
                     continue
 
                 debug_lines.append("→ DURING absence → takes station")
-                if assignment.station_id:
-                    station_to_volunteer_ids[assignment.station_id].add(volunteer_id)
+                target_station_id = assignment.original_station_id or assignment.station_id
+                if target_station_id:
+                    station_to_volunteer_ids[target_station_id].add(volunteer_id)
                 continue
 
         # absent
@@ -1462,7 +1463,7 @@ def assign_reserve_coverage():
                 f"&timestamp={timestamp or ''}"
                 f"&covered_start={cover_start_hour or ''}"
                 f"&covered_end={cover_end_hour or ''}"
-        )
+            )
         else:
             return redirect("/admin")
 
