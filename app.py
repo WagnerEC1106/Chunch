@@ -993,12 +993,9 @@ def build_station_state(volunteers, stations):
                 absence = Absence.query.get(assignment.absence_id)
 
             if not absence:
-                # find active absence for the person being covered
                 absence = Absence.query.filter(
-                    Absence.volunteer_id == assignment.covering_for_volunteer_id,
-                    Absence.start_date <= today,
-                    Absence.end_date >= today
-                ).first()
+                    Absence.volunteer_id == assignment.covering_for_volunteer_id
+                ).order_by(Absence.start_date.desc()).first()
 
             if absence:
                 debug_lines.append(f"absence.start: {absence.start_date}")
