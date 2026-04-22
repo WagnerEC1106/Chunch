@@ -1812,7 +1812,7 @@ def master_list():
             "last_name": v.last_name,
             "email": v.email,
             "phone": v.phone,
-            "role": user.role, #if user is not None else "Volunteer",
+            "role": user.role if user is not None else "Volunteer",
             "station_id": v.station_id,
             "unavailability": v.unavailability,
             "capability_restrictions": v.capability_restrictions,
