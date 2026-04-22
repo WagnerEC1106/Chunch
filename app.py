@@ -1472,7 +1472,7 @@ def assign_reserve_coverage():
                 f"&timestamp={timestamp or ''}"
                 f"&covered_start={cover_start_hour or ''}"
                 f"&covered_end={cover_end_hour or ''}"
-            )
+        )
         else:
             return redirect("/admin")
 
