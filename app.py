@@ -1128,6 +1128,10 @@ def run_sync_absences():
         for v in volunteers
     }
 
+    absent_station = Station.query.filter_by(station_name="Absent").first()
+    absent_station_id = absent_station.station_id if absent_station else 14
+
+
     for row in rows:
         first = str(row.get("First name", "")).strip()
         last = str(row.get("Last name", "")).strip()
@@ -1152,7 +1156,15 @@ def run_sync_absences():
             end_date=end_date_obj
         ).first()
 
+        assignment = Assignment.query\
+            .filter_by(volunteer_id=volunteer_id)\
+            .order_by(Assignment.assignment_id.desc())\
+            .first()
+
         if existing:
+            if assignment:
+                assignment.station_id = absent_station_id
+                assignment.is_absent = True
             continue
 
         absence = Absence(
@@ -1164,6 +1176,9 @@ def run_sync_absences():
         )
 
         db.session.add(absence)
+        if assignment:
+            assignment.station_id = absent_station_id
+            assignment.is_absent = True
 
     db.session.commit()
 
