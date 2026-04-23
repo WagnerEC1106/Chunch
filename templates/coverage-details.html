@@ -184,8 +184,7 @@
                         {% endif %}
 
                         <form method="POST" action="/admin/coverage/assign" class="assign-form" style="margin-top: 10px;">
-                            <!--<input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}"> -->
-                            <input type="hidden" name="absence_id" value="{{ 14 }}">
+                            <input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}">
                             <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
                             <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
                             <input type="hidden" name="send_email" value="no">
@@ -268,6 +267,7 @@
     let pendingAddMoreChoice = false;
     let modalDefaultStart = null;
     let modalDefaultEnd = null;
+    let activeStationId = null;
 
     function formatHour(hour) {
         if (hour === 0) return "12AM";
@@ -351,6 +351,7 @@
         activeAssignForm = form;
         activeReserveName = reserveName;
         activeStationName = stationName;
+        activeStationId = 
         pendingAddMoreChoice = false;
 
         parsedShiftHours = parseHourList(shiftText);
