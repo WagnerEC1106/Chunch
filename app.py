@@ -3257,6 +3257,18 @@ def debug_hourly_final():
             else:
                 volunteer_rows_by_id[volunteer_id]["display_time"] = ""
 
+
+            assignment = Assignment.query\
+                .filter_by(volunteer_id=volunteer_id)\
+                .order_by(Assignment.assignment_id.desc())\
+                .first()
+
+            if latest_absence:
+                if assignment:
+                    assignment.is_absent = True
+                    assignment.station_id = absent_station_id
+                    assignment.absence_id = latest_absence.absence_id
+
             if assignment.is_absent:
                 if absent_station_id is not None:
                     station_to_volunteer_ids[absent_station_id].add(volunteer_id)
