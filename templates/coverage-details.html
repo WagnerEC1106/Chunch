@@ -184,7 +184,8 @@
                         {% endif %}
 
                         <form method="POST" action="/admin/coverage/assign" class="assign-form" style="margin-top: 10px;">
-                            <input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}">
+                            <!--<input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}"> -->
+                            <input type="hidden" name="absence_id" value="{{ 14 }}">
                             <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
                             <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
                             <input type="hidden" name="send_email" value="no">
