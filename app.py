@@ -2124,7 +2124,7 @@ def master_list_edit(volunteer_id):
     start_hour, end_hour = parse_shift(volunteer.typical_shift)
 
     return render_template(
-    "master_list.html", 
+    "master-list.html", 
     volunteer=volunteer,
     start_hour = start_hour,
     end_hour = end_hour
