@@ -1695,7 +1695,10 @@ def update_absence():
     mode = data.get("mode")
     new_end_date = data.get("new_end_date")
 
-    absence = Absence.query.filter_by(volunteer_id=volunteer_id).first()
+    absence = Absence.query\
+        .filter_by(volunteer_id=volunteer_id)\
+        .order_by(Absence.absence_id.desc())\
+        .first()
     if not absence:
         return jsonify({"error": "Absence not found"}), 404
 
