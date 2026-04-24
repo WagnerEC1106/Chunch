@@ -3486,7 +3486,12 @@ def debug_hourly_final():
                 )
             }
 
-        return station_data
+        return jsonify({
+            station_name: {
+                "volunteers": data["volunteers"]
+            }
+            for station_name, data in station_data.items()
+        })
 
     except Exception as e:
         return {"error": str(e)}, 500
