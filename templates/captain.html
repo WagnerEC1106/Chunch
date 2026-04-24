@@ -6,12 +6,6 @@
 <title>Captain Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://apis.google.com/js/platform.js" async defer></script>
-<script src="./admin_captain_shared.js"></script>
-<script>
-window.addEventListener("DOMContentLoaded", () => {
-    loadStationBoard();
-});
-</script>
 <style>
 * {
     margin: 0;
@@ -388,11 +382,6 @@ button.logout-btn:hover { background: rgb(178, 59, 59); }
             <span class="icon">⏱️</span>
             <span class="label">Hourly View</span>
         </button>
-
-        <button onclick="window.location.href='/absence-forms'">
-            <span class="icon">📄</span>
-            <span class="label">Absence Forms</span>
-        </button>
         <!-- <button class="logout-btn" onclick="signOut();">
             <span class="icon">🚪</span>
             <span class="label">Sign Out</span>
@@ -411,36 +400,30 @@ button.logout-btn:hover { background: rgb(178, 59, 59); }
     <div class="grid" id="scheduleGrid"></div>
 </div>
 
-
 <script>
-
-
 let currentVolunteer = null;
-
 const stationClassMap = {
     "Setup Team": "setup",
     "Teardown Team": "teardown",
     "Line Servers": "servers",
     "Kitchen": "kitchen",
-    "Drinks": "drinks",
+    "Drink Station": "drinks",
     "Desserts": "desserts",
-    "Busboys/ sanitation": "busboys",
+    "Busboys/sanitation": "busboys",
     "Dishwashers": "dishes",
     "Reserve": "reserve",
     "General Manager": "manager",
     "Greeters": "greeters",
     "Baked Potato Bar": "potato",
     "Salad Bar": "salad",
-    "Vegan": "vegan",
+    "Vegan Station": "vegan",
     "Absent": "absent",
     "Other": "other"
 };
 
-
 // Initialize station data empty
 let currentStationData = {};
 let currentAbsentEditVolunteer = null;
-
 
 function formatCountLabel(count) {
     return count === 1 ? "1 volunteer" : `${count} volunteers`;
@@ -465,7 +448,6 @@ function isAdmin(volunteer) {
     if (!volunteer || typeof volunteer === "string") return false;
     return (volunteer.role || "").toString().toLowerCase() === "admin";
 }
-
 
 function formatDatePretty(dateStr) {
     if (!dateStr) return "";
@@ -493,7 +475,6 @@ function formatPhonePretty(phone) {
     }
     return phone;
 }
-
 
 function renderStationBoard(stationData) {
     currentStationData = stationData || {};
@@ -597,7 +578,6 @@ function renderStationBoard(stationData) {
     });
 }
 
-
 async function loadStationBoard() {
     try {
         const response = await fetch("/admin/debug-hourly-final");
@@ -610,7 +590,6 @@ async function loadStationBoard() {
         }
 
         renderStationBoard(stationData);
-        
     } catch (error) {
         document.getElementById("scheduleGrid").innerHTML = `
         <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
@@ -685,9 +664,6 @@ function signOut() {
 }
 
 window.addEventListener("DOMContentLoaded", loadStationBoard);
-
-// added for shared file
-window.closeVolunteerPanel = closeVolunteerPanel;
 </script>
 
 <div id="detailOverlay" class="detail-overlay" onclick="closeVolunteerPanel()"></div>
