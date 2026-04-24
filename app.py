@@ -1050,12 +1050,12 @@ def build_station_state(volunteers, stations):
 
         debug_lines.append(f"\n--- VOLUNTEER {volunteer_id} ---")
         debug_lines.append(f"TODAY: {today}")
-        debug_lines.append(f"is_covering: {assignment.is_covering}")
-        debug_lines.append(f"assignment.station_id: {assignment.station_id}")
-        debug_lines.append(f"absence_id: {assignment.absence_id}")
+        debug_lines.append(f"is_covering: {assignment.is_covering if assignment else None}")
+        debug_lines.append(f"assignment.station_id: {assignment.station_id if assignment else None}")
+        debug_lines.append(f"absence_id: {assignment.absence_id if assignment else None}")
 
         # coverage
-        if assignment.is_covering:
+        if assignment and assignment.is_covering:
             absence = None
 
             if assignment.absence_id:
