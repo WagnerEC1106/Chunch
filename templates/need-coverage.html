@@ -109,7 +109,7 @@
         <select id="volunteer_id" name="volunteer_id" required>
     <option></option> <!-- placeholder -->
     {% for v in volunteers %}
-        <option value="{{ v.id }}" {% if prefill.volunteer_id == v.id %}selected{% endif %}>
+        <option value="{{ v.id }}">
             {{ v.first_name }} {{ v.last_name }}
         </option>
     {% endfor %}
@@ -118,47 +118,40 @@
         <div class="inline-row">
             <div class="field">
                 <label for="start_date">Start Date</label>
-                <input type="date" id="start_date" name="start_date" value="{{ prefill.start_date }}" required>
+                <input type="date" id="start_date" name="start_date" required>
             </div>
 
             <div class="field">
                 <label for="end_date">End Date</label>
-                <input type="date" id="end_date" name="end_date" value="{{ prefill.end_date }}" required>
+                <input type="date" id="end_date" name="end_date" required>
             </div>
         </div>
 
         <div class="field">
             <label for="is_partial">Absence Type</label>
             <select id="is_partial" name="is_partial" onchange="togglePartialFields()" required>
-                <option value="false" {% if prefill.is_partial != "true" %}selected{% endif %}>Full Shift</option>
-                <option value="true" {% if prefill.is_partial == "true" %}selected{% endif %}>Partial Shift</option>
+                <option value="false">Full Shift</option>
+                <option value="true">Partial Shift</option>
             </select>
-        </div>
-
-        <div class="field">
-            <label>
-                <input type="checkbox" name="is_extra_coverage" value="true">
-                    Additional Coverage
-                </label>
         </div>
 
         <div id="partialFields">
             <div class="inline-row">
                 <div class="field">
                     <label for="partial_start_hour">Partial Start Hour</label>
-                    <input type="number" id="partial_start_hour" name="partial_start_hour" min="5" max="16" value="{{ prefill.partial_start_hour }}">
+                    <input type="number" id="partial_start_hour" name="partial_start_hour" min="5" max="16">
                 </div>
 
                 <div class="field">
                     <label for="partial_end_hour">Partial End Hour</label>
-                    <input type="number" id="partial_end_hour" name="partial_end_hour" min="5" max="16" value="{{ prefill.partial_end_hour }}">
+                    <input type="number" id="partial_end_hour" name="partial_end_hour" min="5" max="16">
                 </div>
             </div>
         </div>
 
         <div class="field">
             <label for="notes">Notes</label>
-            <textarea id="notes" name="notes" rows="3" placeholder="Optional">{{ prefill.notes }}</textarea>
+            <textarea id="notes" name="notes" rows="3" placeholder="Optional"></textarea>
         </div>
 
         <div class="actions">
@@ -177,27 +170,32 @@ function togglePartialFields() {
     document.getElementById("partialFields").style.display = isPartial ? "block" : "none";
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    togglePartialFields();
-
+$(document).ready(function() {
     $('#volunteer_id').select2({
         placeholder: "Type to search a volunteer",
         allowClear: true,
         width: '100%',
+
         matcher: function(params, data) {
+            // If no search term, show all options
             if ($.trim(params.term) === '') {
                 return data;
             }
 
             const query = params.term.toLowerCase();
             const text = data.text.toLowerCase();
+
+            // Split full name into parts
             const parts = text.split(" ");
+
+            // Check if ANY part starts with the query
             const match = parts.some(part => part.startsWith(query));
 
             return match ? data : null;
         }
     });
 });
+
 </script>
 
 </body>
