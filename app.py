@@ -3238,13 +3238,13 @@ def debug_hourly_final():
             if current is None or assignment.assignment_id > current.assignment_id:
                 latest_assignment_by_volunteer[assignment.volunteer_id] = assignment
 
+        station_to_volunteer_ids, debug = build_station_state(volunteers, stations)
+
         for assignment in latest_assignment_by_volunteer.values():
             volunteer_id = assignment.volunteer_id
+
             if volunteer_id is None or volunteer_id not in volunteer_rows_by_id:
                 continue
-
-            for volunteer_ids in station_to_volunteer_ids.values():
-                volunteer_ids.discard(volunteer_id)
 
             if (
                 assignment.is_covering and
@@ -3259,20 +3259,42 @@ def debug_hourly_final():
                 volunteer_rows_by_id[volunteer_id]["display_time"] = ""
 
 
-            assignment = Assignment.query\
-                .filter_by(volunteer_id=volunteer_id)\
-                .order_by(Assignment.assignment_id.desc())\
-                .first()
 
-            if assignment.is_absent:
-                if absent_station_id is not None:
-                    station_to_volunteer_ids[absent_station_id].add(volunteer_id)
-                continue
+        # for assignment in latest_assignment_by_volunteer.values():
+        #     volunteer_id = assignment.volunteer_id
+        #     if volunteer_id is None or volunteer_id not in volunteer_rows_by_id:
+        #         continue
 
-            if assignment.station_id is not None:
-                station_to_volunteer_ids.setdefault(
-                    assignment.station_id, set()
-                ).add(volunteer_id)
+        #     for volunteer_ids in station_to_volunteer_ids.values():
+        #         volunteer_ids.discard(volunteer_id)
+
+        #     if (
+        #         assignment.is_covering and
+        #         assignment.cover_start_hour is not None and
+        #         assignment.cover_end_hour is not None
+        #     ):
+        #         volunteer_rows_by_id[volunteer_id]["display_time"] = (
+        #             f"{format_hour_label(assignment.cover_start_hour)} - "
+        #             f"{format_hour_label(assignment.cover_end_hour)}"
+        #         )
+        #     else:
+        #         volunteer_rows_by_id[volunteer_id]["display_time"] = ""
+
+
+        #     assignment = Assignment.query\
+        #         .filter_by(volunteer_id=volunteer_id)\
+        #         .order_by(Assignment.assignment_id.desc())\
+        #         .first()
+
+        #     if assignment.is_absent:
+        #         if absent_station_id is not None:
+        #             station_to_volunteer_ids[absent_station_id].add(volunteer_id)
+        #         continue
+
+        #     if assignment.station_id is not None:
+        #         station_to_volunteer_ids.setdefault(
+        #             assignment.station_id, set()
+        #         ).add(volunteer_id)
 
         station_data = {}
 
