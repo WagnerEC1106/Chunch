@@ -181,6 +181,7 @@ tr:hover {
     </form>
 </div>
 
+<!--
 <div id="editForm">
     <form method="POST" action="/admin/master-list/edit-volunteer">
         <input type="text" name="first_name" id="editFirstName" style="display:none;">
@@ -197,7 +198,8 @@ tr:hover {
         <input type="checkbox" name="is_floater" id="editFloater" style="display:none;">
         <button class="primary" type="button" id="saveBtn" onclick="saveVolunteer()" style="display:none;">Save</button>
 </div>
-
+-->
+    
 <table>
     <thead>
         <tr>
@@ -274,11 +276,11 @@ tr:hover {
                             <option value="14" {% if v.station_id == 16 %}selected{% endif %}>Vegan</option>
                         </select>
 
-                        <!-- <label for="start_hour_{{ v.id }}">Start Hour:</label>
+                        <label for="start_hour_{{ v.id }}">Start Hour:</label>
                         <input type="number" name="start_hour" id="start_hour_{{ v.id }}" min="0" max="23"
                             value="{{ v.start_hour if v.start_hour is not none else '' }}"> -->
 
-                        <!-- <label for="end_hour_{{ v.id }}">End Hour:</label>
+                        <label for="end_hour_{{ v.id }}">End Hour:</label>
                         <input type="number" name="end_hour" id="end_hour_{{ v.id }}" min="1" max="24"
                             value="{{ v.end_hour if v.end_hour is not none else '' }}"> -->
 
