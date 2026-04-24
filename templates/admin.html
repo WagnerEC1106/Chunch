@@ -3,11 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard</title>
+<title>Administrator Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://apis.google.com/js/platform.js" async defer></script>
-<!-- <script src="admin_captain_shared.js"></script> -->
-
+    <!-- onload="this.onload=function(){};handleClientLoad()" 
+    onreadystatechange="if (this.readyState === 'complete') this.onload()"
+    async defer
+></script> -->
 <meta name="google-signin-client_id" content="483439290581-t6qm63e9rcuvm62l6j3cghvj71eo5h1k.apps.googleusercontent.com">
 
 <style>
@@ -116,18 +118,6 @@ body {
     background: #e2e8f0;
     color: #0f172a;
 }
-.badge {
-    background: #dc2626;
-    color: white;
-    font-size: 12px;
-    font-weight: 700;
-    border-radius: 999px;
-    padding: 4px 8px;
-    margin-left: 8px;
-    display: inline-block;
-    min-width: 20px;
-    text-align: center;
-}
 
 .detail-btn.edit {
     background: #2563eb;
@@ -221,17 +211,6 @@ body {
 .load-btn:hover,
 .header button:hover {
     background: #1d4ed8;
-}
-.badge {
-    background: #dc2626;
-    color: white;
-    font-size: 12px;
-    font-weight: 700;
-    border-radius: 999px;
-    padding: 4px 8px;
-    margin-left: 8px;
-    min-width: 20px;
-    text-align: center;
 }
 
 .secondary-btn {
@@ -529,22 +508,14 @@ body {
             <span class="label">Need Coverage?</span>
         </button>
 
-        
-    <a href="/absence-forms">
-        <button class="dashboard-btn">
-            Absence Forms
-            <span class="badge">{{ unassigned_count }}</span>
-        </button>
-    </a>
-
         <button onclick="window.location.href='/admin/master-list'">
             <span class="icon">👥</span>
             <span class="label">Volunteer Master List</span>
         </button>
 
-        <button onclick="window.location.href='/captain'">
+        <!-- <button onclick="window.location.href='/captain'">
             <span class="label">Captain View</span>
-        </button>
+        </button> -->
     </div>
 </div>
 
@@ -606,16 +577,16 @@ const stationClassMap = {
     "Teardown Team": "teardown",
     "Line Servers": "servers",
     "Kitchen": "kitchen",
-    "Drinks": "drinks",
+    "Drink Station": "drinks",
     "Desserts": "desserts",
-    "Busboys/ sanitation": "busboys",
+    "Busboys/sanitation": "busboys",
     "Dishwashers": "dishes",
     "Reserve": "reserve",
     "General Manager": "manager",
     "Greeters": "greeters",
     "Baked Potato Bar": "potato",
     "Salad Bar": "salad",
-    "Vegan": "vegan",
+    "Vegan Station": "vegan",
     "Absent": "absent",
     "Other": "other"
 };
@@ -989,12 +960,11 @@ function renderStationBoard(stationData) {
             const roleA = (a.role || "").toLowerCase();
             const roleB = (b.role || "").toLowerCase();
 
-            // Priority: admin (0), captain (1), tech (3)
+            // Priority: admin (0), captain (1), others (2)
             const getPriority = (role) => {
                 if (role === "admin") return 0;
                 if (role === "captain") return 1;
-                if (role === "tech") return 2;
-                return 3;
+                return 2;
             };
 
             const priorityA = getPriority(roleA);
@@ -1052,21 +1022,12 @@ function renderStationBoard(stationData) {
                         const captainBadge = isCaptain(volunteer) ? " (C)" : "";
                         const adminBadge = isAdmin(volunteer) ? " (A)" : "";
                         return `
-                            <div class="volunteer-pill">
-                                <div
-                                    onclick='openVolunteerPanel(${JSON.stringify(JSON.stringify({
-                                        ...volunteer,
-                                        // added for station
-                                        station: stationName,
-                                    }))})'
-                                    style="cursor:pointer;"
-                                >
-                                    ${displayName}${captainBadge}${adminBadge}${displayTime}
-                                </div>
-
-                                ${stationName === "Reserve" ? `
-                                ` : ""}
-                            </div>
+                            <button class="volunteer-pill" type="button" onclick='openVolunteerPanel(${JSON.stringify(JSON.stringify({...volunteer, 
+                                // added for station
+                                station: stationName,
+                                }))})'>
+                                ${displayName}${captainBadge}${adminBadge}${displayTime}
+                            </button>
                         `;
                     }).join("")}
                 </div>
@@ -1142,50 +1103,36 @@ function openVolunteerPanel(volunteerJson) {
         isSelectionLocked = false;
     }
 
-    // Why does this only have some of the fields? What is the purpose of the elements listed below?
     const volunteer = JSON.parse(volunteerJson);
     document.getElementById("editName").style.display = "none";
     document.getElementById("editEmail").style.display = "none";
     document.getElementById("editPhone").style.display = "none";
-
-    // Maybe unnecessary
-    document.getElementById("editRole").style.display = "none";
-    document.getElementById("editStation").style.display = "none";
-    document.getElementById("editFloater").style.display = "none";
     
     document.getElementById("detailName").style.display = "inline";
     document.getElementById("detailEmail").style.display = "block";
     document.getElementById("detailPhone").style.display = "block";
-    
-    // Maybe unnecessary
-    document.getElementById("detailRole").style.display = "block";
-    document.getElementById("detailStation").style.display = "block";
-    document.getElementById("detailFloater").style.display = "block";
-    document.getElementById("detailShift").style.display = "block";
-    document.getElementById("detailUnavailability").style.display = "block";
-    document.getElementById("detailRestrictions").style.display = "block";
 
     document.getElementById("editBtn").style.display = "inline-block";
     document.getElementById("saveBtn").style.display = "none";
 
-    // Volunteer selected
+    
     currentVolunteer = volunteer;
 
     document.getElementById("detailName").textContent = volunteer.name || "Volunteer";
     document.getElementById("detailEmail").textContent = volunteer.email || "None listed";
     document.getElementById("detailPhone").textContent = formatPhonePretty(volunteer.phone) || "None listed";
-    document.getElementById("detailRole").textContent = formatRolePretty(volunteer.role);
+    document.getElementById("detailCaptain").textContent = formatRolePretty(volunteer.role);
+    const roleSelect = document.getElementById("editRole");
+    // roleSelect.value = formatRolePretty(volunteer.role) || "None listed";
+    // roleSelect.value = (volunteer.role || "volunteer");
     
     document.getElementById("detailShift").textContent = volunteer.display_time || volunteer.typical_shift || "None listed";
     document.getElementById("detailUnavailability").textContent = volunteer.unavailability || "None listed";
     document.getElementById("detailRestrictions").textContent = volunteer.capability_restrictions || "None listed";
 
     // added for station
-    // TODO: Change to be the current station, not volunteer's station
-    // TODO: Change sections involving volunteer.station to work with this
     document.getElementById("detailStation").textContent = volunteer.station || "Unassigned";
-    document.getElementById("detailFloater").checked = volunteer.is_floater;
-    document.getElementById("detailFloater").disabled = true; // Shouldn't be editable
+    document.getElementById("editStation").value = volunteer.station_id || "";
 
     const absenceCard = document.getElementById("detailAbsenceCard");
     const absenceText = document.getElementById("detailAbsence");
@@ -1228,16 +1175,13 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("detailPanel").classList.add("open");
     document.getElementById("detailOverlay").classList.add("open");
     
+        
 }
 
 function closeVolunteerPanel() {
     document.getElementById("detailPanel").classList.remove("open");
     document.getElementById("detailOverlay").classList.remove("open");
 
-    // QUESTION: do the following 2 sections need to be here when the panel is hidden?
-    //          after all, they are already defined when the panel is open.
-
-    // Hide edit fields when not in edit mode
     document.getElementById("editName").style.display = "none";
     document.getElementById("editEmail").style.display = "none";
     document.getElementById("editPhone").style.display = "none";
@@ -1247,24 +1191,23 @@ function closeVolunteerPanel() {
     document.getElementById("editRole").style.display = "none";
     // added for station
     document.getElementById("editStation").style.display = "none";
-    document.getElementById("editFloater").style.display = "none";
 
-    // Sets the style of the information
+
     document.getElementById("detailName").style.display = "inline";
     document.getElementById("detailEmail").style.display = "block";
     document.getElementById("detailPhone").style.display = "block";
     document.getElementById("detailShift").style.display = "block";
     document.getElementById("detailUnavailability").style.display = "block";
     document.getElementById("detailRestrictions").style.display = "block";
-    document.getElementById("detailRole").style.display = "block";
+    // Remove or replace with "detailRole", change above as well if changed
+    document.getElementById("detailCaptain").style.display = "block";
     // added for station
     document.getElementById("detailStation").style.display = "block";
-    document.getElementById("detailFloater").style.display = "block";
+
 
     document.getElementById("editBtn").style.display = "inline-block";
     document.getElementById("saveBtn").style.display = "none";
 
-    // What is this for? Is it necessary or was it temporary?
     document.getElementById("editName").value = "";
     document.getElementById("editEmail").value = "";
     document.getElementById("editPhone").value = "";
@@ -1273,7 +1216,6 @@ function closeVolunteerPanel() {
     document.getElementById("editRestrictions").value = "";
     document.getElementById("editRole").value = "";
     document.getElementById("editStation").value = "";
-    document.getElementById("editFloater").value = "";
 
     currentVolunteer = null;
     
@@ -1287,11 +1229,11 @@ function editVolunteer() {
     document.getElementById("detailEmail").style.display = "none";
     document.getElementById("detailPhone").style.display = "none";
     document.getElementById("detailShift").style.display = "none";
-    document.getElementById("detailRole").style.display = "none";
+    // Remove or replace with "detailRole", change above as well if changed
+    document.getElementById("detailCaptain").style.display = "none";
     document.getElementById("detailUnavailability").style.display = "none";
     document.getElementById("detailRestrictions").style.display = "none";
     document.getElementById("detailStation").style.display = "none";
-    document.getElementById("detailFloater").style.display = "none";
 
     const nameInput = document.getElementById("editName");
     const emailInput = document.getElementById("editEmail");
@@ -1300,7 +1242,6 @@ function editVolunteer() {
     const unavailabilityInput = document.getElementById("editUnavailability");
     const restrictionsInput = document.getElementById("editRestrictions");
     const captainInput = document.getElementById("editRole");
-    const floaterCheck = document.getElementById("editFloater");
 
     // added for station
     const stationSelect = document.getElementById("editStation");
@@ -1313,7 +1254,6 @@ function editVolunteer() {
     restrictionsInput.style.display = "block";
     captainInput.style.display = "block";
     stationSelect.style.display = "block";
-    floaterCheck.style.display = "block";
     
     nameInput.value = currentVolunteer.name || "";
     emailInput.value = currentVolunteer.email || "";
@@ -1324,25 +1264,24 @@ function editVolunteer() {
     captainInput.value = currentVolunteer.role || "";
     
     stationSelect.innerHTML = "";
-    floaterCheck.innerHTML = "";
 
     const stations = [
-        { id: 14, name: "Absent" },
+        // { id: 14, name: "Absent" },
         { id: 12, name: "Baked Potato Bar" },
-        { id: 7, name: "Busboys/ sanitation" },
+        { id: 7, name: "Busboys/sanitation" },
         { id: 6, name: "Desserts" },
         { id: 8, name: "Dishwashers" },
-        { id: 5, name: "Drinks" },
+        { id: 5, name: "Drink Station" },
         { id: 10, name: "General Manager" },
         { id: 11, name: "Greeters" },
         { id: 4, name: "Kitchen" },
         { id: 3, name: "Line Servers" },
-        { id: 15, name: "Other" },
+        // { id: 15, name: "Other" },
         { id: 9, name: "Reserve" },
         { id: 13, name: "Salad Bar" },
         { id: 1, name: "Setup Team" },
         { id: 2, name: "Teardown Team" },
-        { id: 16, name: "Vegan" }
+        { id: 16, name: "Vegan Station" }
     ];
 
     stations.forEach(station => {
@@ -1357,16 +1296,6 @@ function editVolunteer() {
         stationSelect.appendChild(option);
     });
     stationSelect.value = currentVolunteer.station_id || "";
-
-    // Floater checkbox settings
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.name = "is_floater";
-    checkbox.id = "floater";
-    checkbox.checked = currentVolunteer.is_floater.value;
-    
-    floaterCheck.append(checkbox);
-    
     document.getElementById("editBtn").style.display = "none";
     document.getElementById("saveBtn").style.display = "inline-block";
     
@@ -1379,7 +1308,6 @@ function saveVolunteer() {
     // added for station
     const stationSelect = document.getElementById("editStation");
     const stationId = stationSelect.value;
-    const checkbox = document.querySelector("#editFloater input");
     const updatedData = {
         id: currentVolunteer.id,
         first_name: firstName,
@@ -1391,8 +1319,7 @@ function saveVolunteer() {
         capability_restrictions: document.getElementById("editRestrictions").value,
         role: document.getElementById("editRole").value,
         // added for station
-        station_id: document.getElementById("editStation").value,
-        is_floater: checkbox ? checkbox.checked : false
+        station_id: document.getElementById("editStation").value
     };
 
     fetch("/admin/edit-volunteer", {
@@ -1435,19 +1362,6 @@ document.addEventListener("click", function (e) {
 // function handleSignoutClick(event) {
 //     gapi.auth2.getAuthInstance().signOut();
 // }
-
-async function restoreReserve(volunteerId) {
-    if (!confirm("Move this volunteer back to Reserve?")) return;
-
-    const res = await fetch(`/debug/restore-reserve/${volunteerId}`);
-    const data = await res.json();
-
-    if (data.success) {
-        location.reload(); // refresh board
-    } else {
-        alert(data.error || "Failed to move volunteer");
-    }
-}
 
 async function logOut() {
     const res = await fetch("/api/google-logout", {
@@ -1537,7 +1451,8 @@ loadStationBoard();
 
         <div class="detail-card">
             <div class="detail-label">Role</div>
-            <div class="detail-value" id="detailRole">—</div>
+            <!-- Is this being used? Change to "detailRole"? -->
+            <div class="detail-value" id="detailCaptain">—</div>
         
             <select id="editRole" class="date-picker" style="display:none;">
                 <option value="admin">Admin</option>
@@ -1571,15 +1486,6 @@ loadStationBoard();
                 <input id="editRestrictions" style="display:none;">
             </div>
         </div>
-        <!-- working on getting checkbox to display if floater status is true -->
-        <div class="detail-card">
-            <div class="detail-label">Floater Status</div>
-            <div class="detail-value">
-                <input type="checkbox" id="detailFloater" disabled>
-                <div id="editFloater" style="display:none;"></div>
-            </div>
-        </div>
-        
         <div class="detail-card" id="detailAbsenceCard" style="display:none;">
             <div class="detail-label">Absence</div>
             <div class="detail-value" id="detailAbsence">—</div>
@@ -1601,7 +1507,7 @@ loadStationBoard();
                 <option value="2">Teardown Team</option>
                 <option value="3">Line Servers</option>
                 <option value="4">Kitchen</option>
-                <option value="5">Drinks</option>
+                <option value="5">Drink Station</option>
                 <option value="6">Desserts</option>
                 <option value="7">Busboys/sanitation</option>
                 <option value="8">Dishwashers</option>
@@ -1610,11 +1516,16 @@ loadStationBoard();
                 <option value="11">Greeters</option>
                 <option value="12">Baked Potato Bar</option>
                 <option value="13">Salad Bar</option>
-                <!-- <option value="14">Absent</option> -->
-                <!-- <option value="15">Other</option> -->
-                <option value="16">Vegan</option>
+                <option value="14">Absent</option>
+                <option value="15">Other</option>
+                <option value="16">Vegan Station</option>
                 
             </select>
+
+            <!-- <div id="floater" style="position:absolute; right:20px; top:20px; font-size:12px; color:#718096;">
+                <input type="checkbox" id="lockSelectionCheckbox" onchange="isSelectionLocked = this.checked;">
+                <label for="lockSelectionCheckbox">Floater</label>
+            </div> -->
         </div>
     </div>
 </div>
