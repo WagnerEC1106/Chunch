@@ -1571,7 +1571,7 @@ def assign_reserve_coverage():
         reserve_assignment = Assignment(
             volunteer_id=reserve_volunteer_id,
             station_id=reserve_station_id,
-            original_station_id=absent_assignment.original_station_id or absent_assignment.station_id
+            original_station_id=absent_assignment.original_station_id or absent_assignment.station_id,
             schedule_id=None,
             is_absent=False,
             is_covering=True,
