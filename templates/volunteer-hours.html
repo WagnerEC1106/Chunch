@@ -123,9 +123,6 @@
         <div class="top-bar-actions">
             <button onclick="window.location.href='/admin'">Back to Dashboard</button>
             <button onclick="printCurrentChart()">Print Current Chart</button>
-            <form method="POST" action="/admin/sync-volunteers">
-                <button class="secondary" type="submit">Update Volunteer List</button>
-            </form>
         </div>
     </div>
 
@@ -145,11 +142,7 @@
 
 <script>
     const stationData = {{ station_data | tojson | safe }};
-    const blockedStations = ["Reserve", "Absent", "Other"];
-    const stationNames = Object.keys(stationData).filter(
-    stationName => !blockedStations.includes(stationName)
-    );
-    
+    const stationNames = Object.keys(stationData);
     const stationSelect = document.getElementById('stationSelect');
     const stationHeading = document.getElementById('stationHeading');
     const ctx = document.getElementById('hoursChart').getContext('2d');
