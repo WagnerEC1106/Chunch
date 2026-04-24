@@ -1044,7 +1044,9 @@ def build_station_state(volunteers, stations):
     reserve_id = reserve_station.station_id if reserve_station else None
     absent_id = absent_station.station_id if absent_station else None
 
-    for volunteer_id, assignment in latest_assignment_by_volunteer.items():
+    for volunteer in volunteers:
+        volunteer_id = volunteer.id
+        assignment = latest_assignment_by_volunteer.get(volunteer_id)
 
         debug_lines.append(f"\n--- VOLUNTEER {volunteer_id} ---")
         debug_lines.append(f"TODAY: {today}")
@@ -1107,7 +1109,7 @@ def build_station_state(volunteers, stations):
         # normal
         debug_lines.append("→ NORMAL STATION")
 
-        if assignment.station_id:
+        if assignment and assignment.station_id:
             station_to_volunteer_ids[assignment.station_id].add(volunteer_id)
 
     return station_to_volunteer_ids, "\n".join(debug_lines)
