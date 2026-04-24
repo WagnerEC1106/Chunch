@@ -1615,6 +1615,20 @@ def assign_reserve_coverage():
         db.session.rollback()
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
+
+@app.route("/admin/delete-absence/<int:vid>")
+def delete_absence(vid):
+    absences = Absence.query.filter_by(volunteer_id=vid).all()
+
+    count = 0
+    for a in absences:
+        db.session.delete(a)
+        count += 1
+
+    db.session.commit()
+
+    return f"Deleted {count} absences for volunteer {vid}"
+
 @app.route("/admin/need-coverage/save", methods=["POST"])
 def save_need_coverage():
     try:
