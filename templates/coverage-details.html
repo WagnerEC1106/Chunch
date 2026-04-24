@@ -243,9 +243,6 @@
         <button type="button" onclick="submitAndExit()" style="padding:10px 14px; border:none; border-radius:10px; background:#64748b; color:white; font-weight:700; cursor:pointer;">
             Assign & Return to Dashboard
         </button>
-        <button type="button" onclick="submitAndStay()" style="padding:10px 14px; border:none; border-radius:10px; background:#2563eb; color:white; font-weight:700; cursor:pointer;">
-            Assign & Add More Coverage
-        </button>
     </div>
 </div>
 
@@ -460,25 +457,6 @@
         activeAssignForm.submit();
     }
         
-    function submitAndStay() {
-        if (!activeAssignForm) {
-            console.error("No active form");
-            return;
-        }
-
-        const stayInput = activeAssignForm.querySelector('input[name="stay_on_page"]');
-
-        if (!stayInput) {
-            console.error("stay_on_page input not found");
-            return;
-        }
-
-        stayInput.value = "true";
-
-        applyCoverageHours();
-
-        activeAssignForm.submit();
-    }
 
     document.getElementById("coverFullShiftCheckbox").addEventListener("change", function() {
         document.getElementById("customHourFields").style.display = this.checked ? "none" : "block";
