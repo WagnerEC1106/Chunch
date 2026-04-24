@@ -1984,6 +1984,48 @@ def master_list():
     return render_template("master-list.html", volunteers=volunteer_rows)
     
 
+@app.route("/admin/debug-absent")
+def debug_absent():
+    from datetime import date
+    today = date.today()
+
+    output = []
+
+    volunteers = Volunteer.query.all()
+
+    for v in volunteers:
+        assignment = Assignment.query.filter_by(
+            volunteer_id=v.id
+        ).order_by(Assignment.assignment_id.desc()).first()
+
+        active_absence = Absence.query.filter(
+            Absence.volunteer_id == v.id,
+            Absence.start_date <= today,
+            Absence.end_date >= today
+        ).all()
+
+        output.append({
+            "volunteer_id": v.id,
+            "name": f"{v.first_name} {v.last_name}",
+            "assignment": {
+                "station_id": assignment.station_id if assignment else None,
+                "is_absent": assignment.is_absent if assignment else None,
+                "is_covering": assignment.is_covering if assignment else None,
+                "covering_for": assignment.covering_for_volunteer_id if assignment else None,
+                "absence_id": assignment.absence_id if assignment else None,
+            } if assignment else None,
+            "active_absences": [
+                {
+                    "id": a.absence_id,
+                    "start": str(a.start_date),
+                    "end": str(a.end_date)
+                }
+                for a in active_absence
+            ]
+        })
+
+    return {"debug": output}
+
 from datetime import date
 
 @app.route("/admin/debug-absences")
