@@ -2953,6 +2953,38 @@ def sync_volunteers():
         db.session.rollback()
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
     
+
+@app.route("/admin/need-coverage", methods=["POST"])
+def need_coverage():
+    try:
+        volunteers = Volunteer.query\
+            .filter(Volunteer.deleted_at.is_(None))\
+            .order_by(Volunteer.last_name)\
+            .all()
+
+        from datetime import datetime
+
+        def to_iso(d):
+            try:
+                return datetime.strptime(d, "%m/%d/%Y").strftime("%Y-%m-%d")
+            except:
+                return d
+
+        prefill = {
+            "start_date": to_iso(request.form.get("start_date", "")),
+            "end_date": to_iso(request.form.get("end_date", "")),
+            "notes": request.form.get("notes", "")
+        }
+
+        return render_template(
+            "need-coverage.html",
+            volunteers=volunteers,
+            prefill=prefill
+        )
+
+    except Exception as e:
+        return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
+
 @app.route("/admin/need-coverage")
 def need_coverage():
     if "user_id" not in session:
