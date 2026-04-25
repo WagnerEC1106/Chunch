@@ -382,6 +382,80 @@ def load_absences():
         db.session.rollback()
         return {"error": str(e)}, 500
 
+
+@app.route("/admin/absences")
+def admin_absences():
+    try:
+        sheet = get_sheet()
+        worksheet = sheet.spreadsheet.worksheet("Absence")
+        rows = worksheet.get_all_records()
+
+        absences = []
+
+        for row in rows:
+            first = row.get("First name", "")
+            last = row.get("Last name", "")
+
+            start_date = row.get("Absence start date")
+            end_date = row.get("Absence end date")
+
+            start_time = row.get("Absence start time")
+            end_time = row.get("Absence end time")
+
+            comments = row.get("Additional comments")
+
+            is_partial = bool(start_time or end_time)
+
+            # find volunteer + station
+            volunteer = Volunteer.query.filter(
+                db.func.lower(Volunteer.first_name) == str(first).lower(),
+                db.func.lower(Volunteer.last_name) == str(last).lower()
+            ).first()
+
+            station_name = None
+            volunteer_id = None
+
+            if volunteer:
+                volunteer_id = volunteer.id
+
+                assignment = Assignment.query.filter_by(
+                    volunteer_id=volunteer.id
+                ).order_by(Assignment.assignment_id.desc()).first()
+
+                if assignment and assignment.station:
+                    station_name = str(assignment.station.station_name)
+
+            # build URL to auto-fill need coverage page
+            coverage_url = (
+                f"/admin/need-coverage?"
+                f"volunteer_id={volunteer_id or ''}"
+                f"&start_date={start_date or ''}"
+                f"&end_date={end_date or ''}"
+                f"&start_time={start_time or ''}"
+                f"&end_time={end_time or ''}"
+                f"&notes={comments or ''}"
+            )
+
+            absences.append({
+                "first": first,
+                "last": last,
+                "station": station_name,
+                "start_date": start_date,
+                "end_date": end_date,
+                "start_time": start_time,
+                "end_time": end_time,
+                "is_partial": is_partial,
+                "partial_start_hour": start_time,
+                "partial_end_hour": end_time,
+                "comments": comments,
+                "coverage_url": coverage_url
+            })
+
+        return render_template("absence-forms.html", absences=absences)
+
+    except Exception as e:
+        return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
+
 @app.route("/admin/edit-volunteer", methods=["POST"])
 def edit_volunteer():
     data = request.get_json()
