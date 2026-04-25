@@ -304,6 +304,84 @@ def me():
         "role": session["role"]
     })
 
+@app.route("/admin/load-absences", methods=["POST"])
+def load_absences():
+    try:
+        sheet = get_sheet()
+        worksheet = sheet.spreadsheet.worksheet("Absence")
+        rows = worksheet.get_all_records()
+
+        created = 0
+
+        for row in rows:
+            first = str(row.get("First name", "")).strip().lower()
+            last = str(row.get("Last name", "")).strip().lower()
+
+            start_date = row.get("Absence start date")
+            end_date = row.get("Absence end date")
+
+            partial_start = row.get("Absence start time")
+            partial_end = row.get("Absence end time")
+
+            notes = row.get("Additional comments")
+
+            if not first or not last or not start_date or not end_date:
+                continue
+
+            volunteer = Volunteer.query.filter(
+                db.func.lower(Volunteer.first_name) == first,
+                db.func.lower(Volunteer.last_name) == last
+            ).first()
+
+            if not volunteer:
+                continue
+
+            # prevent duplicates
+            existing = Absence.query.filter_by(
+                volunteer_id=volunteer.id,
+                start_date=start_date,
+                end_date=end_date
+            ).first()
+
+            if existing:
+                continue
+
+            is_partial = bool(partial_start and partial_end)
+
+            def parse_hour(t):
+                if not t:
+                    return None
+                t = str(t).upper().replace(" ", "")
+                if "AM" in t or "PM" in t:
+                    num = int(t[:-2].split(":")[0])
+                    if "PM" in t and num != 12:
+                        num += 12
+                    if "AM" in t and num == 12:
+                        num = 0
+                    return num
+                return None
+
+            absence = Absence(
+                volunteer_id=volunteer.id,
+                start_date=start_date,
+                end_date=end_date,
+                is_partial=is_partial,
+                partial_start_hour=parse_hour(partial_start),
+                partial_end_hour=parse_hour(partial_end),
+                notes=notes
+            )
+
+            db.session.add(absence)
+            created += 1
+
+        db.session.commit()
+
+        return {"success": True, "created": created}
+
+    except Exception as e:
+        db.session.rollback()
+        return {"error": str(e)}, 500
+
 @app.route("/admin/edit-volunteer", methods=["POST"])
 def edit_volunteer():
     data = request.get_json()
