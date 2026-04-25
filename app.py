@@ -437,6 +437,7 @@ def admin_absences():
             )
 
             absences.append({
+                "volunteer_id": volunteer_id,
                 "first": first,
                 "last": last,
                 "station": station_name,
