@@ -599,6 +599,35 @@ const stationClassMap = {
 let currentStationData = {};
 let currentAbsentEditVolunteer = null;
 
+
+async function resetToReserve() {
+    if (!currentVolunteer || !currentVolunteer.id) {
+        alert("No volunteer selected");
+        return;
+    }
+
+    if (!confirm("Reset this volunteer to Reserve?")) {
+        return;
+    }
+
+    try {
+        const res = await fetch(`/debug/restore-reserve/${currentVolunteer.id}`);
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.error || "Failed");
+        }
+
+        alert("Reset successful");
+
+        // reload the board
+        loadStationBoard();
+
+    } catch (err) {
+        alert(err.message);
+    }
+}
+
 function formatCountLabel(count) {
     return count === 1 ? "1 volunteer" : `${count} volunteers`;
 }
@@ -1456,6 +1485,9 @@ loadStationBoard();
             <button class="detail-btn back" type="button" onclick="closeVolunteerPanel()">Back</button>
             <button class="detail-btn edit" type="button" id = "editBtn" onclick="editVolunteer()">Edit</button>
             <button class="detail-btn save" type="button" id="saveBtn" onclick="saveVolunteer()" style="display:none;">Save changes</button>
+            <button class="detail-btn" onclick="resetToReserve()">
+                Reset to Reserve
+            </button>
         </div>
     </div>
 
