@@ -1230,7 +1230,16 @@ function openVolunteerPanel(volunteerJson) {
 
     document.getElementById("detailPanel").classList.add("open");
     document.getElementById("detailOverlay").classList.add("open");
-    
+    const resetBtn = document.getElementById("resetBtn");
+
+    // normalize station name just in case
+    const station = (volunteer.station || "").toLowerCase();
+
+    if (station === "reserve") {
+        resetBtn.style.display = "inline-block";
+    } else {
+        resetBtn.style.display = "none";
+    }
         
 }
 
@@ -1485,7 +1494,7 @@ loadStationBoard();
             <button class="detail-btn back" type="button" onclick="closeVolunteerPanel()">Back</button>
             <button class="detail-btn edit" type="button" id = "editBtn" onclick="editVolunteer()">Edit</button>
             <button class="detail-btn save" type="button" id="saveBtn" onclick="saveVolunteer()" style="display:none;">Save changes</button>
-            <button class="detail-btn" onclick="resetToReserve()">
+            <button id="resetBtn" class="detail-btn" onclick="resetToReserve()" style="display:none;">
                 Reset to Reserve
             </button>
         </div>
