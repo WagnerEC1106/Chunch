@@ -410,6 +410,36 @@ def delete_absence_form():
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
+
+@app.route("/admin/reset-covering/<int:volunteer_id>", methods=["POST"])
+def reset_single_covering(volunteer_id):
+    try:
+        reserve_station = Station.query.filter_by(station_name="Reserve").first()
+        if not reserve_station:
+            return {"error": "Reserve station not found"}, 404
+
+        assignments = Assignment.query.filter_by(
+            volunteer_id=volunteer_id,
+            is_covering=True
+        ).all()
+
+        for assignment in assignments:
+            assignment.station_id = reserve_station.station_id
+            assignment.is_covering = False
+            assignment.covering_for_volunteer_id = None
+            assignment.original_station_id = None
+            assignment.absence_id = None
+            assignment.cover_start_hour = None
+            assignment.cover_end_hour = None
+
+        db.session.commit()
+
+        return redirect("/admin")
+
+    except Exception as e:
+        db.session.rollback()
+        return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
+
 @app.route("/admin/absences")
 def admin_absences():
     try:
