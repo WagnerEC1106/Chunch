@@ -118,14 +118,12 @@
         <div class="inline-row">
             <div class="field">
                 <label for="start_date">Start Date</label>
-                <input type="date" id="start_date" name="start_date"
-                    value="{{ prefill.start_date }}" required>
+                <input type="date" id="start_date" name="start_date" required>
             </div>
 
             <div class="field">
                 <label for="end_date">End Date</label>
-                <input type="date" id="end_date" name="end_date"
-                    value="{{ prefill.end_date }}" required>
+                <input type="date" id="end_date" name="end_date" required>
             </div>
         </div>
 
@@ -171,7 +169,6 @@ function togglePartialFields() {
     const isPartial = document.getElementById("is_partial").value === "true";
     document.getElementById("partialFields").style.display = isPartial ? "block" : "none";
 }
-
 
 $(document).ready(function() {
     $('#volunteer_id').select2({
