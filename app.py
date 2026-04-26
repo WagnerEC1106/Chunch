@@ -1806,6 +1806,7 @@ def debug_hourly_final():
                 "absence_is_partial": latest_absence.is_partial if latest_absence else False,
                 "absence_partial_start_hour": latest_absence.partial_start_hour if latest_absence else None,
                 "absence_partial_end_hour": latest_absence.partial_end_hour if latest_absence else None,
+                "is_covering": latest_assignment.is_covering if latest_assignment else False,
                 "absence_notes": latest_absence.notes or "" if latest_absence else ""
             }
 
