@@ -382,6 +382,33 @@ def load_absences():
         db.session.rollback()
         return {"error": str(e)}, 500
 
+@app.route("/admin/absences/delete", methods=["POST"])
+def delete_absence_form():
+    try:
+        first = request.form.get("first", "").strip()
+        last = request.form.get("last", "").strip()
+        start_date = request.form.get("start_date", "").strip()
+        end_date = request.form.get("end_date", "").strip()
+
+        sheet = get_sheet()
+        worksheet = sheet.spreadsheet.worksheet("Absence")
+        rows = worksheet.get_all_records()
+
+        # Row 1 is header, so start=2
+        for i, row in enumerate(rows, start=2):
+            if (
+                str(row.get("First name", "")).strip() == first and
+                str(row.get("Last name", "")).strip() == last and
+                str(row.get("Absence start date", "")).strip() == start_date and
+                str(row.get("Absence end date", "")).strip() == end_date
+            ):
+                worksheet.delete_rows(i)
+                break
+
+        return redirect("/admin/absences")
+
+    except Exception as e:
+        return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
 @app.route("/admin/absences")
 def admin_absences():
