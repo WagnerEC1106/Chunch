@@ -2211,14 +2211,12 @@ def master_list():
         .order_by(Volunteer.last_name)\
         .all()
     def parse_shift(shift_str):
-        if not shift_str or " - " not in shift_str:
+        if not shift_str:
             return None, None
-
-        start_str, end_str = shift_str.split(" - ")
-
+    
         def parse_hour(h):
             h = h.strip().upper()
-
+    
             if h == "12AM":
                 return 0
             if h == "12PM":
@@ -2227,10 +2225,31 @@ def master_list():
                 return int(h.replace("AM", ""))
             if h.endswith("PM"):
                 return int(h.replace("PM", "")) + 12
-
+    
             return None
-
-        return parse_hour(start_str), parse_hour(end_str)
+    
+        ranges = shift_str.split(",")
+    
+        hours = []
+    
+        for r in ranges:
+            if " - " not in r:
+                continue
+    
+            start_str, end_str = r.split(" - ")
+            start = parse_hour(start_str)
+            end = parse_hour(end_str)
+    
+            if start is not None:
+                hours.append(start)
+            if end is not None:
+                hours.append(end)
+    
+        if not hours:
+            return None, None
+    
+        return min(hours), max(hours)
+    
     accounts = UserAccount.query.all()
     role_by_volunteer_id = {
         account.volunteer_id: account.role
