@@ -2338,7 +2338,7 @@ def undo_delete(volunteer_id):
         db.session.commit()
     return redirect("/admin/master-list/deleted-volunteers")
 
-@app.route("/admin/master-list/edit-volunteer/<int:volunteer_id>", methods=["POST"])
+@app.route("/admin/master-list/edit-volunteer/<int:volunteer_id>", methods=["POST", "GET"])
 def edit_master_volunteer(volunteer_id):
     if "user_id" not in session:
         return redirect("/")
@@ -2404,14 +2404,6 @@ def edit_master_volunteer(volunteer_id):
             flash("Volunteer already exists.")
             return redirect(f"/admin/master-list/edit-volunteer/{volunteer_id}")
 
-        if start_hour is None or end_hour is None:
-            flash("Start hour and end hour are required.")
-            return redirect(f"/admin/master-list/edit-volunteer/{volunteer_id}")
-
-        if end_hour <= start_hour:
-            flash("Invalid time range.")
-            return redirect(f"/admin/master-list/edit-volunteer/{volunteer_id}")
-
         typical_shift = f"{format_hour(start_hour)} - {format_hour(end_hour)}"
 
         volunteer.first_name = first_name
@@ -2426,7 +2418,6 @@ def edit_master_volunteer(volunteer_id):
         volunteer.is_floater = is_floater
 
         db.session.commit()
-        return redirect("/admin/master-list")
 
     start_hour, end_hour = parse_shift(volunteer.typical_shift)
 
