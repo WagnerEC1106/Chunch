@@ -2203,13 +2203,34 @@ def delete_applicant(applicants_id):
     db.session.commit()
 
     return redirect("/admin/inbox")
+    
 @app.route("/admin/master-list")
 def master_list():
     volunteers = Volunteer.query\
         .filter(Volunteer.deleted_at.is_(None))\
         .order_by(Volunteer.last_name)\
         .all()
-    
+    def parse_shift(shift_str):
+        if not shift_str or " - " not in shift_str:
+            return None, None
+
+        start_str, end_str = shift_str.split(" - ")
+
+        def parse_hour(h):
+            h = h.strip().upper()
+
+            if h == "12AM":
+                return 0
+            if h == "12PM":
+                return 12
+            if h.endswith("AM"):
+                return int(h.replace("AM", ""))
+            if h.endswith("PM"):
+                return int(h.replace("PM", "")) + 12
+
+            return None
+
+        return parse_hour(start_str), parse_hour(end_str)
     accounts = UserAccount.query.all()
     role_by_volunteer_id = {
         account.volunteer_id: account.role
@@ -2218,6 +2239,10 @@ def master_list():
     }
 
     volunteer_rows = []
+    for v in volunteers:
+        user = UserAccount.query.filter(UserAccount.volunteer_id == v.id).first()
+        start_hour, end_hour = parse_shift(v.typical_shift)
+    
     for v in volunteers:
         #role = role_by_volunteer_id.get(v.id, "volunteer")
         user = UserAccount.query.filter(UserAccount.volunteer_id == v.id).first() 
@@ -2229,6 +2254,12 @@ def master_list():
             "phone": v.phone,
             "role": user.role.capitalize() if user is not None else "Volunteer",
             "is_floater": v.is_floater
+            "start_hour": start_hour,
+            "end_hour": end_hour,
+            "station_id": v.station_id,
+            "typical_shift": v.typical_shift,
+            "unavailability": v.unavailability,
+            "capability_restrictions": v.capability_restrictions
         })
 
     return render_template("master-list.html", volunteers=volunteer_rows)
