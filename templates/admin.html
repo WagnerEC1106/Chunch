@@ -799,7 +799,7 @@ function startExtendFlow() {
     const prettyNew = formatDatePretty(newEndDate);
     const isPartial = !!currentAbsentEditVolunteer?.absence_is_partial;
 
-    document.getElementById("reserveDecisionTitle").textContent = "";
+    document.getElementById("reserveDecisionTitle").textContent = "Extend Absence";
 
     if (isPartial) {
         const startHour = formatHourPretty(currentAbsentEditVolunteer?.absence_partial_start_hour);
@@ -1630,6 +1630,7 @@ loadStationBoard();
         </div>
 
         <div class="detail-card" id="extendAbsenceSection" style="display:none;">
+            <div class="detail-label">Extend Absence</div>
             <input type="date" id="extendAbsenceNewEndDate" class="date-picker" style="width:100%;">
             <button class="detail-btn edit" type="button" onclick="startExtendFlow()">Next</button>
         </div>
