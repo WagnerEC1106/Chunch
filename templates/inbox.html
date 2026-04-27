@@ -349,6 +349,11 @@
                                         Undo
                                     </button>
                                 </form>
+                                <form method="POST" action="/admin/inbox/delete/{{ r.id }}">
+                                    <button class="btn-reject" type="submit" onclick="return confirm('Permanently delete this application? This cannot be undone.')">
+                                        Delete
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
