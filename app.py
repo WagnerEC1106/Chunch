@@ -2180,6 +2180,17 @@ def undo_rejection(applicants_id):
         db.session.commit()
     return redirect("/admin/inbox")
 
+@app.route("/admin/inbox/delete/<int:applicants_id>", methods=["POST"])
+def delete_applicant(applicants_id):
+    if "user_id" not in session:
+        return redirect("/")
+
+    applicant = Applicant.query.get_or_404(applicants_id)
+
+    db.session.delete(applicant)
+    db.session.commit()
+
+    return redirect("/admin/inbox")
 @app.route("/admin/master-list")
 def master_list():
     volunteers = Volunteer.query\
