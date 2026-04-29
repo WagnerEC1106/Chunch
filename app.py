@@ -1877,7 +1877,7 @@ def debug_hourly_final():
                 continue
 
             # Skip special cases (important)
-            if assignment.is_absent or assignment.is_covering:
+            if assignment.is_covering:
                 continue
 
             # If assignment doesn't match volunteer's station → fix it
