@@ -9,6 +9,7 @@ from sqlalchemy.orm import relationship, backref
 import random
 import os
 import smtplib
+from datetime import date, datetime
 from email.message import EmailMessage
 from flask import request, jsonify, session, redirect, url_for, flash
 from google.oauth2 import id_token
@@ -468,12 +469,14 @@ def admin_absences():
                 if assignment and assignment.station:
                     station_name = str(assignment.station.station_name)
 
-            # build URL to auto-fill need coverage page
+            iso_start = parsed_start.isoformat() if parsed_start else ""
+            iso_end = parsed_end.isoformat() if parsed_end else ""
+
             coverage_url = (
                 f"/admin/need-coverage?"
                 f"volunteer_id={volunteer_id or ''}"
-                f"&start_date={start_date or ''}"
-                f"&end_date={end_date or ''}"
+                f"&start_date={iso_start}"
+                f"&end_date={iso_end}"
                 f"&start_time={start_time or ''}"
                 f"&end_time={end_time or ''}"
                 f"&notes={comments or ''}"
