@@ -443,6 +443,7 @@ def admin_absences():
 
             parsed_start = None
             parsed_end = None
+            
             if volunteer:
                 try:
                     parsed_start = datetime.strptime(str(start_date), "%m/%d/%Y").date()
