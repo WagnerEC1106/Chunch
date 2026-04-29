@@ -1916,7 +1916,13 @@ def debug_hourly_final():
             else:
                 volunteer_rows_by_id[volunteer_id]["display_time"] = ""
 
-            if assignment.is_absent:
+            active_absence = Absence.query.filter(
+                Absence.volunteer_id == volunteer_id,
+                Absence.start_date <= today,
+                Absence.end_date >= today
+            ).first()
+
+            if active_absence:
                 if absent_station_id is not None:
                     station_to_volunteer_ids[absent_station_id].add(volunteer_id)
                 continue
