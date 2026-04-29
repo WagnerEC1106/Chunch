@@ -538,27 +538,7 @@ def edit_volunteer():
     volunteer.is_floater = data.get("is_floater")
 
     assignment = Assignment.query.filter_by(volunteer_id=volunteer.id).order_by(Assignment.assignment_id.desc()).first()
-    # commenting out for reverting
-    # assignment = Assignment.query.filter_by(volunteer_id=volunteer.id).all() # returns None if volunteer is not in the system
-    # prev_station = assignment.get(volunteer.station_id) if assignment else None
-    # if assignment is None:
-    #     return jsonify({"error": "Volunteer has no assignment"}), 404 
-    # prev_station = {} # assignment.station_id
-    # # if the stations aren't the same, add the volunteer to the new station and remove them from the old station
-    # if(prev_station != volunteer.station_id):
-    #     # assigned_id.append(data["id"])
-    #     db.session.delete(Assignment(volunteer_id=volunteer.id, station_id=prev_station[assignment.volunteer_id]))
-    #     db.session.add(Assignment(volunteer_id=volunteer.id, station_id=volunteer.station_id))
-    #     assignment.station_id = volunteer.station_id 
-    #     current = prev_station.get(assignment.volunteer_id)
-    #     if current is None or assignment.assignment_id != current.assignment_id:
-    #         prev_station[assignment.volunteer_id] = assignment
-    #         db.session.add(assignment)
-    #         db.session.delete(prev_station)
-    #         db.session.commit()
-    
-    # The assignment of the new station, list of volunteers for that station
-    # check for volunteer in this assignment    
+
 
     if "role" in data:
         new_role = data["role"]
@@ -595,6 +575,7 @@ def edit_volunteer():
 
     return {"success": True}
 
+#captain page route
 @app.route("/captain")
 def captain_page():
     try:
@@ -614,6 +595,7 @@ def captain_page():
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
+# currently used as of 4/29
 # Sign out of admin/captain
 @app.route("/api/google-logout", methods=["POST"])
 def google_logout():
@@ -770,6 +752,7 @@ def volunteer_hours_captain():
         today = date.today()
         assignments = Assignment.query.all()
 
+        #commented out by Aaron 4/29
         # latest_assignment_by_volunteer = {}
         # for assignment in assignments:
         #     if assignment.volunteer_id is None:
@@ -945,14 +928,17 @@ def build_station_state(volunteers, stations):
 
     return station_to_volunteer_ids, "\n".join(debug_lines)
 
+#admin route
 @app.route("/admin")
 def admin_page():
     try:
         debug_admin = request.args.get("debug_admin") == "1"
 
+        #if the user does not have login credentials as an admin, captain, or tech, they are redirected to index
         if "user_id" not in session and not debug_admin:
             return redirect("/")
 
+        #if their role is a captain, any attempts to get to /admin will redirect them to /captain
         elif session.get("role") == "captain":
             return redirect("/captain")
 
