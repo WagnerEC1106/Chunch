@@ -241,6 +241,7 @@ def home():
 def static_files(path):
     return send_from_directory(".", path)
 
+
 @app.route("/api/google-login", methods=["POST"])
 def google_login():
     GOOGLE_CLIENT_ID = os.environ["GOOGLE_CLIENT_ID"]
@@ -305,6 +306,7 @@ def me():
         "role": session["role"]
     })
 
+#
 @app.route("/admin/load-absences", methods=["POST"])
 def load_absences():
     try:
@@ -383,8 +385,10 @@ def load_absences():
         db.session.rollback()
         return {"error": str(e)}, 500
 
+#delete button for absence forms
 @app.route("/admin/absences/delete", methods=["POST"])
 def delete_absence_form():
+    #gather the form information from the Absence tab within the Chunch Volunteer Info Sheet
     try:
         first = request.form.get("first", "").strip()
         last = request.form.get("last", "").strip()
@@ -395,7 +399,7 @@ def delete_absence_form():
         worksheet = sheet.spreadsheet.worksheet("Absence")
         rows = worksheet.get_all_records()
 
-        # Row 1 is header, so start=2
+        # iterate through the rows to find the specific instance of that volunteer's absence
         for i, row in enumerate(rows, start=2):
             if (
                 str(row.get("First name", "")).strip() == first and
@@ -403,16 +407,21 @@ def delete_absence_form():
                 str(row.get("Absence start date", "")).strip() == start_date and
                 str(row.get("Absence end date", "")).strip() == end_date
             ):
+                #once found, delete the row
                 worksheet.delete_rows(i)
                 break
 
+        #after deletion user is redirected to absence form page
         return redirect("/admin/absences")
 
+    #failure results in an error
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
+#absence form page
 @app.route("/admin/absences")
 def admin_absences():
+    #pull from the absence tab within the chunch volunteer info sheet
     try:
         sheet = get_sheet()
         worksheet = sheet.spreadsheet.worksheet("Absence")
@@ -420,6 +429,7 @@ def admin_absences():
 
         absences = []
 
+        #establish string variables for all information regarding the absence
         for row in rows:
             first = row.get("First name", "")
             last = row.get("Last name", "")
@@ -441,6 +451,7 @@ def admin_absences():
                 db.func.lower(Volunteer.last_name) == str(last).lower()
             ).first()
 
+            #initialize strings to turn start and end dates into uniformed strings
             parsed_start = None
             parsed_end = None
             
@@ -452,6 +463,7 @@ def admin_absences():
                     parsed_start = None
                     parsed_end = None
 
+                #if there exists a start and end time, initialize an absence record
                 absence_record = None
                 if parsed_start and parsed_end:
                     absence_record = Absence.query.filter_by(
@@ -502,8 +514,10 @@ def admin_absences():
                 "coverage_url": coverage_url
             })
 
+        #return to the absence form
         return render_template("absence-forms.html", absences=absences)
 
+    #exception for error tracking
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
