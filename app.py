@@ -2373,9 +2373,21 @@ def perma_delete(volunteer_id):
     if "user_id" not in session:
         return redirect("/")
     volunteer = Volunteer.query.get_or_404(volunteer_id)
+    assignments = Assignment.query.filter_by(volunteer_id = volunteer_id).all()
+    availabilities = Availability.query.filter_by(volunteer_id = volunteer_id).all()
+    
+    if availabilities:
+        for availability in availabilities:
+            db.session.delete(availability)
+            
+    if assignments:
+        for assignment in assignments:
+            db.session.delete(assignment)
+            
     if volunteer:
         db.session.delete(volunteer)
-        db.session.commit()
+
+    db.session.commit()
     return redirect("/admin/master-list/deleted-volunteers")
 
 @app.route("/admin/master-list/deleted-volunteers/undo/<int:volunteer_id>", methods=["POST"])
