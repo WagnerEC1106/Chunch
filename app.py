@@ -440,6 +440,9 @@ def admin_absences():
                 db.func.lower(Volunteer.first_name) == str(first).lower(),
                 db.func.lower(Volunteer.last_name) == str(last).lower()
             ).first()
+
+            parsed_start = None
+            parsed_end = None
             if volunteer:
                 try:
                     parsed_start = datetime.strptime(str(start_date), "%m/%d/%Y").date()
