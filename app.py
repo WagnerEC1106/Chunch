@@ -1981,7 +1981,22 @@ def debug_hourly_final():
             # If assignment doesn't match volunteer's station → fix it
             if assignment.station_id != volunteer.station_id:
                 assignment.station_id = volunteer.station_id
+        
+        assigned_volunteer_ids = set(latest_assignment_by_volunteer.keys())
 
+        for volunteer in volunteers:
+            if volunteer.id in assigned_volunteer_ids:
+                continue
+        
+            if volunteer.station_id is None:
+                continue
+        
+            new_assignment = Assignment(
+                volunteer_id=volunteer.id,
+                station_id=volunteer.station_id
+            )
+        
+            db.session.add(new_assignment)
         db.session.commit()
 
         refreshed_assignments = Assignment.query.all()
