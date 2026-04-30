@@ -239,7 +239,7 @@ def home():
 
 @app.route("/<path:path>")
 def static_files(path):
-    return send_from_directory("templates", path)
+    return send_from_directory(".", path)
 
 
 @app.route("/api/google-login", methods=["POST"])
