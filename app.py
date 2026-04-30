@@ -2537,6 +2537,8 @@ def edit_master_volunteer(volunteer_id):
         except Exception:
             return None, None
     def format_hour(hour):
+        if hour is None:
+            return ""
         if hour == 0:
             return "12AM"
         elif hour < 12:
