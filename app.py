@@ -1634,9 +1634,11 @@ def assign_reserve_coverage():
         if cover_start_hour > cover_end_hour:
             return "<pre>Coverage start hour cannot be after end hour.</pre>", 400
 
+        reserve_station = Station.query.filter_by(station_name="Reserve").first()
+
         reserve_assignment = Assignment(
             volunteer_id=reserve_volunteer_id,
-            station_id=absent_assignment.station_id,
+            station_id=reserve_station.station_id,
             schedule_id=None,
             is_absent=False,
             is_covering=True,
@@ -2069,6 +2071,28 @@ def debug_hourly_final():
                 )
             else:
                 volunteer_rows_by_id[volunteer_id]["display_time"] = ""
+
+            if assignment.is_covering and assignment.absence_id:
+                absence = Absence.query.get(assignment.absence_id)
+
+                if absence:
+                    if today < absence.start_date:
+                        if reserve_station:
+                            station_to_volunteer_ids[reserve_station.station_id].add(volunteer_id)
+                        continue
+
+                    if absence.start_date <= today <= absence.end_date:
+                        target_station_id = assignment.original_station_id or assignment.station_id
+                        if target_station_id is not None:
+                            station_to_volunteer_ids.setdefault(
+                                target_station_id, set()
+                            ).add(volunteer_id)
+                        continue
+
+                    if today > absence.end_date:
+                        if reserve_station:
+                            station_to_volunteer_ids[reserve_station.station_id].add(volunteer_id)
+                        continue
 
             active_absence = Absence.query.filter(
                 Absence.volunteer_id == volunteer_id,
