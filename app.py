@@ -901,32 +901,36 @@ def build_station_state(volunteers, stations):
             if not absence:
                 absence = Absence.query.filter(
                     Absence.volunteer_id == assignment.covering_for_volunteer_id
-            ).order_by(Absence.start_date.desc()).first()
+                ).order_by(Absence.start_date.desc()).first()
 
             if absence:
                 debug_lines.append(f"absence.start: {absence.start_date}")
                 debug_lines.append(f"absence.end: {absence.end_date}")
                 debug_lines.append(f"today < start: {today < absence.start_date}")
 
+                # BEFORE absence stay reserve ONLY (no station takeover)
                 if today < absence.start_date:
-                    debug_lines.append("→ FORCE RESERVE (before start)")
+                    debug_lines.append("→ BEFORE absence → stay reserve (locked)")
                     if reserve_id:
                         station_to_volunteer_ids[reserve_id].add(volunteer_id)
                     continue
 
+                # DURING absence take over station
+                if absence.start_date <= today <= absence.end_date:
+                    debug_lines.append("→ DURING absence → takes station")
+                    target_station_id = assignment.original_station_id
+                    if target_station_id:
+                        station_to_volunteer_ids[target_station_id].add(volunteer_id)
+                    else:
+                        debug_lines.append("missing original_station_id")
+                    continue
+
+                #  AFTER absence go back to reserve
                 if today > absence.end_date:
                     debug_lines.append("→ AFTER absence → reserve")
                     if reserve_id:
                         station_to_volunteer_ids[reserve_id].add(volunteer_id)
                     continue
-
-                debug_lines.append("→ DURING absence → takes station")
-                target_station_id = assignment.original_station_id
-                if target_station_id:
-                    station_to_volunteer_ids[target_station_id].add(volunteer_id)
-                else:
-                    debug_lines.append("missing original_station_id")
-                continue
 
         # absent
         active_absence = Absence.query.filter(
@@ -1457,6 +1461,20 @@ def assign_reserve_coverage():
         absence_id = request.form.get("absence_id", type=int)
         absent_volunteer_id = request.form.get("absent_volunteer_id", type=int)
         reserve_volunteer_id = request.form.get("reserve_volunteer_id", type=int)
+
+        from datetime import date
+
+        existing_cover = db.session.query(Assignment)\
+            .join(Absence, Assignment.absence_id == Absence.absence_id)\
+            .filter(
+                Assignment.volunteer_id == reserve_volunteer_id,
+                Assignment.is_covering == True,
+                Absence.end_date >= date.today()
+            ).first()
+
+        if existing_cover:
+            return "<pre>This reserve is already scheduled to cover another absence.</pre>", 400
+
         cover_start_hour = request.form.get("cover_start_hour", type=int)
         cover_end_hour = request.form.get("cover_end_hour", type=int)
         send_email = (request.form.get("send_email", "no") == "yes")
@@ -1623,7 +1641,7 @@ def assign_reserve_coverage():
             is_absent=False,
             is_covering=True,
             covering_for_volunteer_id=absent_volunteer_id,
-            original_station_id=None,
+            original_station_id=absent_assignment.station_id,
             absence_id=absence_id,
             cover_start_hour=cover_start_hour,
             cover_end_hour=cover_end_hour
