@@ -1,0 +1,216 @@
+/* 
+    Style code for all public-facing component pages 
+*/
+
+/* Fonts */
+@font-face {
+    font-family: 'Hyperlegible';
+    src: local('Hyperlegible'), 
+        url('../../../assets/fonts/Atkinson-Hyperlegible-Regular.woff2') format('woff2'),
+        url('../../../assets/fonts/Atkinson-Hyperlegible-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Hyperlegible';
+    src: local('Hyperlegible'),
+        url('../../../assets/fonts/Atkinson-Hyperlegible-Bold.woff2') format('woff2'),
+        url('../../../assets/fonts/Atkinson-Hyperlegible-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Hyperlegible';
+    src: local('Hyperlegible'),
+        url('../../../assets/fonts/Atkinson-Hyperlegible-Italic.woff2') format('woff2'),
+        url('../../../assets/fonts/Atkinson-Hyperlegible-Italic.woff') format('woff');
+    font-weight: normal; /* 2 numbers between 1 and 1000 and "normal" "lighter" "bold" "bolder" */
+    font-style: italic;
+}
+@font-face {
+    font-family: 'Hyperlegible';
+    src: local('Hyperlegible') 
+        url('../../../assets/fonts/Atkinson-Hyperlegible-BoldItalic.woff2') format('woff2'),
+        url('../../../assets/fonts/Atkinson-Hyperlegible-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Shared */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Hyperlegible', regular;
+}
+body {
+    background: #F4F6F9;
+    color: #1F2937;
+    line-height: 1.6;
+}
+h1 {
+    font-size: 48px;
+    margin-bottom: 30px;
+    font-weight: 700;
+    color: #111827;
+}
+p {
+    margin-bottom: 18px;
+    font-size: 18px;
+    color: #374151;
+}
+section {
+    margin: 30px 10px;
+    padding: 10px 20px;
+}
+
+/* Navbar */
+.navbar {
+    background: #0F172A;
+    padding: 18px 40px;
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+.navbar a {
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: 0.3s ease;
+}
+.navbar a:hover {
+    background: #2563EB;
+}
+
+/* Home Page */
+.container {
+    max-width: 900px;
+    margin: 80px auto;
+    text-align: center;
+    padding: 0 20px;
+}
+.header {
+    background-color: #F4F6F9
+}
+.tagline {
+    text-align: center;
+    padding: 5px 10px;
+    margin: 5px auto;
+}
+tagline p {
+    margin-bottom: 2px;
+    font-size: 24px;
+}
+.about {
+    max-width: 1000px;
+    text-align: center;
+}
+.define {
+    background-color: white;
+}
+.mission {
+
+}
+.story {
+
+}
+/* Meet The Team Page */
+
+/* Contribute Page */
+.food {
+    margin: 60px auto; /* Space between donation and food section */
+    background: white; /* White card background */
+    padding: 40px; /* Space inside card */
+    width: 80%; /* Card width */
+    border-radius: 20px; /* Rounded corners */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08); /* shadow */
+}
+.food h2 {
+    margin-bottom: 20px; /* Space below heading */
+    font-weight: 600; /* bold heading */
+}
+
+.donate {
+    margin: 60px;
+}
+.donate p {
+    margin-top: 20px;
+}
+.donate button {
+    background-color: #28A745;
+    color: white;
+    padding: 15px 30px;
+    font-size: 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+    transition: all 0.3s ease;
+}
+.donate button:hover {
+    background-color: #218838;
+}
+
+.volunteer {
+    margin: 60px;
+}
+.volunteer p {
+    margin-top: 20px;
+}
+.volunteer button {
+    background-color: #475EF5;
+    color: white;
+    padding: 15px 30px;
+    font-size: 25px;
+    border:none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(71, 94, 245, 0.3);
+}
+.volunteer button:hover {
+    background-color: blue;
+}
+/* Volunteer Page */
+
+/* Students Page */
+
+
+/* Responsive??? */
+@media (max-width: 1024px) {
+    .spotlight-grid { column-count: 2; }
+}
+
+/* Mobile view support */
+@media (max-width: 768px) {
+    .navbar {
+        gap: 12px; /* reduce spacing between links */
+        padding: 15px 20px; /* reduce padding so it fits beter */
+    }
+    
+    /* Meet The Team Page */
+    .container { margin: 60px auto; }
+    .page-header h1  { font-size: 34px; }
+    .page-header p { font-size: 16px; }
+    .team-grid { column-count: 1; }
+
+    /* Contribute Page */
+    body {
+        margin-top: 160px; /* extra space so wrapped navbar does not cover content */
+    }
+    .food-section {
+        width: 90%; /* makes card fit nicely on mobile */
+        padding: 25px; /* smaller padding */
+    }
+
+    /* Volunteer Page */
+    .container {
+        flex-direction: column;
+        padding: 30px;
+    }
+    .info-section, .video-section { width: 100%; }
+
+    /* Student Page */
+}
