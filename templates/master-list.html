@@ -247,10 +247,10 @@ tr:hover {
                         <!-- <br> -->
                         <select name="role" id="editRole">
                             <option value="">Select Role</option>
-                            <option value="volunteer" {% if v.role == "volunteer" %}selected{% endif %}>Volunteer</option>
-                            <option value="captain" {% if v.role == "captain" %}selected{% endif %}>Captain</option>
-                            <option value="admin" {% if v.role == "admin" %}selected{% endif %}>Admin</option>
-                            <option value="tech" {% if v.role == "tech" %}selected{% endif %}>Tech</option>
+                            <option value="volunteer" {% if v.role|lower == "volunteer" %}selected{% endif %}>Volunteer</option>
+                            <option value="captain" {% if v.role|lower == "captain" %}selected{% endif %}>Captain</option>
+                            <option value="admin" {% if v.role|lower == "admin" %}selected{% endif %}>Admin</option>
+                            <option value="tech" {% if v.role|lower == "tech" %}selected{% endif %}>Tech</option>
                         </select>
 
                         <input type="text" name="unavailability" placeholder="Unavailability" value="{{ v.unavailability or '' }}">

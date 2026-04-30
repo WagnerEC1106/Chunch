@@ -9,6 +9,7 @@ from sqlalchemy.orm import relationship, backref
 import random
 import os
 import smtplib
+from datetime import date, datetime
 from email.message import EmailMessage
 from flask import request, jsonify, session, redirect, url_for, flash
 from google.oauth2 import id_token
@@ -240,6 +241,7 @@ def home():
 def static_files(path):
     return send_from_directory(".", path)
 
+
 @app.route("/api/google-login", methods=["POST"])
 def google_login():
     GOOGLE_CLIENT_ID = os.environ["GOOGLE_CLIENT_ID"]
@@ -401,12 +403,14 @@ def load_absences():
         db.session.rollback()
         return {"error": str(e)}, 500
 
+#delete button for absence forms
 @app.route("/admin/absences/delete", methods=["POST"])
 def delete_absence_form():
     """
         Remove absence from database and spreadsheet
     """
     try:
+        # gather the form information from the Absence tab within the Chunch Volunteer Info Sheet
         first = request.form.get("first", "").strip()
         last = request.form.get("last", "").strip()
         start_date = request.form.get("start_date", "").strip()
@@ -416,7 +420,7 @@ def delete_absence_form():
         worksheet = sheet.spreadsheet.worksheet("Absence")
         rows = worksheet.get_all_records()
 
-        # Row 1 is header, so start=2
+        # iterate through the rows to find the specific instance of that volunteer's absence
         for i, row in enumerate(rows, start=2):
             if (
                 str(row.get("First name", "")).strip() == first and
@@ -424,19 +428,24 @@ def delete_absence_form():
                 str(row.get("Absence start date", "")).strip() == start_date and
                 str(row.get("Absence end date", "")).strip() == end_date
             ):
+                #once found, delete the row
                 worksheet.delete_rows(i)
                 break
         absence = Absence.query.filter_by(
             # volunteer_id
         )
 
+        #after deletion user is redirected to absence form page
         return redirect("/admin/absences")
 
+    #failure results in an error
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
+#absence form page
 @app.route("/admin/absences")
 def admin_absences():
+    #pull from the absence tab within the chunch volunteer info sheet
     try:
         sheet = get_sheet()
         worksheet = sheet.spreadsheet.worksheet("Absence")
@@ -444,6 +453,7 @@ def admin_absences():
 
         absences = []
 
+        #establish string variables for all information regarding the absence
         for row in rows:
             first = row.get("First name", "")
             last = row.get("Last name", "")
@@ -464,6 +474,11 @@ def admin_absences():
                 db.func.lower(Volunteer.first_name) == str(first).lower(),
                 db.func.lower(Volunteer.last_name) == str(last).lower()
             ).first()
+
+            #initialize strings to turn start and end dates into uniformed strings
+            parsed_start = None
+            parsed_end = None
+            
             if volunteer:
                 try:
                     parsed_start = datetime.strptime(str(start_date), "%m/%d/%Y").date()
@@ -472,6 +487,7 @@ def admin_absences():
                     parsed_start = None
                     parsed_end = None
 
+                #if there exists a start and end time, initialize an absence record
                 absence_record = None
                 if parsed_start and parsed_end:
                     absence_record = Absence.query.filter_by(
@@ -493,12 +509,14 @@ def admin_absences():
                 if assignment and assignment.station:
                     station_name = str(assignment.station.station_name)
 
-            # build URL to auto-fill need coverage page
+            iso_start = parsed_start.isoformat() if parsed_start else ""
+            iso_end = parsed_end.isoformat() if parsed_end else ""
+
             coverage_url = (
                 f"/admin/need-coverage?"
                 f"volunteer_id={volunteer_id or ''}"
-                f"&start_date={start_date or ''}"
-                f"&end_date={end_date or ''}"
+                f"&start_date={iso_start}"
+                f"&end_date={iso_end}"
                 f"&start_time={start_time or ''}"
                 f"&end_time={end_time or ''}"
                 f"&notes={comments or ''}"
@@ -520,8 +538,10 @@ def admin_absences():
                 "coverage_url": coverage_url
             })
 
+        #return to the absence form
         return render_template("absence-forms.html", absences=absences)
 
+    #exception for error tracking
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
@@ -578,6 +598,7 @@ def edit_volunteer():
 
     return {"success": True}
 
+#captain page route
 @app.route("/captain")
 def captain_page():
     try:
@@ -597,6 +618,7 @@ def captain_page():
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
+# currently used as of 4/29
 # Sign out of admin/captain
 @app.route("/api/google-logout", methods=["POST"])
 def google_logout():
@@ -640,11 +662,13 @@ def volunteer_hours_captain():
 
         db.session.commit()
 
+        #stations = Station.query\
+            #.filter(Station.station_name.notin_(["Reserve", "Absent", "Other"]))\
+            #.order_by(Station.station_name)\
+            #.all()
         stations = Station.query\
-            .filter(Station.station_name.notin_(["Reserve", "Absent", "Other"]))\
-            .order_by(Station.station_name)\
-            .all()
-
+        .order_by(Station.station_name)\
+        .all()
         sheet = get_sheet()
         rows = sheet.get_all_records()
 
@@ -751,58 +775,61 @@ def volunteer_hours_captain():
         today = date.today()
         assignments = Assignment.query.all()
 
-        latest_assignment_by_volunteer = {}
-        for assignment in assignments:
-            if assignment.volunteer_id is None:
-                continue
+        #commented out by Aaron 4/29
+        # latest_assignment_by_volunteer = {}
+        # for assignment in assignments:
+        #     if assignment.volunteer_id is None:
+        #         continue
 
-            current = latest_assignment_by_volunteer.get(assignment.volunteer_id)
-            if current is None or assignment.assignment_id > current.assignment_id:
-                latest_assignment_by_volunteer[assignment.volunteer_id] = assignment
+        #     current = latest_assignment_by_volunteer.get(assignment.volunteer_id)
+        #     if current is None or assignment.assignment_id > current.assignment_id:
+        #         latest_assignment_by_volunteer[assignment.volunteer_id] = assignment
 
-        for volunteer_id, assignment in latest_assignment_by_volunteer.items():
-            if volunteer_id not in volunteer_rows_by_id:
-                continue
+        # for volunteer_id, assignment in latest_assignment_by_volunteer.items():
+        #     if volunteer_id not in volunteer_rows_by_id:
+        #         continue
 
-            for volunteer_ids in station_to_volunteer_ids.values():
-                volunteer_ids.discard(volunteer_id)
+        #     for volunteer_ids in station_to_volunteer_ids.values():
+        #         volunteer_ids.discard(volunteer_id)
 
-            if assignment.is_covering and assignment.absence_id:
-                absence = Absence.query.get(assignment.absence_id)
-                if absence and absence.end_date < today:
-                    continue
+        #     if assignment.is_covering and assignment.absence_id:
+        #         absence = Absence.query.get(assignment.absence_id)
+        #         if absence and absence.end_date < today:
+        #             continue
 
-            if assignment.is_absent:
-                continue
+        #     if assignment.is_absent:
+        #         continue
 
-            if assignment.station_id is None:
-                continue
+        #     if assignment.station_id is None:
+        #         continue
 
-            station = Station.query.get(assignment.station_id)
-            if not station:
-                continue
+        #     station = Station.query.get(assignment.station_id)
+        #     if not station:
+        #         continue
 
-            station_name = str(station.station_name)
-            if station_name in ["Reserve", "Absent", "Other"]:
-                continue
+        #     station_name = str(station.station_name)
+        #     if station_name in ["Reserve", "Absent", "Other"]:
+        #         continue
 
-            if (
-                assignment.is_covering and
-                assignment.cover_start_hour is not None and
-                assignment.cover_end_hour is not None
-            ):
-                start_hour = assignment.cover_start_hour
-                end_hour = assignment.cover_end_hour
-                coverage_hours = list(range(start_hour, end_hour + 1))
-                volunteer_rows_by_id[volunteer_id]["hours"] = coverage_hours
-                volunteer_rows_by_id[volunteer_id]["ranges"] = [[start_hour, end_hour]]
-                volunteer_rows_by_id[volunteer_id]["range_label"] = (
-                    f"{format_hour(start_hour)}-{format_hour(end_hour)}"
-                )
+        #     if (
+        #         assignment.is_covering and
+        #         assignment.cover_start_hour is not None and
+        #         assignment.cover_end_hour is not None
+        #     ):
+        #         start_hour = assignment.cover_start_hour
+        #         end_hour = assignment.cover_end_hour
+        #         coverage_hours = list(range(start_hour, end_hour + 1))
+        #         volunteer_rows_by_id[volunteer_id]["hours"] = coverage_hours
+        #         volunteer_rows_by_id[volunteer_id]["ranges"] = [[start_hour, end_hour]]
+        #         volunteer_rows_by_id[volunteer_id]["range_label"] = (
+        #             f"{format_hour(start_hour)}-{format_hour(end_hour)}"
+        #         )
 
-            station_to_volunteer_ids.setdefault(
-                assignment.station_id, set()
-            ).add(volunteer_id)
+        #     station_to_volunteer_ids.setdefault(
+        #         assignment.station_id, set()
+        #     ).add(volunteer_id)
+
+        station_to_volunteer_ids, debug = build_station_state(volunteers, stations)
 
         station_data = {}
         for station in stations:
@@ -821,20 +848,120 @@ def volunteer_hours_captain():
 
         return render_template(
             "volunteer-hours-cap.html",
-            station_data=station_data
+            station_data=station_data,
+            debug=debug
         )
 
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
+from datetime import date
 
+def build_station_state(volunteers, stations):
+    today = date.today()
+
+    debug_lines = []
+
+    station_to_volunteer_ids = {
+        station.station_id: set()
+        for station in stations
+    }
+    
+    latest_assignment_by_volunteer = {}
+    assignments = Assignment.query.all()
+
+    for assignment in assignments:
+        if assignment.volunteer_id is None:
+            continue
+
+        current = latest_assignment_by_volunteer.get(assignment.volunteer_id)
+        if current is None or assignment.assignment_id > current.assignment_id:
+            latest_assignment_by_volunteer[assignment.volunteer_id] = assignment
+
+    reserve_station = Station.query.filter_by(station_name="Reserve").first()
+    absent_station = Station.query.filter_by(station_name="Absent").first()
+
+    reserve_id = reserve_station.station_id if reserve_station else None
+    absent_id = absent_station.station_id if absent_station else None
+
+    for volunteer_id, assignment in latest_assignment_by_volunteer.items():
+
+        debug_lines.append(f"\n--- VOLUNTEER {volunteer_id} ---")
+        debug_lines.append(f"TODAY: {today}")
+        debug_lines.append(f"is_covering: {assignment.is_covering}")
+        debug_lines.append(f"assignment.station_id: {assignment.station_id}")
+        debug_lines.append(f"absence_id: {assignment.absence_id}")
+
+        # coverage
+        if assignment.is_covering:
+            absence = None
+
+            if assignment.absence_id:
+                absence = Absence.query.get(assignment.absence_id)
+
+            if not absence:
+                absence = Absence.query.filter(
+                    Absence.volunteer_id == assignment.covering_for_volunteer_id
+            ).order_by(Absence.start_date.desc()).first()
+
+            if absence:
+                debug_lines.append(f"absence.start: {absence.start_date}")
+                debug_lines.append(f"absence.end: {absence.end_date}")
+                debug_lines.append(f"today < start: {today < absence.start_date}")
+
+                if today < absence.start_date:
+                    debug_lines.append("→ FORCE RESERVE (before start)")
+                    if reserve_id:
+                        station_to_volunteer_ids[reserve_id].add(volunteer_id)
+                    continue
+
+                if today > absence.end_date:
+                    debug_lines.append("→ AFTER absence → reserve")
+                    if reserve_id:
+                        station_to_volunteer_ids[reserve_id].add(volunteer_id)
+                    continue
+
+                debug_lines.append("→ DURING absence → takes station")
+                target_station_id = assignment.original_station_id
+                if target_station_id:
+                    station_to_volunteer_ids[target_station_id].add(volunteer_id)
+                else:
+                    debug_lines.append("missing original_station_id")
+                continue
+
+        # absent
+        active_absence = Absence.query.filter(
+            Absence.volunteer_id == volunteer_id,
+            Absence.start_date <= today,
+            Absence.end_date >= today
+        ).first()
+
+        debug_lines.append(f"active_absence: {bool(active_absence)}")
+
+        if active_absence:
+            debug_lines.append("→ MARKED ABSENT")
+            if absent_id:
+                station_to_volunteer_ids[absent_id].add(volunteer_id)
+            continue
+
+        # normal
+        debug_lines.append("→ NORMAL STATION")
+
+        if assignment.station_id:
+            station_to_volunteer_ids[assignment.station_id].add(volunteer_id)
+
+    return station_to_volunteer_ids, "\n".join(debug_lines)
+
+#admin route
 @app.route("/admin")
 def admin_page():
     try:
         debug_admin = request.args.get("debug_admin") == "1"
 
+        #if the user does not have login credentials as an admin, captain, or tech, they are redirected to index
         if "user_id" not in session and not debug_admin:
             return redirect("/")
 
+        #if their role is a captain, any attempts to get to /admin will redirect them to /captain
         elif session.get("role") == "captain":
             return redirect("/captain")
 
@@ -1877,7 +2004,22 @@ def debug_hourly_final():
             # If assignment doesn't match volunteer's station → fix it
             if assignment.station_id != volunteer.station_id:
                 assignment.station_id = volunteer.station_id
+        
+        assigned_volunteer_ids = set(latest_assignment_by_volunteer.keys())
 
+        for volunteer in volunteers:
+            if volunteer.id in assigned_volunteer_ids:
+                continue
+        
+            if volunteer.station_id is None:
+                continue
+        
+            new_assignment = Assignment(
+                volunteer_id=volunteer.id,
+                station_id=volunteer.station_id
+            )
+        
+            db.session.add(new_assignment)
         db.session.commit()
 
         refreshed_assignments = Assignment.query.all()
@@ -2259,10 +2401,7 @@ def master_list():
     for v in volunteers:
         user = UserAccount.query.filter(UserAccount.volunteer_id == v.id).first()
         start_hour, end_hour = parse_shift(v.typical_shift)
-    
-    for v in volunteers:
         #role = role_by_volunteer_id.get(v.id, "volunteer")
-        user = UserAccount.query.filter(UserAccount.volunteer_id == v.id).first() 
         volunteer_rows.append({
             "id": v.id,
             "first_name": v.first_name,
@@ -2433,6 +2572,8 @@ def edit_master_volunteer(volunteer_id):
         except Exception:
             return None, None
     def format_hour(hour):
+        if hour is None:
+            return ""
         if hour == 0:
             return "12AM"
         elif hour < 12:
@@ -2465,7 +2606,20 @@ def edit_master_volunteer(volunteer_id):
         volunteer.last_name = last_name
         volunteer.email = email
         volunteer.phone = phone
-        volunteer.account.role = role
+        if role == 'volunteer':
+            if volunteer.account:
+                db.session.delete(volunteer.account)
+                volunteer.account = None
+        else: 
+            if volunteer.account is None:
+                volunteer.account = UserAccount(
+                    volunteer_id = volunteer_id,
+                    role = role
+                )
+                db.session.add(volunteer.account)
+            else:
+                volunteer.account.role = role
+        
         volunteer.typical_shift = typical_shift
         volunteer.unavailability = unavailability
         volunteer.capability_restrictions = capability_restrictions
@@ -2575,11 +2729,13 @@ def volunteer_hours():
 
         db.session.commit()
 
+        #stations = Station.query\
+            #.filter(Station.station_name.notin_(["Reserve", "Absent", "Other"]))\
+            #.order_by(Station.station_name)\
+            #.all()
         stations = Station.query\
-            .filter(Station.station_name.notin_(["Reserve", "Absent", "Other"]))\
-            .order_by(Station.station_name)\
-            .all()
-
+        .order_by(Station.station_name)\
+        .all()
         sheet = get_sheet()
         rows = sheet.get_all_records()
 
@@ -2686,58 +2842,61 @@ def volunteer_hours():
         today = date.today()
         assignments = Assignment.query.all()
 
-        latest_assignment_by_volunteer = {}
-        for assignment in assignments:
-            if assignment.volunteer_id is None:
-                continue
+        #commented out by Aaron 4/29
+        # latest_assignment_by_volunteer = {}
+        # for assignment in assignments:
+        #     if assignment.volunteer_id is None:
+        #         continue
 
-            current = latest_assignment_by_volunteer.get(assignment.volunteer_id)
-            if current is None or assignment.assignment_id > current.assignment_id:
-                latest_assignment_by_volunteer[assignment.volunteer_id] = assignment
+        #     current = latest_assignment_by_volunteer.get(assignment.volunteer_id)
+        #     if current is None or assignment.assignment_id > current.assignment_id:
+        #         latest_assignment_by_volunteer[assignment.volunteer_id] = assignment
 
-        for volunteer_id, assignment in latest_assignment_by_volunteer.items():
-            if volunteer_id not in volunteer_rows_by_id:
-                continue
+        # for volunteer_id, assignment in latest_assignment_by_volunteer.items():
+        #     if volunteer_id not in volunteer_rows_by_id:
+        #         continue
 
-            for volunteer_ids in station_to_volunteer_ids.values():
-                volunteer_ids.discard(volunteer_id)
+        #     for volunteer_ids in station_to_volunteer_ids.values():
+        #         volunteer_ids.discard(volunteer_id)
 
-            if assignment.is_covering and assignment.absence_id:
-                absence = Absence.query.get(assignment.absence_id)
-                if absence and absence.end_date < today:
-                    continue
+        #     if assignment.is_covering and assignment.absence_id:
+        #         absence = Absence.query.get(assignment.absence_id)
+        #         if absence and absence.end_date < today:
+        #             continue
 
-            if assignment.is_absent:
-                continue
+        #     if assignment.is_absent:
+        #         continue
 
-            if assignment.station_id is None:
-                continue
+        #     if assignment.station_id is None:
+        #         continue
 
-            station = Station.query.get(assignment.station_id)
-            if not station:
-                continue
+        #     station = Station.query.get(assignment.station_id)
+        #     if not station:
+        #         continue
 
-            station_name = str(station.station_name)
-            if station_name in ["Reserve", "Absent", "Other"]:
-                continue
+        #     station_name = str(station.station_name)
+        #     if station_name in ["Reserve", "Absent", "Other"]:
+        #         continue
 
-            if (
-                assignment.is_covering and
-                assignment.cover_start_hour is not None and
-                assignment.cover_end_hour is not None
-            ):
-                start_hour = assignment.cover_start_hour
-                end_hour = assignment.cover_end_hour
-                coverage_hours = list(range(start_hour, end_hour + 1))
-                volunteer_rows_by_id[volunteer_id]["hours"] = coverage_hours
-                volunteer_rows_by_id[volunteer_id]["ranges"] = [[start_hour, end_hour]]
-                volunteer_rows_by_id[volunteer_id]["range_label"] = (
-                    f"{format_hour(start_hour)}-{format_hour(end_hour)}"
-                )
+        #     if (
+        #         assignment.is_covering and
+        #         assignment.cover_start_hour is not None and
+        #         assignment.cover_end_hour is not None
+        #     ):
+        #         start_hour = assignment.cover_start_hour
+        #         end_hour = assignment.cover_end_hour
+        #         coverage_hours = list(range(start_hour, end_hour + 1))
+        #         volunteer_rows_by_id[volunteer_id]["hours"] = coverage_hours
+        #         volunteer_rows_by_id[volunteer_id]["ranges"] = [[start_hour, end_hour]]
+        #         volunteer_rows_by_id[volunteer_id]["range_label"] = (
+        #             f"{format_hour(start_hour)}-{format_hour(end_hour)}"
+        #         )
 
-            station_to_volunteer_ids.setdefault(
-                assignment.station_id, set()
-            ).add(volunteer_id)
+        #     station_to_volunteer_ids.setdefault(
+        #         assignment.station_id, set()
+        #     ).add(volunteer_id)
+
+        station_to_volunteer_ids, debug = build_station_state(volunteers, stations)
 
         station_data = {}
         for station in stations:
@@ -2755,8 +2914,9 @@ def volunteer_hours():
             station_data[station_name] = volunteers_for_station
 
         return render_template(
-            "volunteer-hours.html",
-            station_data=station_data
+            "volunteer-hours-cap.html",
+            station_data=station_data,
+            debug=debug
         )
 
     except Exception as e:
@@ -3142,8 +3302,9 @@ def sync_volunteers():
             return None
 
         for row in rows:
-            email = str(row.get("Email", "")).strip().lower()
-            volunteer = Volunteer.query.filter_by(email=email).first()
+            first_name = str(row.get("First Name", "")).strip()
+            last_name = str(row.get("Last Name", "")).strip()
+            volunteer = Volunteer.query.filter_by(first_name = first_name, last_name = last_name).first()
             if not volunteer:
                 continue
 
