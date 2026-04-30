@@ -1,0 +1,52 @@
+/* Shared */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+body {
+    background: linear-gradient(135deg, #0F172A, #1E293B);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: white;
+    text-align: center;
+}
+
+/* Application Received */
+.card {
+    background: white;
+    color: #1F2937;
+    padding: 50px;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+    max-width: 500px;
+    width: 90%;
+}
+
+.card h1 {
+    margin-bottom: 20px;
+}
+
+.card p {
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.next-step-btn {
+    padding: 14px 35px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #2563EB, #1D4ED8);
+    color: white;
+    transition: 0.3s ease;
+}
+
+.next-step-btn:hover {
+    transform: scale(1.05);
+}
