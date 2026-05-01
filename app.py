@@ -1473,8 +1473,9 @@ def assign_reserve_coverage():
             .filter(
                 Assignment.volunteer_id == reserve_volunteer_id,
                 Assignment.is_covering == True,
+                Assignment.absence_id != absence.absence_id, 
                 Absence.start_date <= absence.end_date,
-               Absence.end_date >= absence.start_date
+                Absence.end_date >= absence.start_date
             ).first()
 
         if existing_cover:
@@ -1833,6 +1834,36 @@ def save_need_coverage():
 #    db.session.commit()
 #    return {"message": f"Deleted {len(assignments)} assignments for volunteer {volunteer_id}"}
 
+
+@app.route("/debug/reset-all", methods=["GET"])
+def reset_all():
+    try:
+        # 1. Reset ALL assignments
+        assignments = Assignment.query.all()
+
+        for a in assignments:
+            # reset covering
+            a.is_covering = False
+            a.covering_for_volunteer_id = None
+            a.original_station_id = None
+            a.absence_id = None
+            a.cover_start_hour = None
+            a.cover_end_hour = None
+
+            # reset absence flag
+            a.is_absent = False
+
+        # 2. Delete ALL absences (past + future)
+        Absence.query.delete()
+
+        db.session.commit()
+
+        return "<pre>All covering and absences have been reset.</pre>"
+
+    except Exception as e:
+        db.session.rollback()
+        return {"error": str(e)}, 500
+
 @app.route("/admin/debug-hourly-final")
 def debug_hourly_final():
     try:
@@ -1968,67 +1999,46 @@ def debug_hourly_final():
         assignments = Assignment.query.all()
 
         latest_assignment_by_volunteer = {}
-        for assignment in assignments:
-            if assignment.volunteer_id is None:
-                continue
 
-            current = latest_assignment_by_volunteer.get(assignment.volunteer_id)
-            if current is None or assignment.assignment_id > current.assignment_id:
-                latest_assignment_by_volunteer[assignment.volunteer_id] = assignment
+        for volunteer in volunteers:
+            assignments_for_volunteer = Assignment.query.filter_by(
+                volunteer_id=volunteer.id
+            ).all()
 
+            chosen = None
 
-        for assignment in latest_assignment_by_volunteer.values():
-            if assignment.is_covering and assignment.absence_id:
-                absence = Absence.query.get(assignment.absence_id)
+            for a in assignments_for_volunteer:
+                if not a.is_covering or not a.absence_id:
+                    continue
 
-                should_reset = False
-
+                absence = Absence.query.get(a.absence_id)
                 if not absence:
-                    should_reset = True
-                elif absence.is_partial:
-                    if (
-                        absence.start_date <= today <= absence.end_date and
-                        absence.partial_end_hour is not None and
-                        current_hour >= absence.partial_end_hour
-                    ):
-                        should_reset = True
-                    elif today > absence.end_date:
-                        should_reset = True
-                else:
-                    if today > absence.end_date:
-                        should_reset = True
+                    continue
 
-                if should_reset:
-                    if reserve_station:
-                        assignment.station_id = reserve_station.station_id
+                # PRIORITY 1: active TODAY
+                if absence.start_date <= today <= absence.end_date:
+                    chosen = a
+                    break
 
-                    assignment.is_covering = False
-                    assignment.covering_for_volunteer_id = None
-                    assignment.original_station_id = None
-                    assignment.absence_id = None
-                    assignment.cover_start_hour = None
-                    assignment.cover_end_hour = None
+                # PRIORITY 2: earliest upcoming
+                if today < absence.start_date:
+                    if not chosen:
+                        chosen = a
+                    else:
+                        existing_absence = Absence.query.get(chosen.absence_id)
+                        if existing_absence and absence.start_date < existing_absence.start_date:
+                            chosen = a
 
-                    covered = Assignment.query.filter_by(
-                        volunteer_id=absence.volunteer_id
-                    ).first() if absence else None
+            # fallback is latest assignment
+            if not chosen:
+                chosen = Assignment.query.filter_by(
+                    volunteer_id=volunteer.id
+                ).order_by(Assignment.assignment_id.desc()).first()
 
-                    if covered:
-                        covered.is_absent = False
+            if chosen:
+                latest_assignment_by_volunteer[volunteer.id] = chosen
 
-        for vid, assignment in latest_assignment_by_volunteer.items():
-            volunteer = next((v for v in volunteers if v.id == vid), None)
-            
-            if not volunteer:
-                continue
 
-            # Skip special cases (important)
-            if assignment.is_covering:
-                continue
-
-            # If assignment doesn't match volunteer's station → fix it
-            if assignment.station_id != volunteer.station_id:
-                assignment.station_id = volunteer.station_id
         
         assigned_volunteer_ids = set(latest_assignment_by_volunteer.keys())
 
@@ -2046,16 +2056,6 @@ def debug_hourly_final():
         
             db.session.add(new_assignment)
         db.session.commit()
-
-        refreshed_assignments = Assignment.query.all()
-        latest_assignment_by_volunteer = {}
-        for assignment in refreshed_assignments:
-            if assignment.volunteer_id is None:
-                continue
-
-            current = latest_assignment_by_volunteer.get(assignment.volunteer_id)
-            if current is None or assignment.assignment_id > current.assignment_id:
-                latest_assignment_by_volunteer[assignment.volunteer_id] = assignment
 
         for assignment in latest_assignment_by_volunteer.values():
             volunteer_id = assignment.volunteer_id
