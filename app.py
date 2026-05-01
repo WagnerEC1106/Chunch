@@ -1834,6 +1834,36 @@ def save_need_coverage():
 #    db.session.commit()
 #    return {"message": f"Deleted {len(assignments)} assignments for volunteer {volunteer_id}"}
 
+
+@app.route("/debug/reset-all", methods=["GET"])
+def reset_all():
+    try:
+        # 1. Reset ALL assignments
+        assignments = Assignment.query.all()
+
+        for a in assignments:
+            # reset covering
+            a.is_covering = False
+            a.covering_for_volunteer_id = None
+            a.original_station_id = None
+            a.absence_id = None
+            a.cover_start_hour = None
+            a.cover_end_hour = None
+
+            # reset absence flag
+            a.is_absent = False
+
+        # 2. Delete ALL absences (past + future)
+        Absence.query.delete()
+
+        db.session.commit()
+
+        return "<pre>All covering and absences have been reset.</pre>"
+
+    except Exception as e:
+        db.session.rollback()
+        return {"error": str(e)}, 500
+
 @app.route("/admin/debug-hourly-final")
 def debug_hourly_final():
     try:
