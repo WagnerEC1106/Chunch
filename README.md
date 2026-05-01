@@ -1,5 +1,7 @@
 # Chunch
 
+This project entails a volunteer management system for the Chunch organization at the Crestview Baptist Church. These files contain a public home page and a private admin and captain page, each with their own abilities based on someone's role. 
+
 Folder System:
 - css: stylesheets, includes style.css and responsive.css
 - js: JavaScript files, script.js
