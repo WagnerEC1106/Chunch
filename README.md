@@ -18,7 +18,7 @@ This project entails a volunteer management system for the Chunch organization a
 
 ## Installation and Running Program
 - Fork or download the repository
-- Install dependancies for Flask, SQLAlchemy, and PostgreSQL
+- Install dependancies for Flask, SQLAlchemy, and PostgreSQL by downloading requirements.txt file
 
 Folder System:
 - css: stylesheets, includes style.css and responsive.css
