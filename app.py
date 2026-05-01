@@ -3130,8 +3130,8 @@ def sync_volunteers():
 
             if not volunteer:
                 volunteer = Volunteer(
-                    first_name=row["First Name"],
-                    last_name=row["Last Name"],
+                    first_name=first_name,
+                    last_name=last_name,
                     email=email,
                     phone=phone,
                     capability_restrictions=capability_restrictions,
