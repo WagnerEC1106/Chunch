@@ -2039,45 +2039,6 @@ def debug_hourly_final():
                 latest_assignment_by_volunteer[volunteer.id] = chosen
 
 
-        for assignment in latest_assignment_by_volunteer.values():
-            if assignment.is_covering and assignment.absence_id:
-                absence = Absence.query.get(assignment.absence_id)
-
-                should_reset = False
-
-                if not absence:
-                    should_reset = True
-                elif absence.is_partial:
-                    if (
-                        absence.start_date <= today <= absence.end_date and
-                        absence.partial_end_hour is not None and
-                        current_hour >= absence.partial_end_hour
-                    ):
-                        should_reset = True
-                    elif today > absence.end_date:
-                        should_reset = True
-                else:
-                    if today > absence.end_date:
-                        should_reset = True
-
-                if should_reset:
-                    if reserve_station:
-                        assignment.station_id = reserve_station.station_id
-
-                    assignment.is_covering = False
-                    assignment.covering_for_volunteer_id = None
-                    assignment.original_station_id = None
-                    assignment.absence_id = None
-                    assignment.cover_start_hour = None
-                    assignment.cover_end_hour = None
-
-                    covered = Assignment.query.filter_by(
-                        volunteer_id=absence.volunteer_id
-                    ).first() if absence else None
-
-                    if covered:
-                        covered.is_absent = False
-
         
         assigned_volunteer_ids = set(latest_assignment_by_volunteer.keys())
 
