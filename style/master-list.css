@@ -1,0 +1,97 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    padding: 24px;
+    color: #1e293b;
+}
+h1 {
+    margin-bottom: 16px;
+}
+button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+button:hover { opacity: 0.9; }
+
+.container {
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+
+.top-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+
+.primary {
+    background: #2563eb;
+    color: white;
+}
+
+.secondary {
+    background: #64748b;
+    color: white;
+}
+
+.edit {
+    background: #2563eb;
+    color: white;
+}
+
+.danger {
+    background: #dc2626;
+    color: white;
+}
+
+
+#addForm {
+    display: none;
+    margin-bottom: 16px;
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+#addForm input {
+    padding: 6px 8px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th {
+    text-align: left;
+    background: #e2e8f0;
+    padding: 10px;
+}
+
+td {
+    padding: 10px;
+    border-top: 1px solid #e2e8f0;
+}
+
+tr:hover {
+    background: #f8fafc;
+}
+
+.actions-cell {
+    text-align: right;
+}
