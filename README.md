@@ -39,15 +39,15 @@ This project entails a volunteer management system for the Chunch organization a
   * README: ??
   * script.py.mako: ??
 * style: __ELEANOR__
-  * application.css:
-  * contribute.css: 
-  * coverage.css:
-  * home.css:
+  * application.css: 
+  * contribute.css: Style code for public-facing "Contribute" page.
+  * coverage.css: 
+  * home.css: Style code for public-facing "Home" page.
   * master-list.css: 
-  * meet-the-team.css:
-  * public.css:
-  * student.css:
-  * volunteer.css:
+  * meet-the-team.css: Style code for public-facing "Meet The Team" page.
+  * public.css: Incomplete file that would hold all style code for public-facing components.
+  * student.css: Style code for public-facing "Student Spotlight" page.
+  * volunteer.css: Style code for public-facing "Volunteer" page.
 * templates:
   * absence-forms.html: __EVELYN__
   * admin_captain_shared.js: 
@@ -75,3 +75,4 @@ This project entails a volunteer management system for the Chunch organization a
 
 ## Known Issues
 The only difference between `volunteer-hours-cap.html` and `volunteer-hours.html` is that the back button routes to `/captain` instead of `/admin`. It might be redundant now that we have locked permissions. 
+Public-facing component pages do not have uniform styles. There are deviations in top-margins for `h1` and navbar.
