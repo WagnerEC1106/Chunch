@@ -57,11 +57,11 @@ This project entails a volunteer management system for the Chunch organization a
   * captain.html: Dashboard for users with the captain role, accessible by admin & tech roles.
   * coverage-details.html: __EVELYN__
   * deleted-volunteers.html: Table of volunteers and their information that were chosen to be deleted from the master list. Volunteers can be either permanently deleted or restored to the master list.
-  * inbox.html: __EVELYN__ __REID__
+  * inbox.html: Inbox page on the admin dashboard that allows admins to accept or decline new volunteer applicants.
   * index.html: Public-facing component "Home" page.
   * master-list.html: Table of all current volunteers and their information. Also where new volunteers can be added or current volunteers can be deleted.
   * meet-the-team.html: Public-facing component "Meet the Team" page.
-  * need-coverage.html: __EVELYN__ __REID__
+  * need-coverage.html: Page that is used by captains and admins to find coverage and submit absences for volunteers.
   * student-spotlight.html: Public-facing component "Student Spotlight" page.
   * volunteer-hours-cap.html: __ELEANOR__
   * volunteer-hours.html: Hourly view __EVELYN__
