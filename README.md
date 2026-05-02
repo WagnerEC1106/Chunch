@@ -18,7 +18,9 @@ This project entails a volunteer management system for the Chunch organization a
 
 ## Installation and Running Program
 - Fork or download the repository
-- Install dependancies for Flask, SQLAlchemy, and PostgreSQL by downloading requirements.txt file
+- Install dependancies for Flask, SQLAlchemy, and PostgreSQL by downloading the requirements.txt file
+- The website can be found at https://chunch.onrender.com
+- Before being able to sign in to the admin dashboard, reach out to Bryan Scott or **TECH NAME** to be added as a tech or admin
 
 ## Files
 * \_\_pycache\_\_: ??
@@ -50,18 +52,17 @@ This project entails a volunteer management system for the Chunch organization a
   * volunteer.css: Style code for public-facing "Volunteer" page.
 * templates:
   * absence-forms.html: __EVELYN__
-  * admin_captain_shared.js: 
   * admin.html: Dashboard for users with the admin or tech role.
   * applicant-detail.html: __EVELYN__
   * application_received.html: __EVELYN__
   * captain.html: Dashboard for users with the captain role, accessible by admin & tech roles.
   * coverage-details.html: __EVELYN__
-  * deleted-volunteers.html: __REID__ __EVELYN__
-  * inbox.html: __EVELYN__ __REID__
+  * deleted-volunteers.html: Table of volunteers and their information that were chosen to be deleted from the master list. Volunteers can be either permanently deleted or restored to the master list.
+  * inbox.html: Inbox page on the admin dashboard that allows admins to accept or decline new volunteer applicants.
   * index.html: Public-facing component "Home" page.
-  * master-list.html: __REID__ __ELEANOR__
+  * master-list.html: Table of all current volunteers and their information. Also where new volunteers can be added or current volunteers can be deleted.
   * meet-the-team.html: Public-facing component "Meet the Team" page.
-  * need-coverage.html: __EVELYN__ __REID__
+  * need-coverage.html: Page that is used by captains and admins to find coverage and submit absences for volunteers.
   * student-spotlight.html: Public-facing component "Student Spotlight" page.
   * volunteer-hours-cap.html: __ELEANOR__
   * volunteer-hours.html: Hourly view __EVELYN__
@@ -76,3 +77,4 @@ This project entails a volunteer management system for the Chunch organization a
 ## Known Issues
 The only difference between `volunteer-hours-cap.html` and `volunteer-hours.html` is that the back button routes to `/captain` instead of `/admin`. It might be redundant now that we have locked permissions. 
 Public-facing component pages do not have uniform styles. There are deviations in top-margins for `h1` and navbar.
+
