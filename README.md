@@ -50,7 +50,6 @@ This project entails a volunteer management system for the Chunch organization a
   * volunteer.css:
 * templates:
   * absence-forms.html: __EVELYN__
-  * admin_captain_shared.js: 
   * admin.html: Dashboard for users with the admin or tech role.
   * applicant-detail.html: __EVELYN__
   * application_received.html: __EVELYN__
