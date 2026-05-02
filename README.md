@@ -2,7 +2,7 @@
 
 This is the official GitHub repo for the Southwestern University 2026 Capstone, Chunch Volunteer Management System Project.
 
-This project entails a volunteer management system for the Chunch organization at the Crestview Baptist Church. These files contain a public home page and a private admin and captain page, each with their own abilities based on someone's role. 
+This project entails a volunteer management system for the Chunch organization at the Crestview Baptist Church. These files contain a public-facing component and a private admin/captain dashboard, each with their own abilities based on someone's role. 
 
 # Getting Started
 ## Dependencies
@@ -20,14 +20,58 @@ This project entails a volunteer management system for the Chunch organization a
 - Fork or download the repository
 - Install dependancies for Flask, SQLAlchemy, and PostgreSQL by downloading requirements.txt file
 
-Folder System:
-- css: stylesheets, includes style.css and responsive.css
-- js: JavaScript files, script.js
-- images: All embedded images, (logo, background, icon)
+## Files
+* \_\_pycache\_\_: ??
+  * app.cpython-312.pyc: ??
+  * app.cpython-314.pyc: ??
+* instance: __AARON__
+  * chunch.db: __AARON__
+  * local.db: __AARON__
+  * test.db: __AARON__
+* migrations: ??
+  * \_\_pycache\_\_: ??
+    * env.cpython-314.pyc: ??
+  * versions: ??
+    * 4233ac2120b0_initial_migration.cpython.pyc: ??
+  * 4233ac2120b0_initial_migration.py: ??
+  * alembic.ini: ??
+  * env.py: ??
+  * README: ??
+  * script.py.mako: ??
+* style: __ELEANOR__
+  * application.css:
+  * contribute.css: 
+  * coverage.css:
+  * home.css:
+  * master-list.css: 
+  * meet-the-team.css:
+  * public.css:
+  * student.css:
+  * volunteer.css:
+* templates:
+  * absence-forms.html: __EVELYN__
+  * admin_captain_shared.js: 
+  * admin.html: Dashboard for users with the admin or tech role.
+  * applicant-detail.html: __EVELYN__
+  * application_received.html: __EVELYN__
+  * captain.html: Dashboard for users with the captain role, accessible by admin & tech roles.
+  * coverage-details.html: __EVELYN__
+  * deleted-volunteers.html: __REID__ __EVELYN__
+  * inbox.html: __EVELYN__ __REID__
+  * index.html: Public-facing component "Home" page.
+  * master-list.html: __REID__ __ELEANOR__
+  * meet-the-team.html: Public-facing component "Meet the Team" page.
+  * need-coverage.html: __EVELYN__ __REID__
+  * student-spotlight.html: Public-facing component "Student Spotlight" page.
+  * volunteer-hours-cap.html: __ELEANOR__
+  * volunteer-hours.html: Hourly view __EVELYN__
+  * volunteer-intro-vids.html: Public-facing component "Volunteer" page.
+* app.py: __AARON__
+* credentials.json: ??
+* init_db.py: __AARON__
+* Procfile: __AARON__
+* README.md: This document.
+* requirements.txt: __AARON__
 
-
-[folder structure resources](https://medium.com/@techsuneel99/a-front-end-application-folder-structure-that-makes-sense-802b280da735)
-
-[very different folder structure](https://dev.to/noruwa/folder-structure-for-modern-web-applications-4d11)
-
-[about folder structures](https://webhostingbegin.net/understanding-website-file-structure-a-beginners-essential-guide/)
+## Known Issues
+The only difference between `volunteer-hours-cap.html` and `volunteer-hours.html` is that the back button routes to `/captain` instead of `/admin`. It might be redundant now that we have locked permissions. 
