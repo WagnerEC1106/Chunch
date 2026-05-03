@@ -1,3 +1,159 @@
 /* 
     TODO: Description of file
 */
+
+/* Shared */
+body {
+    font-family: Arial, sans-serif;
+    margin: 24px;
+    background: #F4F6F8;
+    color: #1F2937;
+}
+
+/* Need Coverage */
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.field {
+    margin-bottom: 16px;
+}
+
+.inline-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+button.request {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+#primary {
+    background: #2563eb;
+    color: white;
+}
+
+#secondary {
+    background: #64748b;
+    color: white;
+}
+
+#partialFields {
+    display: none;
+}
+h2 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+p {
+    color: #6B7280;
+    margin-bottom: 20px;
+}
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+select,
+input,
+textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* Coverage Details */
+h1 { margin-bottom: 20px; }
+button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    background: #64748B;
+    color: white;
+}
+button:hover { opacity: 0.9; }
+
+.details {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.card {
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+.card h2 {
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+
+.two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.reserve-card {
+    border: 1px solid #E5E7Eb;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+    background: #F8FAFC;
+}
+
+.reserve-name {
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.warning {
+    margin-top: 8px;
+    color: #92400E;
+    background: #FEF3C7;
+    border: 1px solid #FCD34D;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 14px;
+}
+
+.empty-state {
+    color: #6B7280;
+    font-style: italic;
+}
+
+@media (max-width: 800px) {
+    .two-column { grid-template-columns: 1fr; }
+}

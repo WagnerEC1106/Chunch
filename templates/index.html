@@ -3,360 +3,164 @@
 -->
 <!DOCTYPE html>
 <html lang="en-US">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
-        <title>Chunch</title>
-        
-        <!-- Import font & style -->
-        <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="/style/home.css">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Chunch</title>
+    
+    <!-- Import font & style -->
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style/home.css">
 
-        <!-- Google Identity Services -->
-        <script src="https://accounts.google.com/gsi/client" async defer></script>
-        <script src="https://apis.google.com/js/platform.js" async defer></script>
-        <meta name="google-signin-client_id" content="483439290581-t6qm63e9rcuvm62l6j3cghvj71eo5h1k.apps.googleusercontent.com">
-        
-        <!-- <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-        body {
-            background: #f4f6f9;
-            color: #1f2937;
-            line-height: 1.6;
-        }
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="483439290581-t6qm63e9rcuvm62l6j3cghvj71eo5h1k.apps.googleusercontent.com">
+</head>
 
-        /* NAVBAR */
-        .navbar {
-            background: #0f172a;
-            padding: 18px 40px;
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-        }
+<body>
+    <nav class="navbar">
+        <a href="/">HOME</a>
+        <a href="/meet-the-team">MEET THE TEAM</a>
+        <a href="/templates/contribute.html">CONTRIBUTE</a>
+        <a href="/templates/volunteer-intro-vids.html">VOLUNTEER</a>
+        <a href="/student-spotlight">STUDENTS</a>
+    </nav>
 
-        .navbar a {
-            text-decoration: none;
-            color: white;
-            font-weight: 600;
-            padding: 10px 18px;
-            border-radius: 8px;
-            transition: 0.3s ease;
-        }
-
-        .navbar a:hover {
-            background: #2563eb;
-        }
-
-        /* MAIN CONTENT */
-        .container {
-            max-width: 900px;
-            margin: 80px auto;
-            text-align: center;
-            padding: 0 20px;
-        }
-        .tagline {
-            /* background-color: rgb(236, 193, 244); */
-            text-align: center;
-            padding: 5px 10px;
-            margin: 5px auto;
-            width: 400px;
-            /* border-radius: 18px; */
-            /* max-width: 500px; */
-        }
-        .tagline p {
-            margin-bottom: 2px;
-            font-size: 24px;
-        }
-        .about {
-            max-width: 1000px;
-            text-align: center;
-            margin: 30px 10px;
-        }
-        .define {
-            background-color: white;
-            border-radius: 32px;
-            margin: 30px 10px;
-        }
-        .mission {
-            background-color: white;
-            border-radius: 32px;
-            margin: 30px 10px;
-        }
-        .story {
-            background-color: white;
-            border-radius: 32px;
-            margin: 30px 10px;
-        }
-
-        h1 {
-            font-size: 48px;
-            margin-bottom: 30px;
-            font-weight: 700;
-            color: #111827;
-        }
-
-        p {
-            margin-bottom: 18px;
-            font-size: 18px;
-            color: #374151;
-        }
-
-        section {
-            margin: 10px 0;
-            padding: 10px 20px;
-        }
-
-        /* PRIMARY BUTTON */
-        .primary-btn {
-            margin-top: 50px;
-            padding: 18px 40px;
-            font-size: 20px;
-            font-weight: 600;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            color: white;
-            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .primary-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 25px rgba(37, 99, 235, 0.4);
-        }
-
-        /* ADMIN BUTTON */
-        .admin-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            padding: 12px 24px;
-            border-radius: 30px;
-            border: none;
-            background: #e5e7eb;
-            color: #111827;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.3s ease;
-        }
-
-        .admin-btn:hover {
-            background: #d1d5db;
-        }
-
-        /* LOGIN MODAL */
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.2s ease;
-            z-index: 999;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .modal-content {
-            position: relative;
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            width: 360px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        }
-
-        /* FIXED X BUTTON */
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 18px;
-            font-size: 22px;
-            font-weight: 600;
-            cursor: pointer;
-            color: #6b7280;
-            transition: 0.2s ease;
-        }
-
-        .close-btn:hover {
-            color: #111827;
-        }
-
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 36px;
-            }
-
-            .navbar {
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-        }
-        cite {
-            display: block;
-            margin-top: 8px;
-            font-size: 12px;
-        }
-        </style> -->
-    </head>
-
-    <body>
-        <nav class="navbar">
-            <a href="/">HOME</a>
-            <a href="/meet-the-team">MEET THE TEAM</a>
-            <a href="/templates/contribute.html">CONTRIBUTE</a>
-            <a href="/templates/volunteer-intro-vids.html">VOLUNTEER</a>
-            <a href="/student-spotlight">STUDENTS</a>
-        </nav>
-
-        <div class="container">
-            <div class="about">
-                <section class="header">
-                    <h1>About Us</h1>
-                    <div class="tagline">
-                        <p>“Taste and see that the Lord is good.”</p>
-                        <cite>– PSALM 34:8</cite>
-                    </div>
-                </section>
-                <section class="define">
-                    <h2>What is Chunch?</h2>
-                    <p>From the first Monday of the fall semester at Southwestern University, murmurs of excitement spread across campus. Often, the source of this joy is two words: church lunch, or “chunch,” as it’s fondly called by students, is a staple of student life.</p>
-                    <p>Bryan and Cheryl Scott, leaders of the College Ministry at Crestview Baptist Church, can answer that question: Chunch is a free home-cooked meal for Southwestern students where they eat with friends in a loving community.</p>
-                    <p>Now, from 11:00 a.m. to 2:00 p.m. on Mondays, the doors are open to serve lunch. Any SU student is invited, regardless of religious affiliation or none at all. As long as a student wants a good home-cooked meal, they’re welcome to come.</p>
-                </section>
-                <section class="mission">
-                    <h2>Our Mission</h2>
-                    <p>Provide a space that creates a welcoming and loving community for Southwestern students where they are accepted as they are, loved unconditionally, and served well with a home-cooked meal.</p>
-                </section>
-                <section class="story">
-                    <h2>Our Story</h2> <!-- History, etc. Name can change-->
-                    <p>Cheryl will tell you God gave her a vision to minister to the students of Southwestern University by providing a homecooked meal at no charge. Fulfilling that vision, in the fall of 2014, Church Lunch (Chunch) was born at Crestview Baptist Church.</p>
-                    <p>Our first lunch was served on September 8, 2014, and with great anticipation and positivity Cheryl and the volunteers prepared food for 100. Well, 7 students came in two groups, one group of 3 and a second group of 4 that were vegan. At that time, we had a salad and fruit bar, but no options for a vegan diet.  Cheryl promised if they would come back the next week there would be a vegan dish for them.</p>
-                    <p>The following Monday, once again with great anticipation and positivity, Cheryl and the volunteers prepared for, you guessed it, 100. We didn’t quite hit 100 that day but attendance did increase 100% as 14 students joined us. In case you’re wondering, the 4 vegan students did return to find several options made just for them. They were eager to share meal ideas that helped make the vegan station what it is today.</p>
-                    <p>The third week was pivotal in many ways and includes the story of 25. It is an amazing story. If you want to hear about it, find Ms Cheryl at Chunch and just ask her to tell you the story of 25. To make a long story short, the numbers quickly grew to 100 and continued to grow. Fast forward to 2026 and Chunch is serving around 700 every Monday.</p>
-                </section>
-                <section class="founders">
-                    <h2>Meet Our Founders</h2>
-                    <div class="card">
-                        Bryan
-                    </div>
-                    <div class="card">
-                        Cheryl
-                    </div>
-                </section>
-                <section class="location">
-                    <h2>Location</h2>
-                    <a href="https://maps.app.goo.gl/JJVY3KidaUKQGFmf8">2300 Williams Dr, Georgetown, TX 78628</a>
-                    <!-- Written directions based on Southwestern location -->
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6864.295806589393!2d-97.6888767!3d30.657963399999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8644d6054236cad3%3A0x10aa477b197a59d2!2sCrestview%20Baptist%20Church!5e0!3m2!1sen!2sus!4v1774844067965!5m2!1sen!2sus" 
-                        width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
-                    </iframe>
-                </section>
-            </div>
-            
-            <button class="primary-btn" onclick="window.location.href='volunteer-intro-vids.html'">Apply to Volunteer</button>
-            <!-- <button class="primary-btn" onclick="window.location.href='about-us.html'">Learn More</button> -->
+    <div class="container">
+        <div class="about">
+            <section class="header">
+                <h1>About Us</h1>
+                <div class="tagline">
+                    <p>“Taste and see that the Lord is good.”</p>
+                    <cite>– PSALM 34:8</cite>
+                </div>
+            </section>
+            <section class="define">
+                <h2>What is Chunch?</h2>
+                <p>From the first Monday of the fall semester at Southwestern University, murmurs of excitement spread across campus. Often, the source of this joy is two words: church lunch, or “chunch,” as it’s fondly called by students, is a staple of student life.</p>
+                <p>Bryan and Cheryl Scott, leaders of the College Ministry at Crestview Baptist Church, can answer that question: Chunch is a free home-cooked meal for Southwestern students where they eat with friends in a loving community.</p>
+                <p>Now, from 11:00 a.m. to 2:00 p.m. on Mondays, the doors are open to serve lunch. Any SU student is invited, regardless of religious affiliation or none at all. As long as a student wants a good home-cooked meal, they’re welcome to come.</p>
+            </section>
+            <section class="mission">
+                <h2>Our Mission</h2>
+                <p>Provide a space that creates a welcoming and loving community for Southwestern students where they are accepted as they are, loved unconditionally, and served well with a home-cooked meal.</p>
+            </section>
+            <section class="story">
+                <h2>Our Story</h2> <!-- History, etc. Name can change-->
+                <p>Cheryl will tell you God gave her a vision to minister to the students of Southwestern University by providing a homecooked meal at no charge. Fulfilling that vision, in the fall of 2014, Church Lunch (Chunch) was born at Crestview Baptist Church.</p>
+                <p>Our first lunch was served on September 8, 2014, and with great anticipation and positivity Cheryl and the volunteers prepared food for 100. Well, 7 students came in two groups, one group of 3 and a second group of 4 that were vegan. At that time, we had a salad and fruit bar, but no options for a vegan diet.  Cheryl promised if they would come back the next week there would be a vegan dish for them.</p>
+                <p>The following Monday, once again with great anticipation and positivity, Cheryl and the volunteers prepared for, you guessed it, 100. We didn’t quite hit 100 that day but attendance did increase 100% as 14 students joined us. In case you’re wondering, the 4 vegan students did return to find several options made just for them. They were eager to share meal ideas that helped make the vegan station what it is today.</p>
+                <p>The third week was pivotal in many ways and includes the story of 25. It is an amazing story. If you want to hear about it, find Ms Cheryl at Chunch and just ask her to tell you the story of 25. To make a long story short, the numbers quickly grew to 100 and continued to grow. Fast forward to 2026 and Chunch is serving around 700 every Monday.</p>
+            </section>
+            <section class="founders">
+                <h2>Meet Our Founders</h2>
+                <div class="card">
+                    Bryan
+                </div>
+                <div class="card">
+                    Cheryl
+                </div>
+            </section>
+            <section class="location">
+                <h2>Location</h2>
+                <a href="https://maps.app.goo.gl/JJVY3KidaUKQGFmf8">2300 Williams Dr, Georgetown, TX 78628</a>
+                <!-- Written directions based on Southwestern location -->
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6864.295806589393!2d-97.6888767!3d30.657963399999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8644d6054236cad3%3A0x10aa477b197a59d2!2sCrestview%20Baptist%20Church!5e0!3m2!1sen!2sus!4v1774844067965!5m2!1sen!2sus" 
+                    width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </section>
         </div>
+        
+        <button class="primary-btn" onclick="window.location.href='volunteer-intro-vids.html'">Apply to Volunteer</button>
+        <!-- <button class="primary-btn" onclick="window.location.href='about-us.html'">Learn More</button> -->
+    </div>
 
-        <!-- <div class="footer"> -->
-            <!-- Bunch of link things -->
-        <!-- </div> -->
+    <!-- <div class="footer"> -->
+        <!-- Bunch of link things -->
+    <!-- </div> -->
 
-        <button class="admin-btn" onclick="openModal()">Admin / Captain Sign In</button>
+    <button class="admin-btn" onclick="openModal()">Admin / Captain Sign In</button>
 
-        <!-- LOGIN MODAL -->
-        <div class="modal" id="loginModal">
-            <div class="modal-content">
-                <span class="close-btn" onclick="closeModal()">✕</span>
-                <h2>Admin / Captain Login</h2>
+    <!-- LOGIN MODAL -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">✕</span>
+            <h2>Admin / Captain Login</h2>
 
-                <div id="g_id_onload"
-                    data-client_id="483439290581-t6qm63e9rcuvm62l6j3cghvj71eo5h1k.apps.googleusercontent.com"
-                    data-callback="handleCredentialResponse"
-                    data-auto_prompt="false">
-                </div>
+            <div id="g_id_onload"
+                data-client_id="483439290581-t6qm63e9rcuvm62l6j3cghvj71eo5h1k.apps.googleusercontent.com"
+                data-callback="handleCredentialResponse"
+                data-auto_prompt="false">
+            </div>
 
-                <div class="g_id_signin"
-                    data-type="standard"
-                    data-shape="pill"
-                    data-theme="outline"
-                    data-size="large">
-                </div>
+            <div class="g_id_signin"
+                data-type="standard"
+                data-shape="pill"
+                data-theme="outline"
+                data-size="large">
             </div>
         </div>
+    </div>
 
-        <script>
-        // Modal UI functionality
-        const modal = document.getElementById("loginModal");
+    <script>
+    // Modal UI functionality
+    const modal = document.getElementById("loginModal");
 
-        function openModal() {
-            modal.style.display = "flex";
+    function openModal() {
+        modal.style.display = "flex";
+    }
+
+    function closeModal() {
+        modal.style.display = "none";
+    }
+
+    // Close when clicking outside modal
+    window.onclick = function(event) {
+        if (event.target === modal) {
+            closeModal();
         }
+    };
 
-        function closeModal() {
-            modal.style.display = "none";
+    // Close with ESC key
+    document.addEventListener("keydown", function(event) {
+        if (event.key === "Escape") {
+            closeModal();
         }
+    });
 
-        // Close when clicking outside modal
-        window.onclick = function(event) {
-            if (event.target === modal) {
-                closeModal();
-            }
-        };
-
-        // Close with ESC key
-        document.addEventListener("keydown", function(event) {
-            if (event.key === "Escape") {
-                closeModal();
-            }
+    // Google Sign-In
+    async function handleCredentialResponse(response) {
+        const res = await fetch("/api/google-login", {
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                credential: response.credential
+            })
         });
 
-        // Google Sign-In
-        async function handleCredentialResponse(response) {
-            const res = await fetch("/api/google-login", {
-                method: "POST", 
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    credential: response.credential
-                })
-            });
+        const data = await res.json();
 
-            const data = await res.json();
-
-            if (data.success) {
-                if(data.role === "admin" || data.role === "tech") {
-                    window.location.href = "/admin";
-                } else if (data.role === "captain") {
-                    window.location.href = "/captain";
-                } else {
-                alert("You are not authorized.");
-                closeModal();
-                }
+        if (data.success) {
+            if(data.role === "admin" || data.role === "tech") {
+                window.location.href = "/admin";
+            } else if (data.role === "captain") {
+                window.location.href = "/captain";
+            } else {
+            alert("You are not authorized.");
+            closeModal();
             }
         }
+    }
 
-        function parseJwt(token) {
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            return JSON.parse(atob(base64));
-        }
-
+    function parseJwt(token) {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        return JSON.parse(atob(base64));
+    }
     </script>
-
-    </body>
+</body>
 </html>

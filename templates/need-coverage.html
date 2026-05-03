@@ -1,90 +1,17 @@
+<!-- 
+    TODO: Description of file
+-->
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Request Coverage</title>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 24px;
-            background: #f4f6f8;
-            color: #1f2937;
-        }
-
-        .container {
-            max-width: 700px;
-            margin: 0 auto;
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 24px;
-        }
-
-        h2 {
-            margin-top: 0;
-            margin-bottom: 8px;
-        }
-
-        p {
-            color: #6b7280;
-            margin-bottom: 20px;
-        }
-
-        .field {
-            margin-bottom: 16px;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-
-        select,
-        input,
-        textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-
-        .inline-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        button {
-            padding: 10px 14px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .primary {
-            background: #2563eb;
-            color: white;
-        }
-
-        .secondary {
-            background: #64748b;
-            color: white;
-        }
-
-        #partialFields {
-            display: none;
-        }
-    </style>
+    
+    <!-- Import style -->
+    <link rel="stylesheet" href="/style/coverage.css">
 </head>
 <body>
 
@@ -107,13 +34,13 @@
             </select>
         </div> -->
         <select id="volunteer_id" name="volunteer_id" required>
-    <option></option> <!-- placeholder -->
-    {% for v in volunteers %}
-        <option value="{{ v.id }}">
-            {{ v.first_name }} {{ v.last_name }}
-        </option>
-    {% endfor %}
-</select>
+            <option></option> <!-- placeholder -->
+            {% for v in volunteers %}
+                <option value="{{ v.id }}">
+                {{ v.first_name }} {{ v.last_name }}
+                </option>
+            {% endfor %}
+        </select>
 
         <div class="inline-row">
             <div class="field">
@@ -155,8 +82,8 @@
         </div>
 
         <div class="actions">
-            <button class="primary" type="submit">Save Absence</button>
-            <button class="secondary" type="button" onclick="window.location.href='/admin'">Back</button>
+            <button class="request" id="primary" type="submit">Save Absence</button>
+            <button class="request" id="secondary" type="button" onclick="window.location.href='/admin'">Back</button>
         </div>
     </form>
 </div>
