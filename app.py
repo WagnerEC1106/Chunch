@@ -1178,6 +1178,12 @@ def restore_reserve(volunteer_id):
 
 @app.route("/debug/find-volunteer/<name>")
 def find_volunteer(name):
+    """
+    Searches for volunteers whose names contain the given substring.
+
+    Performs a case-insensitive match against all active volunteers
+    and returns a list of matching volunteer IDs, names, and emails.
+    """
     matches = Volunteer.query\
         .filter(Volunteer.deleted_at.is_(None))\
         .all()
@@ -1196,6 +1202,13 @@ def find_volunteer(name):
 
 @app.route("/debug/reset-all-covering")
 def reset_all_covering():
+    """
+    Resets all covering assignments.
+
+    Moves all volunteers currently marked as covering back to the
+    Reserve station and clears all coverage-related fields.
+    Returns the number of assignments updated.
+    """
     try:
         reserve_station = Station.query.filter_by(station_name="Reserve").first()
         if not reserve_station:
@@ -2713,7 +2726,7 @@ def debug_assignments():
 @app.route("/admin/volunteer-hours")
 def volunteer_hours():
     """
-    View the schedules for each station on an hourly view. 
+    Debug route for inspecting assignment, station, and volunteer data.    
     """
     try:
         volunteers = Volunteer.query\
@@ -2896,7 +2909,7 @@ def volunteer_hours():
 @app.route("/admin/debug-hourly-matches")
 def debug_hourly_matches():
     """
-    TODO: Describe function
+    Debug route for comparing Google Sheet data with database volunteer records.    
     """
     volunteers = Volunteer.query\
         .filter(Volunteer.deleted_at.is_(None))\
@@ -3333,7 +3346,7 @@ def sync_volunteers():
 @app.route("/admin/need-coverage")
 def need_coverage():
     """
-    TODO: Describe function
+    Displays the "Need Coverage" page with eligible volunteers.
     """
     if "user_id" not in session:
         return redirect("/")
