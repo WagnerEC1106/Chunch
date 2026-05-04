@@ -291,8 +291,12 @@ def home():
 @app.route("/<path:path>")
 def static_files(path):
     """
-    TODO: Describe function
+    Serves static files from the project directory.
+
+    Allows routes such as CSS, JavaScript, images, and other frontend files
+    to be loaded directly when requested by the browser.
     """
+    
     return send_from_directory(".", path)
 
 # TODO: Update Docstring
@@ -300,8 +304,13 @@ def static_files(path):
 @app.route("/api/google-login", methods=["POST"])
 def google_login():
     """
-    TODO: Describe function
+    Authenticates a user through Google Sign-In.
+
+    Verifies the Google credential token, checks whether the user's email
+    belongs to an authorized account, stores login information in the session,
+    and returns the user's role to the frontend.
     """
+    
     GOOGLE_CLIENT_ID = os.environ["GOOGLE_CLIENT_ID"]
     token = request.json.get("credential")
 
@@ -345,8 +354,12 @@ def google_login():
 @app.route("/api/me")
 def me():
     """
-    TODO: Describe function
+    Returns information about the currently logged-in user.
+
+    If no user is logged in, returns an unauthorized error.
+    Otherwise, returns the user's email and role from the session.
     """
+    
     if "user_id" not in session:
         return jsonify({"error": "Not logged in"}), 401
 
@@ -610,8 +623,13 @@ def admin_absences():
 @app.route("/admin/edit-volunteer", methods=["POST"])
 def edit_volunteer():
     """
-    TODO: Describe function
+    Updates a volunteer's profile from JSON data.
+
+    Handles changes to personal information, role/account permissions,
+    floater status, and station assignment. If needed, this also creates
+    or deletes a UserAccount based on the selected role.
     """
+    
     data = request.get_json()
 
     volunteer = Volunteer.query.get_or_404(data["id"])
@@ -711,9 +729,13 @@ def captain_page():
 # TODO: Add comments
 @app.route("/api/google-logout", methods=["POST"])
 def google_logout():
+     """
+    Logs out the current user.
+
+    Clears the session if a user is logged in and redirects them to the
+    home page. If no user is logged in, returns a JSON response.
     """
-    TODO: Describe function
-    """
+    
     if "user_id" in session:
         session.clear()
         return redirect("/")
@@ -726,8 +748,13 @@ from datetime import date
 # TODO: Add comments
 def build_station_state(volunteers, stations):
     """
-    TODO: Describe function
+    Builds the current station assignment state for all volunteers.
+
+    Determines where each volunteer should appear based on their latest
+    assignment, active absences, and coverage responsibilities.
+    Returns both the station-to-volunteer mapping and debug output.
     """
+    
     today = date.today()
 
     debug_lines = []
@@ -832,8 +859,13 @@ def build_station_state(volunteers, stations):
 @app.route("/admin")
 def admin_page():
     """
-    TODO: Describe function
+    Displays the admin dashboard.
+
+    Redirects unauthenticated users to the home page and redirects captains
+    to the captain dashboard. Admins and tech users can view all active
+    volunteers ordered by last name.
     """
+    
     try:
         debug_admin = request.args.get("debug_admin") == "1"
 
@@ -860,8 +892,13 @@ def admin_page():
 @app.route("/admin/coverage/details")
 def coverage_details():
     """
-    TODO: Describe function
+    Displays coverage options for an absent volunteer.
+
+    Finds the absent volunteer, determines their absence details, calculates
+    shift coverage needs, and identifies reserve volunteers who are fully
+    or partially available to cover the absence.
     """
+    
     volunteer_id = request.args.get("volunteer_id", type=int)
     covered_start = request.args.get("covered_start", type=int)
     covered_end = request.args.get("covered_end", type=int)
@@ -1103,8 +1140,12 @@ def coverage_details():
 @app.route("/debug/restore-reserve/<int:volunteer_id>")
 def restore_reserve(volunteer_id):
     """
-    TODO: Describe function
+    Debug route that resets a volunteer back to the Reserve station.
+
+    Deletes existing assignments for the volunteer and creates a clean
+    Reserve assignment with all absence and coverage fields cleared.
     """
+    
     try:
         reserve_station = Station.query.filter_by(station_name="Reserve").first()
         if not reserve_station:
@@ -2204,8 +2245,12 @@ def delete_applicant(applicants_id):
 @app.route("/admin/master-list")
 def master_list():
     """
-    TODO: Describe function
+    Displays the master volunteer list.
+
+    Retrieves all active volunteers, parses their shift times, determines
+    their roles, and sends formatted volunteer data to the master list page.
     """
+    
     volunteers = Volunteer.query\
         .filter(Volunteer.deleted_at.is_(None))\
         .order_by(Volunteer.last_name)\
@@ -2285,7 +2330,11 @@ def master_list():
 @app.route("/admin/master-list/add-volunteer", methods=["POST"])
 def add_volunteer():
     """
-    TODO: Describe function
+    Adds a new volunteer from the master list form.
+
+    Creates the volunteer record, assigns availability hours, creates an
+    optional UserAccount for privileged roles, creates an initial station
+    assignment, and grants Google Drive access.
     """
     if "user_id" not in session:
         return redirect("/")
@@ -2379,8 +2428,13 @@ def add_volunteer():
 @app.route("/admin/master-list/edit-volunteer/<int:volunteer_id>", methods=["POST", "GET"])
 def edit_master_volunteer(volunteer_id):
     """
-    TODO: Describe function
+    Edits an existing volunteer from the master list.
+
+    Loads the selected volunteer, updates their personal information,
+    role, shift availability, and station assignment, then saves the
+    changes to the database.
     """
+    
     if "user_id" not in session:
         return redirect("/")
     
