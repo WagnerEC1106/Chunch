@@ -99,7 +99,7 @@ button:hover { opacity: 0.9; }
     margin: 0 auto;
 }
 
-.top-bar {
+.top-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
