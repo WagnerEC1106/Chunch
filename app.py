@@ -735,7 +735,6 @@ def google_logout():
     Clears the session if a user is logged in and redirects them to the
     home page. If no user is logged in, returns a JSON response.
     """
-    
     if "user_id" in session:
         session.clear()
         return redirect("/")
@@ -754,7 +753,6 @@ def build_station_state(volunteers, stations):
     assignment, active absences, and coverage responsibilities.
     Returns both the station-to-volunteer mapping and debug output.
     """
-    
     today = date.today()
 
     debug_lines = []
@@ -865,7 +863,6 @@ def admin_page():
     to the captain dashboard. Admins and tech users can view all active
     volunteers ordered by last name.
     """
-    
     try:
         debug_admin = request.args.get("debug_admin") == "1"
 
@@ -898,7 +895,6 @@ def coverage_details():
     shift coverage needs, and identifies reserve volunteers who are fully
     or partially available to cover the absence.
     """
-    
     volunteer_id = request.args.get("volunteer_id", type=int)
     covered_start = request.args.get("covered_start", type=int)
     covered_end = request.args.get("covered_end", type=int)
@@ -1145,7 +1141,6 @@ def restore_reserve(volunteer_id):
     Deletes existing assignments for the volunteer and creates a clean
     Reserve assignment with all absence and coverage fields cleared.
     """
-    
     try:
         reserve_station = Station.query.filter_by(station_name="Reserve").first()
         if not reserve_station:
@@ -2250,7 +2245,6 @@ def master_list():
     Retrieves all active volunteers, parses their shift times, determines
     their roles, and sends formatted volunteer data to the master list page.
     """
-    
     volunteers = Volunteer.query\
         .filter(Volunteer.deleted_at.is_(None))\
         .order_by(Volunteer.last_name)\
@@ -2434,7 +2428,6 @@ def edit_master_volunteer(volunteer_id):
     role, shift availability, and station assignment, then saves the
     changes to the database.
     """
-    
     if "user_id" not in session:
         return redirect("/")
     
