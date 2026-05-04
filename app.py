@@ -105,7 +105,7 @@ class Applicant(db.Model, SoftDeleteMixin):
     unavailability = Column(String(500))
     
 # creating user account class
-Class UserAccount(db.Model):
+class UserAccount(db.Model):
     """
     Represents login credentials and roles for privileged users.
 
