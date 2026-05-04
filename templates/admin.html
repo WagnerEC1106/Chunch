@@ -944,7 +944,9 @@ document.addEventListener("click", function (e) {
     e.preventDefault();
 }, true);
 
+// Meant to be used with logout button but doesn't work
 async function logOut() {
+    // Function being fetched only checks if the user is authorized
     const res = await fetch("/api/google-logout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
