@@ -2399,7 +2399,7 @@ def add_volunteer():
     last_name = request.form.get("last_name", "").strip()
     email = request.form.get("email", "").strip().lower()
     phone = request.form.get("phone", "").strip()
-    role = request.form.get("role", "").strip().lower()
+    # role = request.form.get("role", "").strip().lower()
     station_id = request.form.get("station_id", type=int)
     start_hour = request.form.get("start_hour", type=int)
     end_hour = request.form.get("end_hour", type=int)
@@ -2413,8 +2413,8 @@ def add_volunteer():
         return "Invalid time range", 400
     
     # Default role to Volunteer if none is assigned
-    if role is None:
-        role = "volunteer"
+    # if role is None:
+    #     role = "volunteer"
     
     # Default station to Reserve if none is assigned
     if station_id is None:
@@ -2534,8 +2534,6 @@ def edit_master_volunteer(volunteer_id):
         # Assignment information
         if assignment:
             assignment.station_id = station_id
-        if role == "tech":
-            assignment.station_id = None
         
         db.session.commit()
     return redirect("/admin/master-list")
