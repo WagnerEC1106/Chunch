@@ -41,10 +41,16 @@ This project entails a volunteer management system for the Chunch organization a
   * README: Description of migrations: "Single-database configuration for Flask."
   * script.py.mako: Template used by Alembic to generate new migration scripts.
 * style: All CSS style code for the `.html` files in `/templates`.
+  * absence.css: Corresponds to `absence-forms.html`.
+  * admin.css: Corresponds to `admin.html`.
   * application.css: Corresponds to`applicant-detail.html` & `application_received.html`.
+  * captain.css: Corresponds to `captain.html`.
   * contribute.css: Style code for public-facing "Contribute" page; corresponds to `contribute.html`.
   * coverage.css: Corresponds to `coverage-details.html` & `need-coverage.html`. 
+  * deleted.css: Corresponds to `deleted-volunteers.html`.
   * home.css: Style code for public-facing "Home" page; corresponds to `index.html`.
+  * hourly-view.css: Corresponds to `volunteer-hours.html`
+  * inbox.css: Corresponds to `inbox.html`.
   * master-list.css: Corresponds to `master-list.html`.
   * meet-the-team.css: Style code for public-facing "Meet The Team" page; corresponds to `meet-the-team.html`.
   * public.css: Incomplete file that would hold all style code for public-facing components.
