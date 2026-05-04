@@ -40,7 +40,8 @@ db = SQLAlchemy(model_class=Base)
 db_url = os.environ.get("DATABASE_URL")
 if not db_url:
     db_url = "sqlite:///local.db"   # local dev
-#render sometimes gives postgres://, sqlalchemy needs postgresql://
+    
+# Render sometimes gives postgres://, sqlalchemy needs postgresql://
 elif db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
 
@@ -50,12 +51,15 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 # creating a volunteer class
-#class Volunteer(db.Model, SoftDeleteMixin):
-# TODO: Fill out Docstring
 class Volunteer(db.Model, SoftDeleteMixin):
     """
-    TODO: Describe class
+    Represents an active volunteer in the system.
+
+    Stores personal information, contact details, scheduling preferences,
+    and their current assigned station. Each volunteer may optionally have
+    a linked UserAccount if they have elevated permissions (admin/captain/tech).
     """
+    
     __tablename__ = "volunteers"
 
     id = Column(Integer, primary_key=True)
@@ -73,11 +77,13 @@ class Volunteer(db.Model, SoftDeleteMixin):
     station = relationship("Station", foreign_keys=[station_id])
     account = relationship("UserAccount", back_populates="volunteer", uselist=False)
 
-#for people signing up to volunteer that will be placed in inbox
-# TODO: Fill out Docstring
+# for people signing up to volunteer that will be placed in inbox
 class Applicant(db.Model, SoftDeleteMixin):
     """
-    TODO: Describe class
+    Represents a person who has applied to become a volunteer.
+
+    Applicants are initially stored here with a 'pending' status and can be
+    accepted or rejected. Once accepted, they are converted into a Volunteer.
     """
     __tablename__ = "applicants"
 
@@ -99,11 +105,12 @@ class Applicant(db.Model, SoftDeleteMixin):
     unavailability = Column(String(500))
     
 # creating user account class
-# only admins and captains should have be on this table
-# TODO: Fill out Docstring
-class UserAccount(db.Model):
+Class UserAccount(db.Model):
     """
-    TODO: Describe class
+    Represents login credentials and roles for privileged users.
+
+    Only admins, captains, and tech users should have accounts.
+    Links directly to a Volunteer and controls access permissions.
     """
     __tablename__ = "user_account"
 
@@ -123,10 +130,12 @@ class UserAccount(db.Model):
     volunteer = relationship("Volunteer", back_populates="account")
 
 # creating a stations table
-# TODO: Fill out Docstring
 class Station(db.Model):
     """
-    TODO: Describe class
+    Represents a work station at Chunch
+
+    Each station is identified by a predefined enum value and is used to
+    assign volunteers to specific roles during scheduling.
     """
     __tablename__ = "station"
 
@@ -154,10 +163,12 @@ class Station(db.Model):
         )
     )
 
-# TODO: Fill out Docstring
 class Absence(db.Model):
     """
-    TODO: Describe class
+    Represents a volunteer's absence over a date range.
+
+    Supports both full-day and partial absences (specific hours).
+    Used for scheduling logic and assigning coverage.
     """
     __tablename__ = "absences"
 
@@ -174,10 +185,11 @@ class Absence(db.Model):
     volunteer = relationship("Volunteer", backref="absences")
 
 # creating schedule table
-# TODO: Fill out Docstring
 class Schedule(db.Model, SoftDeleteMixin):
     """
-    TODO: Describe class
+    Represents a scheduled date and time block for assignments.
+
+    Used to organize when volunteers are assigned to stations.
     """
     __tablename__ = "schedule"
 
@@ -187,10 +199,12 @@ class Schedule(db.Model, SoftDeleteMixin):
     time = Column(Time)
 
 # creating assignment table
-# TODO: Fill out Docstring
 class Assignment(db.Model):
     """
-    TODO: Describe class
+    Represents a volunteer's assignment to a station and schedule.
+
+    Handles normal assignments, absences, and coverage logic
+    (including who is covering for whom and during what hours).
     """
     __tablename__ = "assignments"
 
@@ -214,10 +228,12 @@ class Assignment(db.Model):
     schedule = relationship("Schedule", backref="assignments")
     
 # creating a class that will store the availiablity hours for each person
-# TODO: Fill out Docstring
 class Availability(db.Model, SoftDeleteMixin):
     """
-    TODO: Describe class
+    Represents the hourly availability of a volunteer.
+
+    Each record corresponds to a single hour the volunteer is available
+    to work. Used for scheduling and coverage matching.
     """
     __tablename__ = "availability"
 
@@ -262,7 +278,6 @@ with app.app_context():
 
     db.session.commit()
         
-# TODO: Verify correctness of Docstring
 # Serve your existing HTML pages
 @app.route("/")
 def home():
@@ -327,8 +342,6 @@ def google_login():
     
     return jsonify({"success": True, "role": user.role})
 
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/api/me")
 def me():
     """
@@ -345,6 +358,7 @@ def me():
 # ABSENCES
 # TODO: Update Docstring
 # TODO: Update/verify comments
+
 @app.route("/admin/load-absences", methods=["POST"])
 def load_absences():
     """
