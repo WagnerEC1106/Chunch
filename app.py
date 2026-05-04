@@ -729,7 +729,7 @@ def captain_page():
 # TODO: Add comments
 @app.route("/api/google-logout", methods=["POST"])
 def google_logout():
-     """
+    """
     Logs out the current user.
 
     Clears the session if a user is logged in and redirects them to the
@@ -1229,6 +1229,11 @@ def reset_all_covering():
 
 @app.route("/admin/absence/update", methods=["POST"])
 def update_absence():
+    """
+    Updates an existing volunteer absence.
+    
+    Supports extending, shortening, or ending an absence and can optionally reset reserve coverage assignments.
+    """
     data = request.get_json()
 
     volunteer_id = data.get("volunteer_id")
@@ -1305,6 +1310,11 @@ def update_absence():
 
 @app.route("/meet-the-team")
 def meet_the_team():
+    """
+    Displays participating Meet the Team volunteers.
+    
+    Loads approved team member information from the Google Sheet, randomizes the order, and renders the Meet the Team page.
+    """
     try:
         sheet = get_sheet()
         worksheet = sheet.spreadsheet.worksheet("Meet the Team")
@@ -1346,6 +1356,11 @@ def meet_the_team():
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
 def send_coverage_email(to_email, reserve_name, station_name):
+    """
+    Sends a coverage assignment email to a reserve volunteer.
+    
+    Builds an email message with the assigned station and training material link, then sends it through SMTP.
+    """
     smtp_email = "YOUR_EMAIL@gmail.com"
     smtp_password = "YOUR_APP_PASSWORD"
 
@@ -1376,6 +1391,11 @@ def send_coverage_email(to_email, reserve_name, station_name):
     
 @app.route("/admin/coverage/assign", methods=["POST"])
 def assign_reserve_coverage():
+    """
+    Assigns a reserve volunteer to cover an absent volunteer.
+    
+    Validates the absence and reserve volunteer, determines coverage hours, creates a coverage assignment, and removes the handled absence form row from the sheet when applicable.
+    """
     try:
         if "user_id" not in session:
             return redirect("/")
@@ -1625,6 +1645,11 @@ def assign_reserve_coverage():
 
 @app.route("/admin/need-coverage/save", methods=["POST"])
 def save_need_coverage():
+    """
+    Saves a manually created absence that needs coverage.
+    
+    Validates the absence dates and optional partial-hour range, creates an Absence record, and redirects to the coverage details page.
+    """
     try:
         if "user_id" not in session:
             return redirect("/")
@@ -1680,6 +1705,11 @@ def save_need_coverage():
 
 @app.route("/debug/reset-all", methods=["GET"])
 def reset_all():
+    """
+    Debug route that clears all absence and coverage state.
+    
+    Resets assignment coverage fields and deletes all stored absences.
+    """
     try:
         # 1. Reset ALL assignments
         assignments = Assignment.query.all()
@@ -1709,6 +1739,11 @@ def reset_all():
 
 @app.route("/admin/debug-hourly-final")
 def debug_hourly_final():
+    """
+    Builds the final station-board data used for debugging hourly assignments.
+    
+    Combines volunteer records, Google Sheet data, absences, and latest assignments to return station-to-volunteer data as JSON.
+    """
     try:
         from datetime import datetime
 
@@ -1997,6 +2032,11 @@ def debug_hourly_final():
 
 @app.route("/admin/debug-other-check")
 def debug_other_check():
+    """
+    Debug route that compares active volunteers with assigned volunteers.
+    
+    Returns assignment IDs and sample matching data to help diagnose unassigned volunteer issues.
+    """
     volunteers = Volunteer.query\
         .filter(Volunteer.deleted_at.is_(None))\
         .order_by(Volunteer.id)\
@@ -2028,6 +2068,11 @@ def debug_other_check():
 
 @app.route("/admin/debug-hourly-data")
 def debug_hourly_data():
+    """
+    Debug route that returns hourly availability and assignment data.
+    
+    Parses volunteer availability into ranges and groups volunteers by station for inspection.
+    """
     volunteers = Volunteer.query\
         .filter(Volunteer.deleted_at.is_(None))\
         .order_by(Volunteer.last_name, Volunteer.first_name)\
@@ -2136,6 +2181,11 @@ def debug_hourly_data():
 
 @app.route("/admin/inbox")
 def inbox():
+    """
+    Displays the applicant inbox.
+    
+    Loads pending and rejected applicants along with stations and schedules for the inbox page.
+    """
     applicants = Applicant.query.filter(Applicant.status == 'pending').all()
     rejected = Applicant.query.filter(Applicant.status == 'rejected').all()
 
@@ -2146,6 +2196,11 @@ def inbox():
 
 @app.route("/admin/inbox/accept-with-assignment", methods=["POST"])
 def accept_applicant():
+    """
+    Accepts an applicant and converts them into a volunteer.
+    
+    Creates the volunteer record, availability rows, initial station assignment, typical shift label, and marks the applicant as accepted.
+    """
     if "user_id" not in session:
         return redirect("/")
     applicants_id = request.form.get("applicant_id", type=int)
@@ -2204,6 +2259,9 @@ def accept_applicant():
 
 @app.route("/admin/inbox/reject/<int:applicants_id>", methods=["POST"])
 def reject_applicant(applicants_id):
+    """
+    Marks an applicant as rejected and returns to the inbox.
+    """
     if "user_id" not in session:
         return redirect("/")
     applicant = Applicant.query.get_or_404(applicants_id)
@@ -2214,6 +2272,9 @@ def reject_applicant(applicants_id):
 
 @app.route("/admin/inbox/pending/<int:applicants_id>", methods=["POST"])
 def undo_rejection(applicants_id):
+    """
+    Moves a rejected applicant back to pending status.
+    """
     if "user_id" not in session:
         return redirect("/")
     applicant = Applicant.query.get_or_404(applicants_id)
@@ -2224,6 +2285,9 @@ def undo_rejection(applicants_id):
 
 @app.route("/admin/inbox/delete/<int:applicants_id>", methods=["POST"])
 def delete_applicant(applicants_id):
+    """
+    Deletes an applicant from the inbox permanently.
+    """
     if "user_id" not in session:
         return redirect("/")
 
@@ -2502,7 +2566,7 @@ def edit_master_volunteer(volunteer_id):
 @app.route("/admin/master-list/delete-volunteer/<int:volunteer_id>", methods=["POST"])
 def delete_volunteer(volunteer_id):
     """
-    TODO: Describe function
+    Soft deletes a volunteer from the master list.
     """
     if "user_id" not in session:
         return redirect("/")
@@ -2518,7 +2582,7 @@ def delete_volunteer(volunteer_id):
 @app.route("/admin/master-list/deleted-volunteers")
 def view_deleted():
     """
-    TODO: Describe function
+    Takes you to a new page to view all volunteers who have been soft deleted. 
     """
     if "user_id" not in session:
         return redirect("/")
@@ -2531,7 +2595,7 @@ def view_deleted():
 @app.route("/admin/master-list/deleted-volunteers/permadelete/<int:volunteer_id>", methods=["POST"])
 def perma_delete(volunteer_id):
     """
-    TODO: Describe function
+    Permanently delete a volunteer from the master list, along with any records in the database. 
     """
     if "user_id" not in session:
         return redirect("/")
@@ -2558,7 +2622,7 @@ def perma_delete(volunteer_id):
 @app.route("/admin/master-list/deleted-volunteers/undo/<int:volunteer_id>", methods=["POST"])
 def undo_delete(volunteer_id):
     """
-    TODO: Describe function
+    Move a volunteer from the deleted page back into the master list. 
     """
     if "user_id" not in session:
         return redirect("/")
@@ -2573,7 +2637,7 @@ def undo_delete(volunteer_id):
 @app.route("/student-spotlight")
 def student_spotlight():
     """
-    TODO: Describe function
+    Auto populates the student spotlight page with information from filled out Google Form. 
     """  
     try:
         sheet = get_spotlight_sheet()
@@ -2649,7 +2713,7 @@ def debug_assignments():
 @app.route("/admin/volunteer-hours")
 def volunteer_hours():
     """
-    TODO: Describe function
+    View the schedules for each station on an hourly view. 
     """
     try:
         volunteers = Volunteer.query\
@@ -2904,12 +2968,12 @@ def debug_hourly_matches():
 # TODO: Add comments
 def seed_admin():
     """
-    TODO: Describe function
+    Add an admin manually by routing to this page. 
     """
     
-    email = "anthonyb@southwestern.edu"   # must match Google email
-    first_name = "Barbara"
-    last_name = "Anthony"
+    email = ""   # must match Google email
+    first_name = "" # change to first name of email owner
+    last_name = "" # change to last name of email owner
     
     volunteer = Volunteer.query.filter_by(email=email).first()
     if not volunteer:
@@ -2948,7 +3012,7 @@ from google.oauth2.service_account import Credentials
 # TODO: Add comments
 def get_sheet():
     """
-    TODO: Describe function
+    Retrieves the Google Sheet named "Chunch Volunteer Info" and the tab "Volunteer Information"
     """
     creds_dict = json.loads(os.environ["GOOGLE_SERVICE_JSON"])
 
@@ -2970,7 +3034,7 @@ def get_sheet():
 # TODO: Add comments
 def get_applicant_sheet():
     """
-    TODO: Describe function
+    Retrieves the Google Sheet named "Chunch Volunteer Info" and the tab "Applicant Information"
     """
     creds_dict = json.loads(os.environ["GOOGLE_SERVICE_JSON"])
 
@@ -2989,7 +3053,7 @@ def get_applicant_sheet():
 # TODO: Add comments
 def get_spotlight_sheet():
     """
-    TODO: Describe function
+    Retrieves the Google Sheet named "Chunch Volunteer Info" and the tab "Spotlight"
     """
     creds_dict = json.loads(os.environ["GOOGLE_SERVICE_JSON"])
 
@@ -3010,7 +3074,7 @@ def get_spotlight_sheet():
 @app.route("/admin/inbox/<int:applicant_id>")
 def applicant_detail(applicant_id):
     """
-    TODO: Describe function
+    Retrieves applicant information from Applicant table
     """
     applicant = Applicant.query.get_or_404(applicant_id)
     return render_template("applicant-detail.html", applicant=applicant)
@@ -3021,7 +3085,7 @@ def applicant_detail(applicant_id):
 @app.route("/admin/sync-applicants", methods=["GET", "POST"])
 def sync_applicants():
     """
-    TODO: Describe function
+    Function that updates the inbox based on the Google sheet.
     """
     if "user_id" not in session:
         return redirect("/")
@@ -3082,7 +3146,7 @@ def sync_applicants():
 # TODO: Add comments
 def get_drive_service():
     """
-    TODO: Describe function
+    Retrieve the Google Drive service. 
     """
     creds_dict = json.loads(os.environ["GOOGLE_DRIVE_JSON"])
 
@@ -3102,7 +3166,7 @@ DRIVE_FOLDER_ID = "1IwmKyFWKEvAB86WKg9I7C9N1BBvrSzD-"
 # TODO: Add comments
 def grant_drive_access(email):
     """
-    TODO: Describe function
+    Grant someone viewing permissions to the Chunch Google Drive.
     """
     service = get_drive_service()
 
@@ -3126,7 +3190,7 @@ def grant_drive_access(email):
 @app.route("/admin/sync-volunteers", methods=["GET", "POST"])
 def sync_volunteers():
     """
-    TODO: Describe function
+    Update the master list based on the Chunch Volunteer Info Google Sheet. 
     """    
     try:
         if "user_id" not in session:
@@ -3298,45 +3362,3 @@ def need_coverage():
 
     return render_template("need-coverage.html", volunteers=filtered_volunteers)
 
-#attempting to write a flask cli command to add admins
-import click
-from flask.cli import with_appcontext
-
-@app.cli.command("create-admin")
-@click.argument("email")
-@click.argument("first_name")
-@click.argument("last_name")
-@with_appcontext
-
-# TODO: Update Docstring
-# TODO: Add comments
-def create_admin(email, first_name, last_name):
-    """
-    TODO: Describe function
-    """
-    volunteer = Volunteer.query.filter_by(email=email).first()
-
-    if not volunteer:
-        volunteer = Volunteer(
-            first_name=first_name,
-            last_name=last_name,
-            email=email
-        )
-        db.session.add(volunteer)
-        db.session.flush() #adds without actually committing so we can get ID
-
-    existing = UserAccount.query.filter_by(volunteer_id=volunteer.id).first()
-
-    if existing: 
-        click.echo("User already has an account")
-        return
-    admin = UserAccount(
-        volunteer_id=volunteer.id,
-        password="stilltesting",
-        role="admin"
-    )
-    db.session.add(admin)
-
-    db.session.commit()
-
-    click.echo(f"admin privileges given to {email}")
