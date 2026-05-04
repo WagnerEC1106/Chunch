@@ -57,12 +57,12 @@ This project entails a volunteer management system for the Chunch organization a
   * student.css: Style code for public-facing "Student Spotlight" page; corresponds to `student-spotlight.html`.
   * volunteer.css: Style code for public-facing "Volunteer" page; corresponds to `volunteer-intro-vids.html`.
 * templates: All `.html` code files for all webpages. 
-  * absence-forms.html: __EVELYN__
+  * absence-forms.html: Creates absence form button and gets all submitted absences.
   * admin.html: Dashboard for users with the admin or tech role.
-  * applicant-detail.html: __EVELYN__
-  * application_received.html: __EVELYN__
+  * applicant-detail.html: Inside absence forms and showing the absence forms and their corresponding information for each volunteer.
+  * application_received.html: Shows short message after receiving new volunteer application.
   * captain.html: Dashboard for users with the captain role, accessible by admin & tech roles.
-  * coverage-details.html: __EVELYN__
+  * coverage-details.html: Finds volunteers that can cover an absent volunteer.
   * deleted-volunteers.html: Table of volunteers and their information that were chosen to be deleted from the master list. Volunteers can be either permanently deleted or restored to the master list.
   * inbox.html: Inbox accessible through the admin dashboard that allows the user to accept or decline new volunteer applicants.
   * index.html: Public-facing component "Home" page.
@@ -70,7 +70,7 @@ This project entails a volunteer management system for the Chunch organization a
   * meet-the-team.html: Public-facing component "Meet the Team" page.
   * need-coverage.html: Page that is accessible through either dashboard for captains and admins to find coverage and submit absences for volunteers.
   * student-spotlight.html: Public-facing component "Student Spotlight" page.
-  * volunteer-hours.html: Hourly view __EVELYN__
+  * volunteer-hours.html: Hourly view for admins. Returns user to admin page.
   * volunteer-intro-vids.html: Public-facing component "Volunteer" page.
 * app.py: Main Flask application containing all routes and core logic.
 * credentials.json: Stores credentials for Google API access (used for Sheets integration).
