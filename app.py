@@ -2411,9 +2411,12 @@ def add_volunteer():
         return "Start and end hour are required", 400
     if end_hour <= start_hour:
         return "Invalid time range", 400
+    
+    # Default role to Volunteer if none is assigned
+    if role is None:
+        role = "volunteer"
+    
     # Default station to Reserve if none is assigned
-    if role == "tech":
-        station_id = None
     if station_id is None:
         station_id = 9
     

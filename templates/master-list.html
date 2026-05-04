@@ -68,12 +68,14 @@
                 <select name="start_hour" required>
                     <!-- Time range 5AM - 3PM -->
                     {% for h in range(5, 15) %}
+                    <option value="">—</option>
                     <option value="{{ h }}">{{ h }}</option>
                     {% endfor %}
                 </select>
                 <label>End Hour:</label>
                 <select name="end_hour" required>
                     <!-- Time range 6AM - 4PM -->
+                    <option value="">—</option>
                     {% for h in range(6, 16) %}
                         <option value="{{ h }}">{{ h }}</option>
                     {% endfor %}
