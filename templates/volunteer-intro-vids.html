@@ -1,5 +1,7 @@
 <!-- 
-    TODO: Description of file
+    This file contains the HTML and JavaScript code that creates the
+    public-facing Volunteer page. It displays volunteer expectations 
+    and an introductory video.
 -->
 <!DOCTYPE html>
 <html lang="en-US">
@@ -9,14 +11,14 @@
     
     <title>Volunteer Intro</title>
 
-    <!-- Import font & style -->
+    <!-- Import fonts & page-specific stylesheet -->
     <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/style/volunteer.css">
 </head>
 <body>
 
-<!-- Navbar -->
+<!-- Navigation bar -->
 <nav class="navbar">
     <a href="/">HOME</a>
     <a href="/meet-the-team">MEET THE TEAM</a>
@@ -25,10 +27,10 @@
     <a href="/student-spotlight">STUDENTS</a>
 </nav>
 
-<!-- Main layout -->
+<!-- Main content layout -->
 <div class="container">
 
-    <!-- Left info -->
+    <!-- Left side: volunteer expectations -->
     <div class="info-section">
         <h2>Volunteer Expectations</h2>
         <p>Three Pillars of Chunch:</p>
@@ -37,30 +39,37 @@
         <p>Serve them well (with a home cooked meal, of course!)</p>
     </div>
 
-    <!-- Right video -->
+    <!-- Right side: intro video and next button -->
     <div class="video-section">
         <iframe width="560" height="315" src="https://www.youtube.com/embed/2XoXhTPYL0Y?si=pA7meUpEGNUP0I0O" 
-            title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            title="YouTube video player" frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
             referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
         </iframe>
-        <button class="next-btn" id="nextButton" onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSc_DALi0Rh5Zaxza1IOsTjc_zJ8j5m791TXfDoAI2uAG0Nvlw/viewform?usp=header')">Next</button>
+
+        <!-- Button to proceed to volunteer form -->
+        <button class="next-btn" id="nextButton"
+            onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSc_DALi0Rh5Zaxza1IOsTjc_zJ8j5m791TXfDoAI2uAG0Nvlw/viewform?usp=header')">
+            Next
+        </button>
     </div>
 
 </div>
 
-<!-- Help button -->
+<!-- Floating help button -->
 <button class="help-btn" onclick="showHelp()">?</button>
 
 <script>
-// Show Next button after video ends
+// Attempt to show Next button after video ends
+// (Note: iframe videos cannot trigger "ended" events this way)
 const video = document.getElementById("volunteerInfo");
 const nextButton = document.getElementById("nextButton");
 
-video.addEventListener("ended", () => {
+video?.addEventListener("ended", () => {
     nextButton.style.display = "inline-block";
 });
 
-// Help button
+// Help button alert
 function showHelp() {
     alert("Having issues? Contact Bryan Scott at: (512) 864-4866.");
 }
