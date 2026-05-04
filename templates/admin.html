@@ -880,13 +880,12 @@ function editVolunteer() {
         option.value = station.id;      // numeric ID
         option.textContent = station.name;
 
-        if (station.id === currentVolunteer.station_id) { // use numeric comparison
+        if (station.name === currentVolunteer.station) { // use numeric comparison
             option.selected = true;
         }
 
         stationSelect.appendChild(option);
     });
-    stationSelect.value = currentVolunteer.station_id || "";
     document.getElementById("editBtn").style.display = "none";
     document.getElementById("saveBtn").style.display = "inline-block";
     
